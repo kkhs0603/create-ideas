@@ -1,20 +1,18 @@
-import React, { useContext } from 'react';
-import Style from './SelectRandomWords.module.scss';
-import Label from '../../atoms/Label/Label';
-import InputNumber from '../../atoms/InputNumber/InputNumber';
-import { FormControlLabel, Switch, withStyles } from '@material-ui/core';
-import { green } from '@material-ui/core/colors';
-import { Store } from '../../../store/index';
+import React from "react";
+import Style from "./SelectRandomWords.module.scss";
+import Label from "../../atoms/Label/Label";
+import InputNumber from "../../atoms/InputNumber/InputNumber";
+import { FormControlLabel, Switch, withStyles } from "@material-ui/core";
+import { green } from "@material-ui/core/colors";
 
 const SelectRandomWords = (props) => {
-  const { globalState, setGlobalState } = useContext(Store);
   const GreenSwitch = withStyles({
     switchBase: {
       color: green[300],
-      '&$checked': {
+      "&$checked": {
         color: green[500],
       },
-      '&$checked + $track': {
+      "&$checked + $track": {
         backgroundColor: green[500],
       },
     },
@@ -23,14 +21,8 @@ const SelectRandomWords = (props) => {
   })(Switch);
 
   const swichChange = () => {
-    console.log('switch changed');
-    if (globalState.enableRandomWords) {
-      console.log('disable');
-      setGlobalState({ type: 'SET_ENABLE_RANDOM_WORDS', payload: { enableRandomWords: false } });
-    } else {
-      console.log('enable');
-      setGlobalState({ type: 'SET_ENABLE_RANDOM_WORDS', payload: { enableRandomWords: true } });
-    }
+    console.log("switch changed");
+    props.enableRandomWords(props.enable);
   };
   return (
     <div className={Style.selectRandomWords}>
@@ -39,7 +31,7 @@ const SelectRandomWords = (props) => {
       </div>
       <div className={Style.numeric}>
         <InputNumber
-          enable={globalState.enableRandomWords}
+          enable={props.enable}
           type="random"
           increment={props.changeRandomWordsCount.increment}
           decrement={props.changeRandomWordsCount.decrement}
@@ -50,11 +42,7 @@ const SelectRandomWords = (props) => {
       <div className={Style.switch}>
         <FormControlLabel
           control={
-            <GreenSwitch
-              checked={globalState.enableRandomWords}
-              onChange={swichChange}
-              name="checkedA"
-            />
+            <GreenSwitch checked={props.enable} onChange={swichChange} />
           }
         />
       </div>
