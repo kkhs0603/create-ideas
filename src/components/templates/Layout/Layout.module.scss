@@ -1,0 +1,26 @@
+@font-face {
+  font-family: 'logoType';
+  src: url('../../../LogoTypeGothic.otf') format('opentype');
+}
+
+.wrapper {
+  font-family: 'LogoType';
+  width: 100%;
+  min-height: 100vh;
+  background: rgb(252, 245, 227);
+  text-align: center;
+  .main {
+    margin: 0 auto;
+    padding-top: 56px;
+    width: 90%;
+    font-size: 40px;
+    background: rgb(252, 245, 227);
+    @media screen and (max-width: 960px) {
+      max-width: 90%;
+      margin: 0 auto;
+      flex-direction: column;
+    }
+    @media screen and (max-width: 640px) {
+    }
+  }
+}

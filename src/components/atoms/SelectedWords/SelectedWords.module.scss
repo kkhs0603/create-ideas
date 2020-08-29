@@ -1,0 +1,15 @@
+.wrapper {
+  display: block;
+  .selectedWords {
+    display: inline;
+  }
+  .cross {
+    display: inline;
+    color: gray;
+    font-size: 25px;
+  }
+  .word {
+    display: inline;
+    font-size: 25px;
+  }
+}

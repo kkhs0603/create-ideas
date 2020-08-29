@@ -1,0 +1,38 @@
+.header {
+  z-index: 10;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  height: 56px;
+  width: 100%;
+  background-color: #4587f9;
+  color: white;
+  align-items: center;
+  span {
+    margin-left: 10px;
+  }
+  .profile {
+    margin: 10px 5px 0 auto;
+    button {
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    img {
+      display: block;
+      border: 2px solid white;
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+    }
+  }
+  // span {
+  //   position: relative;
+  //   text-align: center;
+  //   align-items: center;
+  //   display: flex;
+  //   justify-content: center;
+  //   margin: 0px auto;
+  // }
+}

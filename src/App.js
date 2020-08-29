@@ -1,25 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Top from "./pages/TopPage";
+import Main from "./pages/MainPage";
+import { AuthProvider } from "./contexts/Auth";
+import Router from "./components/Router";
+import { LoadPage } from "./pages/LoadPage";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <Router
+        renderMain={() => <Main />}
+        renderLogin={() => <Top />}
+        renderLoading={() => <LoadPage />}
+      />
+    </AuthProvider>
   );
 }
 

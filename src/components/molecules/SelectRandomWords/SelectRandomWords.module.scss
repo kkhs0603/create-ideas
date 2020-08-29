@@ -1,0 +1,57 @@
+.selectRandomWords {
+  display: grid;
+  grid-template-columns: 300px 500px 1fr;
+  grid-template-rows: 1fr;
+  margin: 80px 30px;
+  text-align: left;
+  .label {
+    grid-column: 1;
+    font-size: 30px;
+  }
+  .numeric {
+    grid-column: 2;
+    margin-left: 50px;
+  }
+  .switch {
+    margin-left: 30px;
+  }
+  @media screen and (max-width: 1000px) {
+    grid-template-rows: 60px 60px;
+    grid-template-columns: 70% 30%;
+    .label {
+      grid-row: 1;
+      grid-column: 1 / span 2;
+      width: 100%;
+    }
+    .numeric {
+      grid-row: 2;
+      grid-column: 1;
+      width: 100%;
+    }
+    .switch {
+      grid-row: 2;
+      grid-column: 2;
+      margin-right: 0px;
+    }
+  }
+  @media screen and (max-width: 640px) {
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 75% 1fr;
+    font-size: 20px;
+    margin: 10px 30px;
+    .label {
+      grid-row: 1;
+      grid-column: 1;
+    }
+    .numeric {
+      grid-row: 2;
+      grid-column: 1;
+      width: 100%;
+      margin-left: 0;
+    }
+    .switch {
+      grid-row: 2;
+      grid-column: 2;
+    }
+  }
+}
