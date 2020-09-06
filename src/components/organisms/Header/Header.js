@@ -1,16 +1,17 @@
-import React, { useContext } from 'react';
-import Style from './Header.module.scss';
-import { AuthContext } from '../../../contexts/Auth';
+import React, { useContext } from "react";
+import Style from "./Header.module.scss";
+import { AuthContext } from "../../../contexts/Auth";
 
 const Header = () => {
   const { currentUser, signout } = useContext(AuthContext);
+  //console.log(currentUser);
   return (
     <div className={Style.header}>
       <span>Create Ideas</span>
       {currentUser != null ? (
         <div className={Style.profile}>
           <button onClick={signout}>
-            <img alt="prof" src={currentUser.photoURL} />
+            <img alt="" src={currentUser.photoURL} />
           </button>
         </div>
       ) : (

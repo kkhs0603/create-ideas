@@ -6,7 +6,11 @@ export default ({ renderLoading, renderLogin, renderMain }) => {
 
   return (
     <>
-      {loading ? renderLoading() : currentUser ? renderMain() : renderLogin()}
+      {loading
+        ? renderLoading()
+        : currentUser
+        ? renderMain(currentUser)
+        : renderLogin()}
     </>
   );
 };

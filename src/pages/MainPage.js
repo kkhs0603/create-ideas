@@ -7,79 +7,61 @@ import SelectRandomWords from "../components/molecules/SelectRandomWords/SelectR
 
 import firebase from "../firebase.js";
 
-const MainPage = () => {
+const MainPage = (props) => {
   const [wordsCount, setWordsCount] = useState(1);
   const [words, setWords] = useState(["Hello", "React", "World"]);
   const [randomWordsCount, setRandomWordsCount] = useState(1);
   const [enable, setEnable] = useState(false);
-  const getWords = () => {
-    //TODO: 肥大化したメソッドを分割
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        const db = firebase.database();
-        const ref = db.ref(`${user.uid}/words/`);
-        const arr = [];
-        ref
-          .once("value")
-          .then((data) => {
-            data.forEach((element) => {
-              arr.push(element.val().word);
-            });
-            let m = arr.length;
-            while (m) {
-              let i = Math.floor(Math.random() * m--);
-              [arr[m], arr[i]] = [arr[i], arr[m]];
-            }
 
-            if (randomWordsCount > 0 && enableRandomWords) {
-              const url = `http://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=10`;
-              fetch("https://cors-anywhere.herokuapp.com/" + url)
-                .then((res) => res.json())
-                .then((data) => {
-                  let resultWords = [];
-                  let count = wordsCount > arr.length ? arr.length : wordsCount;
-                  if (count - randomWordsCount > 0) {
-                    count = count - randomWordsCount;
-                    resultWords = arr.slice(0, count);
-                  } else {
-                    count = wordsCount;
-                  }
-                  if (wordsCount - randomWordsCount < 0) {
-                    setRandomWordsCount(wordsCount);
-                  }
-                  // randomWordsCount =
-                  //   wordsCount - randomWordsCount < 0
-                  //     ? wordsCount
-                  //     : randomWordsCount;
-                  const gotRandomWord = data.query.random
-                    .filter((v, k) => k < randomWordsCount)
-                    .map((v) => v.title);
-                  gotRandomWord.forEach((element) => {
-                    resultWords.push(element);
-                  });
-                  let m = resultWords.length;
-                  while (m) {
-                    let i = Math.floor(Math.random() * m--);
-                    [resultWords[m], resultWords[i]] = [
-                      resultWords[i],
-                      resultWords[m],
-                    ];
-                  }
-                  setWords(resultWords);
-                });
-            } else {
-              let count = wordsCount > arr.length ? arr.length : wordsCount;
-              let resultWords = arr.slice(0, count);
-              setWords(resultWords);
-            }
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      } else {
-        console.log("no user");
-      }
+  //firebaseから取得する単語
+  const getWordsFromDb = async () => {
+    let arr = [];
+    const db = firebase.database();
+    const ref = await db.ref(`${props.currentUser.uid}/words/`).once("value");
+    ref.forEach((element) => {
+      arr.push(element.val().word);
     });
+    return arr;
+  };
+
+  //単語をランダムに並び替える
+  const shuffleWords = (arr) => {
+    let m = arr.length;
+    while (m) {
+      let i = Math.floor(Math.random() * m--);
+      [arr[m], arr[i]] = [arr[i], arr[m]];
+    }
+    return arr;
+  };
+
+  //Wikiから単語をランダムで１０個取得
+  const getRandomWordsFromWiki = async () => {
+    const url = `http://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=10`;
+    const wikiData = await fetch("https://cors-anywhere.herokuapp.com/" + url);
+    const wikiObj = await wikiData.json();
+    return wikiObj.query.random;
+  };
+
+  const getResultWords = async () => {
+    const dbWords = await getWordsFromDb();
+    const shuffled = shuffleWords(dbWords);
+    //firebaseに登録された単語のみ取得する時
+    if (randomWordsCount < 1 || !enable) {
+      const count = wordsCount > shuffled.length ? shuffled.length : wordsCount;
+      const resultWords = shuffled.slice(0, count);
+      setWords(resultWords);
+    }
+    //firebaseの単語とwikiのランダムの単語を取得する時
+    if (randomWordsCount >= 1 && enable) {
+      const words = shuffled.slice(0, wordsCount - randomWordsCount);
+      const randomWords = await getRandomWordsFromWiki();
+      const seletRandomWords = randomWords
+        .map((word) => word.title)
+        .slice(0, randomWordsCount);
+      seletRandomWords.forEach((word) => words.push(word));
+      const resultWords = shuffleWords(words);
+      setWords(resultWords);
+    }
   };
 
   const changeWordsCount = {
@@ -115,7 +97,7 @@ const MainPage = () => {
       <CreateIdea
         changeWordsCount={changeWordsCount}
         count={wordsCount}
-        getWords={getWords}
+        getWords={getResultWords}
       />
       <AddWords />
       <SelectRandomWords

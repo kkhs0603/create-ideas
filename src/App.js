@@ -9,7 +9,7 @@ function App() {
   return (
     <AuthProvider>
       <Router
-        renderMain={() => <Main />}
+        renderMain={(user) => <Main currentUser={user} />}
         renderLogin={() => <Top />}
         renderLoading={() => <LoadPage />}
       />
