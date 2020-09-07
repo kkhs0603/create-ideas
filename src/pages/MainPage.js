@@ -13,9 +13,12 @@ const MainPage = (props) => {
   const [randomWordsCount, setRandomWordsCount] = useState(1);
   const [enable, setEnable] = useState(false);
 
+  const [validationMessage, setValidationMessage] = useState("");
+  const [word, setWord] = useState("");
+
   //firebaseから取得する単語
   const getWordsFromDb = async () => {
-    let arr = [];
+    const arr = [];
     const db = firebase.database();
     const ref = await db.ref(`${props.currentUser.uid}/words/`).once("value");
     ref.forEach((element) => {
@@ -34,9 +37,9 @@ const MainPage = (props) => {
     return arr;
   };
 
-  //Wikiから単語をランダムで１０個取得
+  //Wikiから単語をランダムで5個取得
   const getRandomWordsFromWiki = async () => {
-    const url = `http://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=10`;
+    const url = `http://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=5`;
     const wikiData = await fetch("https://cors-anywhere.herokuapp.com/" + url);
     const wikiObj = await wikiData.json();
     return wikiObj.query.random;
@@ -72,25 +75,42 @@ const MainPage = (props) => {
       setWordsCount(count - 1);
     },
     onChange: (count) => {
-      setWordsCount(count);
+      setWordsCount(Number(count));
     },
   };
 
   const changeRandomWordsCount = {
     increment: (count) => {
+      if (count >= 5) return;
       setRandomWordsCount(count + 1);
     },
     decrement: (count) => {
+      if (count <= 0) return;
       setRandomWordsCount(count - 1);
     },
     onChange: (count) => {
-      setRandomWordsCount(count);
+      setRandomWordsCount(Number(count));
     },
   };
 
   const enableRandomWords = (enable) => {
     setEnable(!enable);
   };
+
+  const writeWords = async () => {
+    if (word.trim().length === 0) {
+      setWord("");
+      setValidationMessage("文字を入力して下さい");
+      return;
+    }
+    setValidationMessage("");
+    let db = firebase.database();
+    let ref = db.ref(`${props.currentUser.uid}/words/`);
+    await ref.push({ word });
+    setWord("");
+    console.log("db written");
+  };
+
   return (
     <Layout>
       <NewIdea words={words} />
@@ -99,7 +119,12 @@ const MainPage = (props) => {
         count={wordsCount}
         getWords={getResultWords}
       />
-      <AddWords />
+      <AddWords
+        write={writeWords}
+        setWord={(val) => setWord(val)}
+        word={word}
+        validationMessage={validationMessage}
+      />
       <SelectRandomWords
         changeRandomWordsCount={changeRandomWordsCount}
         count={randomWordsCount}
