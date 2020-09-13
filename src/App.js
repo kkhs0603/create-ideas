@@ -1,5 +1,5 @@
 import React from "react";
-import Top from "./pages/TopPage";
+import Login from "./pages/LoginPage";
 import Main from "./pages/MainPage";
 import { AuthProvider } from "./contexts/Auth";
 import Router from "./components/Router";
@@ -10,7 +10,7 @@ function App() {
     <AuthProvider>
       <Router
         renderMain={(user) => <Main currentUser={user} />}
-        renderLogin={() => <Top />}
+        renderLogin={() => <Login />}
         renderLoading={() => <LoadPage />}
       />
     </AuthProvider>

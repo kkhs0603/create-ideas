@@ -4,7 +4,7 @@ import { AuthContext } from "../../../contexts/Auth";
 
 const Header = () => {
   const { currentUser, signout } = useContext(AuthContext);
-  //console.log(currentUser);
+  console.log(currentUser);
   return (
     <div className={Style.header}>
       <span>Create Ideas</span>
