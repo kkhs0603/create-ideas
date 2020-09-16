@@ -10,6 +10,7 @@ const AuthProvider = ({ children }) => {
 
   const signup = async (email, password, userName) => {
     try {
+      //then → awaitにしたい
       await auth
         .createUserWithEmailAndPassword(email, password)
         .then((result) => {

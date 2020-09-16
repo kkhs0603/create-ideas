@@ -23,7 +23,7 @@ export const SignUp = () => {
           name="userName"
           placeholder="ユーザー名を入力"
           ref={register({
-            required: "required",
+            required: true,
           })}
           type="userName"
         />
@@ -35,7 +35,7 @@ export const SignUp = () => {
           name="email"
           placeholder="メールアドレスを入力"
           ref={register({
-            required: "required",
+            required: true,
             // pattern: {
             //   value: /S+@S+.S+/,
             // },
@@ -49,7 +49,7 @@ export const SignUp = () => {
           name="password"
           placeholder="パスワードを入力"
           ref={register({
-            required: "required",
+            required: true,
           })}
           type="password"
         />

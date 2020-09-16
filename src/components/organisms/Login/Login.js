@@ -6,10 +6,10 @@ import Style from "./Login.module.scss";
 
 export const Login = () => {
   const { register, handleSubmit, watch, errors } = useForm();
+  const { signin, singninWithMail } = useContext(AuthContext);
   const onSubmit = async (event) => {
     await singninWithMail(event.email, event.password);
   };
-  const { signin, singninWithMail } = useContext(AuthContext);
   return (
     <div className={Style.login}>
       <input type="button" className={Style.signinButton} onClick={signin} />
@@ -34,7 +34,7 @@ export const Login = () => {
           name="password"
           placeholder="パスワードを入力"
           ref={register({
-            required: "required",
+            required: true,
           })}
           type="password"
         />
