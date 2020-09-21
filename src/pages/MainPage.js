@@ -5,7 +5,7 @@ import CreateIdea from "../components/molecules/CreateIdea/CreateIdea";
 import AddWords from "../components/molecules/AddWords/AddWords";
 import SelectRandomWords from "../components/molecules/SelectRandomWords/SelectRandomWords";
 
-import firebase from "../firebase.js";
+import firebase from "../firebase/firebase.js";
 
 const MainPage = (props) => {
   const [wordsCount, setWordsCount] = useState(1);

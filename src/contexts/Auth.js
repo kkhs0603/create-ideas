@@ -1,6 +1,6 @@
 import React, { useState, createContext, useCallback, useEffect } from "react";
-import firebase, { googleProvider } from "../firebase";
-
+import firebase, { googleProvider } from "../firebase/firebase";
+import ErrorMessage from "../firebase/ErrorMessage.js";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -8,33 +8,30 @@ const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const auth = firebase.auth();
 
-  const signup = async (email, password, userName) => {
+  const signupWithEmailAndPassword = async (email, password, userName) => {
     try {
-      //then → awaitにしたい
-      await auth
-        .createUserWithEmailAndPassword(email, password)
-        .then((result) => {
-          result.user.updateProfile({ displayName: userName });
-        });
-    } catch (error) {
-      return error;
+      const result = await auth.createUserWithEmailAndPassword(email, password);
+      result.user.updateProfile({ displayName: userName });
+      return result;
+    } catch (e) {
+      return ErrorMessage(e, "signup");
     }
   };
 
-  const signin = useCallback(async () => {
+  const signinWithGoogle = useCallback(async () => {
     try {
       setLoading(true);
       await auth.signInWithRedirect(googleProvider);
     } catch (e) {
-      console.error(e.code, e.message);
+      return ErrorMessage(e, "signin");
     }
   }, [auth]);
 
-  const singninWithMail = async (email, password) => {
+  const signinWithEmailAndPassword = async (email, password) => {
     try {
       await auth.signInWithEmailAndPassword(email, password);
     } catch (e) {
-      console.error(e.code, e.message);
+      return ErrorMessage(e, "signin");
     }
   };
 
@@ -44,7 +41,7 @@ const AuthProvider = ({ children }) => {
       await auth.signOut();
       console.log("sign out");
     } catch (e) {
-      console.error(e.code, e.message);
+      return ErrorMessage(e, "signout");
     }
   }, [auth]);
 
@@ -56,7 +53,14 @@ const AuthProvider = ({ children }) => {
   }, [auth]);
   return (
     <AuthContext.Provider
-      value={{ currentUser, signin, signout, loading, signup, singninWithMail }}
+      value={{
+        currentUser,
+        signinWithGoogle,
+        signout,
+        loading,
+        signupWithEmailAndPassword,
+        signinWithEmailAndPassword,
+      }}
     >
       {children}
     </AuthContext.Provider>

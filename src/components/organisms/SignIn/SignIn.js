@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../../../contexts/Auth";
+import { Separator } from "../../atoms/Separator/Separator";
+import { InputLabel, TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { TextField, Button } from "@material-ui/core";
 
 const useStyles = makeStyles({
   textField: {
@@ -9,36 +10,33 @@ const useStyles = makeStyles({
   },
 });
 
-export const SignUp = () => {
+export const SignIn = () => {
   const classes = useStyles();
-  const { signupWithEmailAndPassword } = useContext(AuthContext);
-  const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
+  const { signinWithGoogle, signinWithEmailAndPassword } = useContext(
+    AuthContext
+  );
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [isFirst, setIsFirst] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const onSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setIsFirst(false);
-    const result = await signupWithEmailAndPassword(email, password, userName);
+    const result = await signinWithEmailAndPassword(email, password);
     setErrorMessage(result);
   };
   return (
     <div>
-      <form onSubmit={onSubmit}>
-        <TextField
-          className={classes.textField}
-          id="username"
-          label="UserName"
-          type="text"
-          autoComplete="off"
-          required
-          error={!isFirst && userName.length === 0}
-          helperText={""}
-          fullWidth
-          variant="outlined"
-          onChange={(e) => setUserName(e.target.value)}
-        />
+      <Button
+        fullWidth
+        variant="contained"
+        color="primary"
+        onClick={signinWithGoogle}
+      >
+        Googleアカウントでサインイン
+      </Button>
+      <Separator />
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
         <TextField
           className={classes.textField}
           id="email"
@@ -67,7 +65,7 @@ export const SignUp = () => {
         />
         {errorMessage ? errorMessage : ""}
         <Button type="submit" fullWidth variant="contained" color="primary">
-          登録
+          サインイン
         </Button>
       </form>
     </div>
