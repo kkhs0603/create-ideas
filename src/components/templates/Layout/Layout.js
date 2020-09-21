@@ -1,15 +1,17 @@
-import React from 'react';
-import Header from '../../organisms/Header/Header';
-import Style from './Layout.module.scss';
+import React from "react";
+import Header from "../../organisms/Header/Header";
+import Style from "./Layout.module.scss";
+import { Container } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
 const Layout = ({ children }) => {
   return (
-    <div className={Style.wrapper}>
+    <Container className={Style.wrapper}>
       <div className={Style.main}>
         <Header />
         {children}
       </div>
-    </div>
+    </Container>
   );
 };
 
