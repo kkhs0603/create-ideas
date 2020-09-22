@@ -1,4 +1,5 @@
 import * as firebase from "../../node_modules/firebase/app";
+import "@firebase/firestore";
 import "../../node_modules/firebase/auth";
 import "../../node_modules/firebase/database";
 

@@ -1,7 +1,12 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../contexts/Auth";
 
-export default ({ renderLoading, renderSignIn, renderMain }) => {
+export default ({
+  renderLoading,
+  renderSignIn,
+  renderMain,
+  renderSelectCanvas,
+}) => {
   const { currentUser, loading } = useContext(AuthContext);
 
   return (
@@ -9,8 +14,9 @@ export default ({ renderLoading, renderSignIn, renderMain }) => {
       {loading
         ? renderLoading()
         : currentUser
-        ? renderMain(currentUser)
-        : renderSignIn()}
+        ? renderSelectCanvas()
+        : /* ? renderMain(currentUser) */
+          renderSignIn()}
     </>
   );
 };
