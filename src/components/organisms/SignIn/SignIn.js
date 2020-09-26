@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { AuthContext } from "../../../contexts/Auth";
+import { AuthContext } from "../../../contexts/AuthContext";
 import { Separator } from "../../atoms/Separator/Separator";
 import { InputLabel, TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -15,6 +15,8 @@ export const SignIn = () => {
   const { signinWithGoogle, signinWithEmailAndPassword } = useContext(
     AuthContext
   );
+  //TODO:カスタムHookを使うように
+
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [isFirst, setIsFirst] = useState(true);
@@ -44,10 +46,12 @@ export const SignIn = () => {
           type="email"
           autoComplete="email"
           required
+          //FIXME:isFirstいらんかも
           error={!isFirst && email.length === 0}
           helperText={""}
           fullWidth
           variant="outlined"
+          //FIXME:handleOnChangeなどで上に切り出す
           onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
@@ -61,6 +65,7 @@ export const SignIn = () => {
           helperText={""}
           fullWidth
           variant="outlined"
+          //FIXME:handleOnChangeなどで上に切り出す
           onChange={(e) => setPassword(e.target.value)}
         />
         {errorMessage ? errorMessage : ""}

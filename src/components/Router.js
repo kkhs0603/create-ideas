@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { AuthContext } from "../contexts/Auth";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default ({
   renderLoading,

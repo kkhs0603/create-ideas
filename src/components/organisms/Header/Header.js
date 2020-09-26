@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { AuthContext } from "../../../contexts/Auth";
+import { AuthContext } from "../../../contexts/AuthContext";
 import { AppBar, Toolbar, IconButton, Menu, MenuItem } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 
@@ -22,6 +22,7 @@ const Header = () => {
   const classes = useStyles();
   const { currentUser, signout } = useContext(AuthContext);
   console.log(currentUser);
+  //FIXME:React.useStateを廃止
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event) => {

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { AuthContext } from "../../../contexts/Auth";
+import { AuthContext } from "../../../contexts/AuthContext";
 import { makeStyles } from "@material-ui/core/styles";
 import { TextField, Button } from "@material-ui/core";
 
@@ -10,6 +10,7 @@ const useStyles = makeStyles({
 });
 
 export const SignUp = () => {
+  //TODO: SignIn/SignUp再利用できるところはまとめる。
   const classes = useStyles();
   const { signupWithEmailAndPassword } = useContext(AuthContext);
   const [userName, setUserName] = useState("");

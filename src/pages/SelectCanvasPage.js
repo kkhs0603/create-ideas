@@ -1,10 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../contexts/Auth";
+import { CanvasContext } from "../contexts/CanvasContext";
 import Layout from "../components/templates/Layout/Layout";
 import { Button, List, ListItem, ListItemText } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { orange } from "@material-ui/core/colors";
-import firebase from "../firebase/firebase.js";
 const ColorButton = withStyles((theme) => ({
   root: {
     color: theme.palette.getContrastText(orange[500]),
@@ -16,7 +15,7 @@ const ColorButton = withStyles((theme) => ({
 }))(Button);
 
 const SelectCanvasPage = () => {
-  const { newCanvas, canvases } = useContext(AuthContext);
+  const { newCanvas, canvases } = useContext(CanvasContext);
 
   return (
     <Layout>
