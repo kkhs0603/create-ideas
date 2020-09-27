@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Layout from "../components/templates/Layout/Layout";
 import Title from "../components/atoms/Title/Title";
 import TopSlider from "../components/molecules/TopSlider/TopSlider";
-import { SignIn } from "../components/organisms/SignIn/SignIn";
-import { SignUp } from "../components/organisms/SignUp/SignUp";
+import { SignIn } from "../components/organisms/SignIn";
+import { SignUp } from "../components/organisms/SignUp";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 

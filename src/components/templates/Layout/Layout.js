@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../../organisms/Header/Header";
+import Header from "../../organisms/Header";
 import Style from "./Layout.module.scss";
 import { Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";

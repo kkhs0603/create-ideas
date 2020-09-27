@@ -1,32 +1,52 @@
 import React, { useState, useContext } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
-import { Separator } from "../../atoms/Separator/Separator";
-import { InputLabel, TextField, Button } from "@material-ui/core";
+import { AuthContext } from "../../contexts/AuthContext";
+import { Separator } from "../atoms/Separator/Separator";
+import { TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles({
-  textField: {
-    margin: "10px 0",
-  },
-});
-
-export const SignIn = () => {
-  const classes = useStyles();
+///////
+//Logic
+///////
+const useSignIn = () => {
   const { signinWithGoogle, signinWithEmailAndPassword } = useContext(
     AuthContext
   );
-  //TODO:カスタムHookを使うように
-
-  const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [isFirst, setIsFirst] = useState(true);
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const handleEmailOnChanged = (event) => {
+    setEmail(event.target.value);
+  };
+  const handlePasswordOnChanged = (event) => {
+    setPassword(event.target.value);
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setIsFirst(false);
     const result = await signinWithEmailAndPassword(email, password);
     setErrorMessage(result);
   };
+  return [
+    errorMessage,
+    signinWithGoogle,
+    handleSubmit,
+    handleEmailOnChanged,
+    handlePasswordOnChanged,
+  ];
+};
+
+///////////
+//Component
+///////////
+export const SignIn = () => {
+  const classes = useStyles();
+  const [
+    errorMessage,
+    signinWithGoogle,
+    handleSubmit,
+    handleEmailOnChanged,
+    handlePasswordOnChanged,
+  ] = useSignIn();
+
   return (
     <div>
       <Button
@@ -46,13 +66,10 @@ export const SignIn = () => {
           type="email"
           autoComplete="email"
           required
-          //FIXME:isFirstいらんかも
-          error={!isFirst && email.length === 0}
           helperText={""}
           fullWidth
           variant="outlined"
-          //FIXME:handleOnChangeなどで上に切り出す
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailOnChanged}
         />
         <TextField
           className={classes.textField}
@@ -61,12 +78,10 @@ export const SignIn = () => {
           type="password"
           autoComplete="current-password"
           required
-          error={!isFirst && password.length === 0}
           helperText={""}
           fullWidth
           variant="outlined"
-          //FIXME:handleOnChangeなどで上に切り出す
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handlePasswordOnChanged}
         />
         {errorMessage ? errorMessage : ""}
         <Button type="submit" fullWidth variant="contained" color="primary">
@@ -76,3 +91,12 @@ export const SignIn = () => {
     </div>
   );
 };
+
+///////
+//Style
+///////
+const useStyles = makeStyles({
+  textField: {
+    margin: "10px 0",
+  },
+});

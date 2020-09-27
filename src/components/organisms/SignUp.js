@@ -1,29 +1,52 @@
 import React, { useContext, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { makeStyles } from "@material-ui/core/styles";
 import { TextField, Button } from "@material-ui/core";
 
-const useStyles = makeStyles({
-  textField: {
-    margin: "10px 0",
-  },
-});
-
-export const SignUp = () => {
-  //TODO: SignIn/SignUp再利用できるところはまとめる。
-  const classes = useStyles();
+///////
+//Logic
+///////
+const useSignUp = () => {
   const { signupWithEmailAndPassword } = useContext(AuthContext);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isFirst, setIsFirst] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const handleEmailOnChanged = (event) => {
+    setUserName(event.target.value);
+  };
+  const handleUserNameOnChanged = (event) => {
+    setEmail(event.target.value);
+  };
+  const handlePasswordOnChanged = (event) => {
+    setPassword(event.target.value);
+  };
   const onSubmit = async (event) => {
     event.preventDefault();
-    setIsFirst(false);
     const result = await signupWithEmailAndPassword(email, password, userName);
     setErrorMessage(result);
   };
+  return [
+    errorMessage,
+    onSubmit,
+    handleUserNameOnChanged,
+    handleEmailOnChanged,
+    handlePasswordOnChanged,
+  ];
+};
+
+///////////
+//Component
+///////////
+export const SignUp = () => {
+  const classes = useStyles();
+  const [
+    errorMessage,
+    onSubmit,
+    handleUserNameOnChanged,
+    handleEmailOnChanged,
+    handlePasswordOnChanged,
+  ] = useSignUp();
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -34,11 +57,10 @@ export const SignUp = () => {
           type="text"
           autoComplete="off"
           required
-          error={!isFirst && userName.length === 0}
           helperText={""}
           fullWidth
           variant="outlined"
-          onChange={(e) => setUserName(e.target.value)}
+          onChange={handleUserNameOnChanged}
         />
         <TextField
           className={classes.textField}
@@ -47,11 +69,10 @@ export const SignUp = () => {
           type="email"
           autoComplete="email"
           required
-          error={!isFirst && email.length === 0}
           helperText={""}
           fullWidth
           variant="outlined"
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailOnChanged}
         />
         <TextField
           className={classes.textField}
@@ -60,11 +81,10 @@ export const SignUp = () => {
           type="password"
           autoComplete="current-password"
           required
-          error={!isFirst && password.length === 0}
           helperText={""}
           fullWidth
           variant="outlined"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handlePasswordOnChanged}
         />
         {errorMessage ? errorMessage : ""}
         <Button type="submit" fullWidth variant="contained" color="primary">
@@ -74,3 +94,12 @@ export const SignUp = () => {
     </div>
   );
 };
+
+///////
+//Style
+///////
+const useStyles = makeStyles({
+  textField: {
+    margin: "10px 0",
+  },
+});
