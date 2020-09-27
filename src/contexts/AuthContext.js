@@ -12,6 +12,14 @@ const AuthProvider = ({ children }) => {
     try {
       const result = await auth.createUserWithEmailAndPassword(email, password);
       result.user.updateProfile({ displayName: userName });
+      const timestamp = firebase.firestore.Timestamp.now();
+      firebase.firestore().collection("users").doc(result.user.uid).set({
+        id: result.user.uid,
+        name: userName,
+        canvasIds: [],
+        created_at: timestamp,
+        updated_at: timestamp,
+      });
       return result;
     } catch (e) {
       return ErrorMessage(e, "signup");
