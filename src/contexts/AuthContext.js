@@ -8,9 +8,6 @@ const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const auth = firebase.auth();
 
-  ////////////
-  //ユーザー権限
-  ////////////
   const signupWithEmailAndPassword = async (email, password, userName) => {
     try {
       const result = await auth.createUserWithEmailAndPassword(email, password);
