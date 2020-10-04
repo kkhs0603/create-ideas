@@ -4,19 +4,20 @@ import { AuthContext } from "../contexts/AuthContext";
 export default ({
   renderLoading,
   renderSignIn,
-  renderMain,
   renderSelectCanvas,
+  renderUserSettings,
 }) => {
-  const { token, loading } = useContext(AuthContext);
+  const { token, loading, isUserSetting } = useContext(AuthContext);
 
   return (
     <>
       {loading
         ? renderLoading()
         : token
-        ? renderSelectCanvas()
-        : /* ? renderMain(currentUser) */
-          renderSignIn()}
+        ? isUserSetting
+          ? renderUserSettings()
+          : renderSelectCanvas()
+        : renderSignIn()}
     </>
   );
 };

@@ -7,6 +7,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [isUserSetting, setIsUserSetting] = useState(false);
   const auth = firebase.auth();
 
   const signinWithEmailAndPassword = async (email, password) => {
@@ -21,14 +22,6 @@ const AuthProvider = ({ children }) => {
     try {
       const result = await auth.createUserWithEmailAndPassword(email, password);
       result.user.updateProfile({ displayName: userName });
-      const timestamp = firebase.firestore.Timestamp.now();
-      firebase.firestore().collection("users").doc(result.user.uid).set({
-        id: result.user.uid,
-        name: userName,
-        canvasIds: [],
-        created_at: timestamp,
-        updated_at: timestamp,
-      });
       return result;
     } catch (error) {
       return ErrorMessage(error, "signup");
@@ -38,8 +31,7 @@ const AuthProvider = ({ children }) => {
   const signinWithGoogle = async () => {
     try {
       setLoading(true);
-      const result = await auth.signInWithRedirect(googleProvider);
-      return result;
+      await auth.signInWithRedirect(googleProvider);
     } catch (e) {
       return ErrorMessage(e, "signin");
     }
@@ -56,6 +48,10 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const userSetting = () => {
+    setIsUserSetting(true);
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       setLoading(false);
@@ -66,6 +62,21 @@ const AuthProvider = ({ children }) => {
         return;
       }
       setUser(user);
+
+      const usersCollection = firebase
+        .firestore()
+        .collection("users")
+        .doc(user.uid);
+      if (!usersCollection.get()) {
+        const timestamp = firebase.firestore.Timestamp.now();
+        usersCollection.set({
+          id: user.uid,
+          name: user.displayName,
+          canvasIds: [],
+          created_at: timestamp,
+          updated_at: timestamp,
+        });
+      }
       const token = user.getIdToken(true);
       setToken(token);
       localStorage.setItem("token", token);
@@ -81,6 +92,8 @@ const AuthProvider = ({ children }) => {
         signinWithEmailAndPassword,
         token,
         user,
+        userSetting,
+        isUserSetting,
       }}
     >
       {children}

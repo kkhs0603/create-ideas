@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = () => {
   const classes = useStyles();
-  const { user, signout } = useContext(AuthContext);
+  const { user, signout, userSetting } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event) => {
@@ -63,7 +63,7 @@ const Header = () => {
                 open={open}
                 onClose={handleClose}
               >
-                <MenuItem>Profile</MenuItem>
+                <MenuItem onClick={userSetting}>設定</MenuItem>
                 <MenuItem onClick={signout}>サインアウト</MenuItem>
               </Menu>
             </div>

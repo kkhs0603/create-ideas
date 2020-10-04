@@ -4,12 +4,13 @@ const CanvasContext = createContext();
 const db = firebase.firestore();
 const CanvasProvider = ({ children }) => {
   const [canvases, setCanvases] = useState([]);
+  const [canvasName, setCanvasName] = useState("");
   const auth = firebase.auth();
 
   /////////
   ///canvas
   /////////
-  const newCanvas = async () => {
+  const createCanvas = async () => {
     try {
       const userDoc = await db
         .collection("users")
@@ -24,9 +25,10 @@ const CanvasProvider = ({ children }) => {
       //canvases
       const timestamp = firebase.firestore.Timestamp.now();
       const docRef = await db.collection("canvases").add({
+        name: canvasName,
         words: [],
         ideas: [],
-        users: [],
+        joinedUsers: [],
         created_at: timestamp,
         created_by: auth.currentUser.uid,
         updated_at: timestamp,
@@ -57,6 +59,11 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  const handleCanvasName = (event) => {
+    console.log(event.target.value);
+    setCanvasName(event.target.value);
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged(() => {
       getCanvases();
@@ -66,8 +73,9 @@ const CanvasProvider = ({ children }) => {
   return (
     <CanvasContext.Provider
       value={{
-        newCanvas,
+        createCanvas,
         canvases,
+        handleCanvasName,
       }}
     >
       {children}
