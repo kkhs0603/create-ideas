@@ -1,38 +1,8 @@
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
+import React from "react";
+import { useSignIn } from "../../hooks/useSignIn";
 import { Separator } from "../atoms/Separator/Separator";
 import { TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-
-///////
-//Logic
-///////
-const useSignIn = () => {
-  const { signinWithGoogle, signinWithEmailAndPassword } = useContext(
-    AuthContext
-  );
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const handleEmailOnChanged = (event) => {
-    setEmail(event.target.value);
-  };
-  const handlePasswordOnChanged = (event) => {
-    setPassword(event.target.value);
-  };
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const result = await signinWithEmailAndPassword(email, password);
-    setErrorMessage(result);
-  };
-  return [
-    errorMessage,
-    signinWithGoogle,
-    handleSubmit,
-    handleEmailOnChanged,
-    handlePasswordOnChanged,
-  ];
-};
 
 ///////////
 //Component

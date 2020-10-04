@@ -7,13 +7,13 @@ export default ({
   renderMain,
   renderSelectCanvas,
 }) => {
-  const { currentUser, loading } = useContext(AuthContext);
+  const { token, loading } = useContext(AuthContext);
 
   return (
     <>
       {loading
         ? renderLoading()
-        : currentUser
+        : token
         ? renderSelectCanvas()
         : /* ? renderMain(currentUser) */
           renderSignIn()}
