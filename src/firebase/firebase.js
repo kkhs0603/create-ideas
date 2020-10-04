@@ -13,6 +13,7 @@ const config = {
 };
 
 firebase.initializeApp(config);
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
 export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export default firebase;

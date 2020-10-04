@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { AuthContext } from "../../contexts/AuthContext";
 import { AppBar, Toolbar, IconButton, Menu, MenuItem } from "@material-ui/core";
@@ -20,10 +20,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = () => {
   const classes = useStyles();
-  const { currentUser, signout } = useContext(AuthContext);
-  console.log(currentUser);
-  //FIXME:React.useStateを廃止
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const { user, signout } = useContext(AuthContext);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -36,11 +34,11 @@ const Header = () => {
       <Toolbar>
         <div className={classes.root}>
           <div className={classes.title}>Create Ideas</div>
-          {currentUser == null ? (
+          {user == null ? (
             <></>
           ) : (
             <div>
-              {currentUser.displayName + "さん"}
+              {user.displayName + "さん"}
               <IconButton
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
