@@ -8,12 +8,11 @@ const SelectCanvas = (props) => {
   ) : (
     <div>
       {canvases.map((canvas) => {
-        const caption =
-          "canvas:" + canvas.name + " created_by" + canvas.created_by;
         return (
           <ListItem key={canvas.created_at} button>
             <Card variant="outlined">
-              <CardContent>{caption}</CardContent>
+              <CardContent>{"canvas名：" + canvas.name}</CardContent>
+              <CardContent>{"created_by：" + canvas.created_by}</CardContent>
             </Card>
             {/* <ListItemText key={canvas.created_at} primary={caption} /> */}
           </ListItem>

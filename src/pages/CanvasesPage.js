@@ -4,7 +4,7 @@ import Layout from "../components/templates/Layout/Layout";
 import CreateCanvas from "../components/organisms/CreateCanvas";
 import SelectCanvas from "../components/organisms/SelectCanvas";
 
-const SelectCanvasPage = () => {
+const CanvasesPage = () => {
   const { canvases } = useContext(CanvasContext);
 
   return (
@@ -16,4 +16,4 @@ const SelectCanvasPage = () => {
   );
 };
 
-export default SelectCanvasPage;
+export default CanvasesPage;

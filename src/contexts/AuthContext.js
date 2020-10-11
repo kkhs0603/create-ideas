@@ -1,15 +1,15 @@
 import React, { useState, createContext, useEffect } from "react";
 import firebase, { googleProvider } from "../firebase/firebase";
 import ErrorMessage from "../firebase/ErrorMessage.js";
+import { useHistory } from "react-router-dom";
+
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
-  const [isUserSetting, setIsUserSetting] = useState(false);
   const auth = firebase.auth();
-
+  const history = useHistory();
+  //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
     try {
       await auth.signInWithEmailAndPassword(email, password);
@@ -30,7 +30,6 @@ const AuthProvider = ({ children }) => {
 
   const signinWithGoogle = async () => {
     try {
-      setLoading(true);
       await auth.signInWithRedirect(googleProvider);
     } catch (e) {
       return ErrorMessage(e, "signin");
@@ -39,24 +38,20 @@ const AuthProvider = ({ children }) => {
 
   const signout = async () => {
     try {
-      setLoading(true);
       await auth.signOut();
       console.log("sign out");
-      setLoading(false);
     } catch (e) {
       return ErrorMessage(e, "signout");
     }
   };
 
   const userSetting = () => {
-    setIsUserSetting(true);
+    history.push("/settings");
   };
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
-      setLoading(false);
       if (user == null) {
-        setToken(null);
         setUser(null);
         localStorage.clear();
         return;
@@ -77,9 +72,7 @@ const AuthProvider = ({ children }) => {
           updated_at: timestamp,
         });
       }
-      const token = user.getIdToken(true);
-      setToken(token);
-      localStorage.setItem("token", token);
+      history.push("/canvases");
     });
   }, [auth]);
   return (
@@ -87,13 +80,10 @@ const AuthProvider = ({ children }) => {
       value={{
         signinWithGoogle,
         signout,
-        loading,
         signupWithEmailAndPassword,
         signinWithEmailAndPassword,
-        token,
         user,
         userSetting,
-        isUserSetting,
       }}
     >
       {children}
