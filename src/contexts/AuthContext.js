@@ -49,6 +49,18 @@ const AuthProvider = ({ children }) => {
     history.push("/settings");
   };
 
+  const updateUserSetting = async (name) => {
+    try {
+      await user.updateProfile({ displayName: name });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const goBack = () => {
+    history.goBack();
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user == null) {
@@ -84,6 +96,8 @@ const AuthProvider = ({ children }) => {
         signinWithEmailAndPassword,
         user,
         userSetting,
+        updateUserSetting,
+        goBack,
       }}
     >
       {children}
