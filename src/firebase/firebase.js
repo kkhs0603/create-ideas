@@ -2,6 +2,7 @@ import * as firebase from "../../node_modules/firebase/app";
 import "@firebase/firestore";
 import "../../node_modules/firebase/auth";
 import "../../node_modules/firebase/database";
+import "firebase/storage";
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
@@ -16,4 +17,5 @@ firebase.initializeApp(config);
 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
 export const googleProvider = new firebase.auth.GoogleAuthProvider();
+export const storage = firebase.storage();
 export default firebase;

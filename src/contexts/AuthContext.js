@@ -9,6 +9,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const auth = firebase.auth();
   const history = useHistory();
+
   //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
     try {
@@ -45,19 +46,11 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const userSetting = () => {
+  const handleGoUserSetting = () => {
     history.push("/settings");
   };
 
-  const updateUserSetting = async (name) => {
-    try {
-      await user.updateProfile({ displayName: name });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const goBack = () => {
+  const handleGoBack = () => {
     history.goBack();
   };
 
@@ -95,9 +88,8 @@ const AuthProvider = ({ children }) => {
         signupWithEmailAndPassword,
         signinWithEmailAndPassword,
         user,
-        userSetting,
-        updateUserSetting,
-        goBack,
+        handleGoUserSetting,
+        handleGoBack,
       }}
     >
       {children}

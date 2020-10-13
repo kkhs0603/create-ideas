@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "../components/templates/Layout/Layout";
-import { Button, TextField } from "@material-ui/core";
+import { Button, TextField, Avatar } from "@material-ui/core";
 import { useUserSetting } from "../hooks/useUserSetting";
 
 const UserSettingsPage = () => {
@@ -8,11 +8,16 @@ const UserSettingsPage = () => {
     handleUpdateUserSetting,
     handleUserNameOnChanged,
     username,
-    goBack,
+    handleGoBack,
+    imgUrl,
+    handleUploadImage,
   ] = useUserSetting();
   return (
     <Layout>
       <div>user settings</div>
+      <Avatar alt="user" src={imgUrl} />
+      <input type="file" onChange={handleUploadImage} />
+
       <TextField
         // className={classes.textField}
         id="username"
@@ -25,7 +30,7 @@ const UserSettingsPage = () => {
         defaultValue={username}
         onChange={handleUserNameOnChanged}
       />
-      <Button variant="contained" onClick={goBack}>
+      <Button variant="contained" onClick={handleGoBack}>
         戻る
       </Button>
       <Button
