@@ -9,14 +9,14 @@ const UserSettingsPage = () => {
     handleUserNameOnChanged,
     username,
     handleGoBack,
-    imgUrl,
-    handleUploadImage,
+    imageUrl,
+    handleSaveTempImage,
   ] = useUserSetting();
   return (
     <Layout>
       <div>user settings</div>
-      <Avatar alt="user" src={imgUrl} />
-      <input type="file" onChange={handleUploadImage} />
+      <Avatar alt="user" src={imageUrl} />
+      <input type="file" onChange={handleSaveTempImage} />
 
       <TextField
         // className={classes.textField}
