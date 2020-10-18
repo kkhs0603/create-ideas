@@ -17,7 +17,6 @@ function App() {
             <AuthRouter>
               <Route exact path="/canvases" component={CanvasesPage} />
               <Route exact path="/settings" component={UserSettingsPage} />
-              <Redirect from="/" to="/canvases" />
             </AuthRouter>
           </Switch>
         </CanvasProvider>

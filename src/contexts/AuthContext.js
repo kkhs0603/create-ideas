@@ -55,28 +55,27 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
       if (user == null) {
         setUser(null);
         localStorage.clear();
         return;
       }
       setUser(user);
+      // console.log(user);
+      // const usersCollection = firebase
+      //   .firestore()
+      //   .collection("users")
+      //   .doc(user.uid);
+      // await usersCollection.get();
+      // const timestamp = firebase.firestore.Timestamp.now();
+      // usersCollection.set({
+      //   id: user.uid,
+      //   canvasIds: [],
+      //   created_at: timestamp,
+      //   updated_at: timestamp,
+      // });
 
-      const usersCollection = firebase
-        .firestore()
-        .collection("users")
-        .doc(user.uid);
-      if (!usersCollection.get()) {
-        const timestamp = firebase.firestore.Timestamp.now();
-        usersCollection.set({
-          id: user.uid,
-          name: user.displayName,
-          canvasIds: [],
-          created_at: timestamp,
-          updated_at: timestamp,
-        });
-      }
       history.push("/canvases");
     });
   }, [auth]);

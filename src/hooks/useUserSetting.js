@@ -49,6 +49,8 @@ export const useUserSetting = () => {
   const complete = () => {
     // 完了後の処理
     // 画像表示のため、アップロードした画像のURLを取得
+    //TODO:try catch
+    //TODO:await
     storage
       .ref("images")
       .child(user.uid)
