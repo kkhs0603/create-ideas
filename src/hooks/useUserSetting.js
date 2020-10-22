@@ -1,6 +1,6 @@
 import { useContext, useState, useCallback } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import firebase, { storage } from "../firebase/firebase";
+import { storage } from "../firebase/firebase";
 
 export const useUserSetting = () => {
   const { user, handleGoBack } = useContext(AuthContext);
@@ -15,10 +15,10 @@ export const useUserSetting = () => {
     [setUserName]
   );
   //ユーザー情報更新
-  const handleUpdateUserSetting = async () => {
+  const updateUserSetting = async () => {
     try {
       const url =
-        tempFile !== null ? await handleUploadImage(tempFile) : user.photoURL;
+        tempFile !== null ? await uploadImage(tempFile) : user.photoURL;
       console.log("url", url);
       await user.updateProfile({ photoURL: url, displayName: username });
       handleGoBack();
@@ -27,8 +27,10 @@ export const useUserSetting = () => {
     }
   };
 
+  //DOMに紐づかないものはメソッド名にhandleをつけなくていい
+  //TODO:hooksなど切り出す Util
   //画像をstorageにupload
-  const handleUploadImage = (image) => {
+  const uploadImage = (image) => {
     return new Promise((resolve, reject) => {
       const uploadTask = storage.ref(`/images/${user.uid}`).put(image);
       uploadTask.on(
@@ -75,7 +77,7 @@ export const useUserSetting = () => {
   };
 
   return [
-    handleUpdateUserSetting,
+    updateUserSetting,
     handleUserNameOnChanged,
     username,
     handleGoBack,

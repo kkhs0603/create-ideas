@@ -2,20 +2,28 @@ import React from "react";
 import Layout from "../components/templates/Layout/Layout";
 import { Button, TextField, Avatar } from "@material-ui/core";
 import { useUserSetting } from "../hooks/useUserSetting";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(() => ({
+  large: {
+    width: "50%",
+    height: "50%",
+  },
+}));
 
 const UserSettingsPage = () => {
   const [
-    handleUpdateUserSetting,
+    updateUserSetting,
     handleUserNameOnChanged,
     username,
     handleGoBack,
     imageUrl,
     handleSaveTempImage,
   ] = useUserSetting();
+  const classes = useStyles();
   return (
     <Layout>
-      <div>user settings</div>
-      <Avatar alt="user" src={imageUrl} />
+      <Avatar alt="user" src={imageUrl} className={classes.large} />
       <input type="file" onChange={handleSaveTempImage} />
 
       <TextField
@@ -33,11 +41,7 @@ const UserSettingsPage = () => {
       <Button variant="contained" onClick={handleGoBack}>
         戻る
       </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleUpdateUserSetting}
-      >
+      <Button variant="contained" color="primary" onClick={updateUserSetting}>
         保存
       </Button>
     </Layout>
