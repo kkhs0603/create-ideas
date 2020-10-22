@@ -1,7 +1,14 @@
 import React, { useState, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { AuthContext } from "../../contexts/AuthContext";
-import { AppBar, Toolbar, IconButton, Menu, MenuItem } from "@material-ui/core";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Avatar,
+} from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 
 const useStyles = makeStyles((theme) => ({
@@ -20,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = () => {
   const classes = useStyles();
-  const { user, signout } = useContext(AuthContext);
+  const { user, signout, handleGoUserSetting } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event) => {
@@ -46,7 +53,7 @@ const Header = () => {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <MenuIcon />
+                <Avatar alt="user" src={user.photoURL} />
               </IconButton>
 
               <Menu
@@ -63,7 +70,7 @@ const Header = () => {
                 open={open}
                 onClose={handleClose}
               >
-                <MenuItem>Profile</MenuItem>
+                <MenuItem onClick={handleGoUserSetting}>設定</MenuItem>
                 <MenuItem onClick={signout}>サインアウト</MenuItem>
               </Menu>
             </div>

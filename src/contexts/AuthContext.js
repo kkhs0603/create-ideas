@@ -1,14 +1,16 @@
 import React, { useState, createContext, useEffect } from "react";
 import firebase, { googleProvider } from "../firebase/firebase";
 import ErrorMessage from "../firebase/ErrorMessage.js";
+import { useHistory } from "react-router-dom";
+
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const auth = firebase.auth();
+  const history = useHistory();
 
+  //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
     try {
       await auth.signInWithEmailAndPassword(email, password);
@@ -21,14 +23,6 @@ const AuthProvider = ({ children }) => {
     try {
       const result = await auth.createUserWithEmailAndPassword(email, password);
       result.user.updateProfile({ displayName: userName });
-      const timestamp = firebase.firestore.Timestamp.now();
-      firebase.firestore().collection("users").doc(result.user.uid).set({
-        id: result.user.uid,
-        name: userName,
-        canvasIds: [],
-        created_at: timestamp,
-        updated_at: timestamp,
-      });
       return result;
     } catch (error) {
       return ErrorMessage(error, "signup");
@@ -37,9 +31,7 @@ const AuthProvider = ({ children }) => {
 
   const signinWithGoogle = async () => {
     try {
-      setLoading(true);
-      const result = await auth.signInWithRedirect(googleProvider);
-      return result;
+      await auth.signInWithRedirect(googleProvider);
     } catch (e) {
       return ErrorMessage(e, "signin");
     }
@@ -47,28 +39,44 @@ const AuthProvider = ({ children }) => {
 
   const signout = async () => {
     try {
-      setLoading(true);
       await auth.signOut();
       console.log("sign out");
-      setLoading(false);
     } catch (e) {
       return ErrorMessage(e, "signout");
     }
   };
 
+  const handleGoUserSetting = () => {
+    history.push("/settings");
+  };
+
+  const handleGoBack = () => {
+    history.goBack();
+  };
+
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      setLoading(false);
+    auth.onAuthStateChanged(async (user) => {
       if (user == null) {
-        setToken(null);
         setUser(null);
         localStorage.clear();
         return;
       }
       setUser(user);
-      const token = user.getIdToken(true);
-      setToken(token);
-      localStorage.setItem("token", token);
+      // console.log(user);
+      // const usersCollection = firebase
+      //   .firestore()
+      //   .collection("users")
+      //   .doc(user.uid);
+      // await usersCollection.get();
+      // const timestamp = firebase.firestore.Timestamp.now();
+      // usersCollection.set({
+      //   id: user.uid,
+      //   canvasIds: [],
+      //   created_at: timestamp,
+      //   updated_at: timestamp,
+      // });
+
+      history.push("/canvases");
     });
   }, [auth]);
   return (
@@ -76,11 +84,11 @@ const AuthProvider = ({ children }) => {
       value={{
         signinWithGoogle,
         signout,
-        loading,
         signupWithEmailAndPassword,
         signinWithEmailAndPassword,
-        token,
         user,
+        handleGoUserSetting,
+        handleGoBack,
       }}
     >
       {children}
