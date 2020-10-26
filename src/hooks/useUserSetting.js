@@ -3,7 +3,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { storage } from "../firebase/firebase";
 
 export const useUserSetting = () => {
-  const { user, handleGoBack } = useContext(AuthContext);
+  const { user, handleGoBack, updateUser } = useContext(AuthContext);
   const [username, setUserName] = useState(user.displayName);
   const [tempFile, setTempFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(user.photoURL);
@@ -19,15 +19,14 @@ export const useUserSetting = () => {
     try {
       const url =
         tempFile !== null ? await uploadImage(tempFile) : user.photoURL;
-      console.log("url", url);
       await user.updateProfile({ photoURL: url, displayName: username });
+      await updateUser(user.uid, username, url);
       handleGoBack();
     } catch (error) {
       console.log(error);
     }
   };
 
-  //DOMに紐づかないものはメソッド名にhandleをつけなくていい
   //TODO:hooksなど切り出す Util
   //画像をstorageにupload
   const uploadImage = (image) => {

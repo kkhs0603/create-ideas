@@ -1,7 +1,8 @@
 import React from "react";
 import SignInPage from "./pages/SignInPage";
-import CanvasesPage from "./pages/CanvasesPage";
+import CanvasListPage from "./pages/CanvasListPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
+import CanvasPage from "./pages/CanvasPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CanvasProvider } from "./contexts/CanvasContext";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
@@ -15,8 +16,9 @@ function App() {
           <Switch>
             <Route exact path="/" component={SignInPage} />
             <AuthRouter>
-              <Route exact path="/canvases" component={CanvasesPage} />
+              <Route exact path="/canvas-list" component={CanvasListPage} />
               <Route exact path="/settings" component={UserSettingsPage} />
+              <Route exact path="/canvas" component={CanvasPage} />
             </AuthRouter>
           </Switch>
         </CanvasProvider>

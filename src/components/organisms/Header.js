@@ -45,7 +45,7 @@ const Header = () => {
             <></>
           ) : (
             <div>
-              {user.displayName + "さん"}
+              {user.displayName}
               <IconButton
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
