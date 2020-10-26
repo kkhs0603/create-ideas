@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { ListItem, ListItemText, Card, CardContent } from "@material-ui/core";
 
+import { AuthContext } from "../../contexts/AuthContext";
 const SelectCanvas = (props) => {
   const canvases = props.canvases;
+
+  const { handleGoCanvas } = useContext(AuthContext);
+
   console.log(canvases);
   if (canvases == null) {
     return <></>;
@@ -12,7 +16,13 @@ const SelectCanvas = (props) => {
     );
     return sortedCanvases.map((canvas) => {
       return (
-        <ListItem key={canvas.created_at} button>
+        <ListItem
+          key={canvas.created_at}
+          button
+          onClick={() => {
+            handleGoCanvas(canvas.id);
+          }}
+        >
           <Card variant="outlined">
             <CardContent>{"canvas名：" + canvas.name}</CardContent>
             <CardContent>{"created_by：" + canvas.created_by}</CardContent>

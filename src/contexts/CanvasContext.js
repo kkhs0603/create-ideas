@@ -5,6 +5,7 @@ const db = firebase.firestore();
 const CanvasProvider = ({ children }) => {
   const [canvases, setCanvases] = useState([]);
   const [canvasName, setCanvasName] = useState("");
+  const [joinedUsers, setJoinedUsers] = useState([]);
   const auth = firebase.auth();
 
   /////////
@@ -18,28 +19,17 @@ const CanvasProvider = ({ children }) => {
         .get();
       const userData = userDoc.data();
       console.log(userData);
-      // if (userData.canvasIds !== null && userData.canvasIds.length >= 3) {
-      //   console.log("canvasの上限です");
-      //   return;
-      // }
       //canvases
       const timestamp = firebase.firestore.Timestamp.now();
       await db.collection("canvases").add({
         name: canvasName,
         words: [],
         ideas: [],
-        joinedUsers: [],
+        joined_users: [],
         created_at: timestamp,
         created_by: auth.currentUser.uid,
         updated_at: timestamp,
       });
-      //users
-      // await db
-      //   .collection("users")
-      //   .doc(auth.currentUser.uid)
-      //   .update({
-      //     canvasIds: firebase.firestore.FieldValue.arrayUnion(docRef.id),
-      //   });
       console.log("new canvas created!");
     } catch (error) {
       console.log(error);
@@ -51,7 +41,15 @@ const CanvasProvider = ({ children }) => {
       const canvasesRef = await db.collection("canvases");
       canvasesRef.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          setCanvases((values) => [...values, change.doc.data()]);
+          setCanvases((values) => [
+            ...values,
+            {
+              id: change.doc.id,
+              name: change.doc.data().name,
+              created_by: change.doc.data().created_by,
+              created_at: change.doc.data().created_at,
+            },
+          ]);
           // 追加
           if (change.type === "added") {
             // addLog(change.doc.id, change.doc.data());
@@ -76,6 +74,33 @@ const CanvasProvider = ({ children }) => {
     setCanvasName(event.target.value);
   };
 
+  const enterCanvas = async (canvasId) => {
+    try {
+      //firebase canvasesのコレクションから参加しているユーザーID取得
+      const canvasesRef = await db.collection("canvases").doc(canvasId);
+      const joinedUsers = (await canvasesRef.get()).data().joined_users;
+      if (!joinedUsers.includes(auth.currentUser.uid)) {
+        joinedUsers.push(auth.currentUser.uid);
+        canvasesRef.update({ joined_users: joinedUsers });
+      }
+      //取得したユーザーIDからユーザー情報取得
+      joinedUsers.map(async (user) => {
+        const usersRef = db.collection("users").doc(user);
+        const userdata = (await usersRef.get()).data();
+        setJoinedUsers((user) => [...user, userdata]);
+      });
+      await canvasesRef.onSnapshot((snapshot) => {
+        if (snapshot.data().created_by !== auth.currentUser.uid) {
+          console.log("not authoer");
+        } else {
+          console.log("author");
+        }
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -90,6 +115,8 @@ const CanvasProvider = ({ children }) => {
         createCanvas,
         canvases,
         handleCanvasName,
+        enterCanvas,
+        joinedUsers,
       }}
     >
       {children}
