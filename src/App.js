@@ -1,8 +1,8 @@
 import React from "react";
 import SignInPage from "./pages/SignInPage";
-import CanvasListPage from "./pages/CanvasListPage";
-import UserSettingsPage from "./pages/UserSettingsPage";
-import CanvasPage from "./pages/CanvasPage";
+import CanvasListPage from "./pages/CanvasList";
+import UserSettingsPage from "./pages/UserSetting";
+import CanvasPage from "./pages/Canvas";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CanvasProvider } from "./contexts/CanvasContext";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
