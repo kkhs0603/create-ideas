@@ -81,9 +81,9 @@ const AuthProvider = ({ children }) => {
         await userRef.set({
           id: user.uid,
           name: user.displayName,
-          image_url: user.photoURL,
-          created_at: timestamp,
-          updated_at: timestamp,
+          imageUrl: user.photoURL,
+          createdAt: timestamp,
+          updatedAt: timestamp,
         });
       }
       router.push("/CanvasList");

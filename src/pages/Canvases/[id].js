@@ -31,17 +31,20 @@ export async function getStaticProps({ params }) {
 
 const Canvas = (props) => {
   const classes = useStyles();
-  const { enterCanvas, joinedUsers } = useContext(CanvasContext);
+  const { enterCanvas, joinedUsers, canvasData } = useContext(CanvasContext);
   const id = props.id;
+
+  const users = joinedUsers.map((user) => (
+    <Avatar user={user} key={user.id} alt="user" src={user.imageUrl} />
+  ));
   useEffect(() => {
     enterCanvas(id);
   }, []);
-  const users = joinedUsers.map((user) => (
-    <Avatar user={user} key={user.id} alt="user" src={user.image_url} />
-  ));
 
+  console.log(canvasData);
   return (
     <Layout>
+      <div>canvas名：{canvasData?.name}</div>
       <div className={classes.avatars}>{users}</div>
       <TextField></TextField>
       <Button type="submit" fullWidth variant="contained" color="primary">
