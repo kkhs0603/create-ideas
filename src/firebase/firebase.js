@@ -5,17 +5,17 @@ import "../../node_modules/firebase/database";
 import "firebase/storage";
 
 const config = {
-  apiKey: process.env.REACT_APP_FIREBASE_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_DOMAIN,
-  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_SENDER_ID,
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  databeseURL: process.env.FIREBASE_DATABASE_URL,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSEGING_SENDER_ID,
 };
+if (!firebase.apps.length) {
+  firebase.initializeApp(config);
+}
+//firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-firebase.initializeApp(config);
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-
-export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export const storage = firebase.storage();
 export default firebase;

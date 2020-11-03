@@ -13,12 +13,6 @@ const CanvasProvider = ({ children }) => {
   /////////
   const createCanvas = async () => {
     try {
-      const userDoc = await db
-        .collection("users")
-        .doc(auth.currentUser.uid)
-        .get();
-      const userData = userDoc.data();
-      console.log(userData);
       //canvases
       const timestamp = firebase.firestore.Timestamp.now();
       await db.collection("canvases").add({
@@ -40,28 +34,17 @@ const CanvasProvider = ({ children }) => {
     try {
       const canvasesRef = await db.collection("canvases");
       canvasesRef.onSnapshot((snapshot) => {
-        snapshot.docChanges().forEach((change) => {
+        snapshot.docs.forEach((change) => {
+          const date = change.data().created_at.toDate();
           setCanvases((values) => [
             ...values,
             {
-              id: change.doc.id,
-              name: change.doc.data().name,
-              created_by: change.doc.data().created_by,
-              created_at: change.doc.data().created_at,
+              id: change.id,
+              name: change.data().name,
+              created_by: change.data().created_by,
+              created_at: date,
             },
           ]);
-          // 追加
-          if (change.type === "added") {
-            // addLog(change.doc.id, change.doc.data());
-          }
-          // 更新
-          else if (change.type === "modified") {
-            // modLog(change.doc.id, change.doc.data());
-          }
-          // 削除
-          else if (change.type === "removed") {
-            // removeLog(change.doc.id);
-          }
         });
       });
     } catch (error) {
@@ -70,30 +53,32 @@ const CanvasProvider = ({ children }) => {
   };
 
   const handleCanvasName = (event) => {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setCanvasName(event.target.value);
   };
 
   const enterCanvas = async (canvasId) => {
     try {
       //firebase canvasesのコレクションから参加しているユーザーID取得
+      setJoinedUsers([]);
       const canvasesRef = await db.collection("canvases").doc(canvasId);
-      const joinedUsers = (await canvasesRef.get()).data().joined_users;
-      if (!joinedUsers.includes(auth.currentUser.uid)) {
-        joinedUsers.push(auth.currentUser.uid);
-        canvasesRef.update({ joined_users: joinedUsers });
+      const joinedUserIds = (await canvasesRef.get()).data().joined_users;
+      const myUserId = auth.currentUser.uid;
+      if (!joinedUserIds.includes(myUserId)) {
+        joinedUserIds.push(myUserId);
+        canvasesRef.update({ joined_users: joinedUserIds });
       }
       //取得したユーザーIDからユーザー情報取得
-      joinedUsers.map(async (user) => {
-        const usersRef = db.collection("users").doc(user);
+      joinedUserIds.map(async (userId) => {
+        const usersRef = db.collection("users").doc(userId);
         const userdata = (await usersRef.get()).data();
         setJoinedUsers((user) => [...user, userdata]);
       });
       await canvasesRef.onSnapshot((snapshot) => {
         if (snapshot.data().created_by !== auth.currentUser.uid) {
-          console.log("not authoer");
+          // console.log("not authoer");
         } else {
-          console.log("author");
+          // console.log("author");
         }
       });
     } catch (error) {

@@ -1,14 +1,14 @@
 import React, { useState, createContext, useEffect } from "react";
-import firebase, { googleProvider } from "../firebase/firebase";
+import firebase from "../firebase/firebase";
 import ErrorMessage from "../firebase/ErrorMessage.js";
-import { useHistory } from "react-router-dom";
+import { useRouter } from "next/router";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const auth = firebase.auth();
-  const history = useHistory();
   const db = firebase.firestore();
   //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
@@ -31,6 +31,7 @@ const AuthProvider = ({ children }) => {
 
   const signinWithGoogle = async () => {
     try {
+      const googleProvider = new firebase.auth.GoogleAuthProvider();
       await auth.signInWithRedirect(googleProvider);
     } catch (e) {
       return ErrorMessage(e, "signin");
@@ -48,7 +49,6 @@ const AuthProvider = ({ children }) => {
 
   const updateUser = async (userId, name, imageUrl) => {
     try {
-      // console.log(userId);
       await db
         .collection("users")
         .doc(userId)
@@ -59,15 +59,11 @@ const AuthProvider = ({ children }) => {
   };
 
   const handleGoUserSetting = () => {
-    history.push("/settings");
+    router.push("/UserSetting");
   };
 
   const handleGoBack = () => {
-    history.goBack();
-  };
-
-  const handleGoCanvas = (id) => {
-    history.push({ pathname: "/canvas", state: { canvasId: id } });
+    router.back();
   };
 
   useEffect(() => {
@@ -75,6 +71,7 @@ const AuthProvider = ({ children }) => {
       if (user == null) {
         setUser(null);
         localStorage.clear();
+        router.push("/");
         return;
       }
       setUser(user);
@@ -82,15 +79,17 @@ const AuthProvider = ({ children }) => {
       if (!userRef.get().exists) {
         const timestamp = firebase.firestore.Timestamp.now();
         await userRef.set({
+          id: user.uid,
           name: user.displayName,
           image_url: user.photoURL,
           created_at: timestamp,
           updated_at: timestamp,
         });
       }
-      history.push("/canvas-list");
+      router.push("/CanvasList");
     });
   }, [auth]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -101,7 +100,6 @@ const AuthProvider = ({ children }) => {
         user,
         handleGoUserSetting,
         handleGoBack,
-        handleGoCanvas,
         updateUser,
       }}
     >
