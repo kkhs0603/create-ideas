@@ -6,6 +6,7 @@ const CanvasProvider = ({ children }) => {
   const [canvases, setCanvases] = useState([]);
   const [canvasName, setCanvasName] = useState("");
   const [joinedUsers, setJoinedUsers] = useState([]);
+  const [canvasData, setCanvasData] = useState();
   const auth = firebase.auth();
 
   /////////
@@ -19,10 +20,10 @@ const CanvasProvider = ({ children }) => {
         name: canvasName,
         words: [],
         ideas: [],
-        joined_users: [],
-        created_at: timestamp,
-        created_by: auth.currentUser.uid,
-        updated_at: timestamp,
+        joinedUsers: [],
+        createdAt: timestamp,
+        createdBy: auth.currentUser.uid,
+        updatedAt: timestamp,
       });
       console.log("new canvas created!");
     } catch (error) {
@@ -35,14 +36,14 @@ const CanvasProvider = ({ children }) => {
       const canvasesRef = await db.collection("canvases");
       canvasesRef.onSnapshot((snapshot) => {
         snapshot.docs.forEach((change) => {
-          const date = change.data().created_at.toDate();
+          const date = change.data().createdAt.toDate();
           setCanvases((values) => [
             ...values,
             {
               id: change.id,
               name: change.data().name,
-              created_by: change.data().created_by,
-              created_at: date,
+              createdBy: change.data().createdBy,
+              createdAt: date,
             },
           ]);
         });
@@ -53,7 +54,6 @@ const CanvasProvider = ({ children }) => {
   };
 
   const handleCanvasName = (event) => {
-    //console.log(event.target.value);
     setCanvasName(event.target.value);
   };
 
@@ -62,11 +62,13 @@ const CanvasProvider = ({ children }) => {
       //firebase canvasesのコレクションから参加しているユーザーID取得
       setJoinedUsers([]);
       const canvasesRef = await db.collection("canvases").doc(canvasId);
-      const joinedUserIds = (await canvasesRef.get()).data().joined_users;
+      const data = (await canvasesRef.get()).data();
+      setCanvasData(data);
+      const joinedUserIds = data.joinedUsers;
       const myUserId = auth.currentUser.uid;
       if (!joinedUserIds.includes(myUserId)) {
         joinedUserIds.push(myUserId);
-        canvasesRef.update({ joined_users: joinedUserIds });
+        canvasesRef.update({ joinedUsers: joinedUserIds });
       }
       //取得したユーザーIDからユーザー情報取得
       joinedUserIds.map(async (userId) => {
@@ -75,7 +77,7 @@ const CanvasProvider = ({ children }) => {
         setJoinedUsers((user) => [...user, userdata]);
       });
       await canvasesRef.onSnapshot((snapshot) => {
-        if (snapshot.data().created_by !== auth.currentUser.uid) {
+        if (snapshot.data().createdBy !== auth.currentUser.uid) {
           // console.log("not authoer");
         } else {
           // console.log("author");
@@ -102,6 +104,7 @@ const CanvasProvider = ({ children }) => {
         handleCanvasName,
         enterCanvas,
         joinedUsers,
+        canvasData,
       }}
     >
       {children}
