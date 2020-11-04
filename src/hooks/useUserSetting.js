@@ -4,9 +4,9 @@ import { storage } from "../firebase/firebase";
 
 export const useUserSetting = () => {
   const { user, handleGoBack, updateUser } = useContext(AuthContext);
-  const [username, setUserName] = useState(user.displayName);
+  const [username, setUserName] = useState(user?.displayName);
   const [tempFile, setTempFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState(user.photoURL);
+  const [imageUrl, setImageUrl] = useState(user?.photoURL);
 
   const handleUserNameOnChanged = useCallback(
     (event) => {
