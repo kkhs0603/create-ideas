@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 const SelectCanvas = (props) => {
   const canvases = props.canvases;
   const router = useRouter();
-  if (canvases == null) {
+  if (canvases.length === 0) {
     return <></>;
   } else {
     const sortedCanvases = canvases.sort((a, b) =>
