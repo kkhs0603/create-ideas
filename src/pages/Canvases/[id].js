@@ -5,6 +5,7 @@ import { TextField, Button, Avatar, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import firebase from "../../firebase/firebase";
 import SendStickyNote from "../../components/organisms/SendStickyNote";
+import StickyNotesArea from "../../components/organisms/StickyNotesArea";
 
 export async function getCanvasIds() {
   const db = firebase.firestore();
@@ -33,6 +34,7 @@ export async function getStaticProps({ params }) {
 const Canvas = (props) => {
   const classes = useStyles();
   const { enterCanvas, joinedUsers, canvasData } = useContext(CanvasContext);
+  console.log(canvasData);
   const id = props.id;
 
   const users = joinedUsers.map((user) => (
@@ -54,7 +56,9 @@ const Canvas = (props) => {
           <div className={classes.avatars}>{users}</div>
         </Grid>
       </Grid>
-      <div className={classes.middle}>test</div>
+      <div className={classes.middle}>
+        <StickyNotesArea words={canvasData?.words} />
+      </div>
       <div className={classes.bottom}>
         <SendStickyNote />
       </div>

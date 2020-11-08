@@ -1,5 +1,6 @@
 import React, { useState, createContext, useEffect } from "react";
 import firebase from "../firebase/firebase";
+
 const CanvasContext = createContext();
 const db = firebase.firestore();
 const CanvasProvider = ({ children }) => {
@@ -64,9 +65,10 @@ const CanvasProvider = ({ children }) => {
       //firebase canvasesのコレクションから参加しているユーザーID取得
       setJoinedUsers([]);
       const canvasesRef = await db.collection("canvases").doc(canvasId);
-      const data = (await canvasesRef.get()).data();
-      setCanvasData(data);
-      const joinedUserIds = data.joinedUsers;
+      await canvasesRef.onSnapshot((snapshot) => {
+        setCanvasData(snapshot.data());
+      });
+      const joinedUserIds = canvasData.joinedUsers;
       const myUserId = auth.currentUser.uid;
       if (!joinedUserIds.includes(myUserId)) {
         joinedUserIds.push(myUserId);
@@ -92,10 +94,10 @@ const CanvasProvider = ({ children }) => {
 
   const sendWord = async (word) => {
     try {
+      console.log(word);
       const canvasRef = await db.collection("canvases").doc(canvasId);
       const words = (await canvasRef.get()).data().words;
       words.push(word);
-      console.log(word);
       canvasRef.update({ words: words });
     } catch (error) {
       console.log(error.message);
