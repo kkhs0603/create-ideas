@@ -7,6 +7,7 @@ const CanvasProvider = ({ children }) => {
   const [canvasName, setCanvasName] = useState("");
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [canvasData, setCanvasData] = useState();
+  const [canvasId, setCanvasId] = useState();
   const auth = firebase.auth();
 
   /////////
@@ -59,6 +60,7 @@ const CanvasProvider = ({ children }) => {
 
   const enterCanvas = async (canvasId) => {
     try {
+      setCanvasId(canvasId);
       //firebase canvasesのコレクションから参加しているユーザーID取得
       setJoinedUsers([]);
       const canvasesRef = await db.collection("canvases").doc(canvasId);
@@ -88,6 +90,18 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  const sendWord = async (word) => {
+    try {
+      const canvasRef = await db.collection("canvases").doc(canvasId);
+      const words = (await canvasRef.get()).data().words;
+      words.push(word);
+      console.log(word);
+      canvasRef.update({ words: words });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -105,6 +119,7 @@ const CanvasProvider = ({ children }) => {
         enterCanvas,
         joinedUsers,
         canvasData,
+        sendWord,
       }}
     >
       {children}

@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { CanvasContext } from "../../contexts/CanvasContext";
 import Layout from "../../components/templates/Layout/Layout";
-import { TextField, Button, Avatar } from "@material-ui/core";
+import { TextField, Button, Avatar, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import firebase from "../../firebase/firebase";
+import SendStickyNote from "../../components/organisms/SendStickyNote";
 
 export async function getCanvasIds() {
   const db = firebase.firestore();
@@ -44,12 +45,19 @@ const Canvas = (props) => {
   console.log(canvasData);
   return (
     <Layout>
-      <div>canvas名：{canvasData?.name}</div>
-      <div className={classes.avatars}>{users}</div>
-      <TextField></TextField>
-      <Button type="submit" fullWidth variant="contained" color="primary">
-        送信
-      </Button>
+      <Grid container spacing={3} className={classes.top}>
+        <Grid item xs={6}>
+          <div>canvas名：{canvasData?.name}</div>
+        </Grid>
+        <Grid item xs={6}>
+          <div>参加者</div>
+          <div className={classes.avatars}>{users}</div>
+        </Grid>
+      </Grid>
+      <div className={classes.middle}>test</div>
+      <div className={classes.bottom}>
+        <SendStickyNote />
+      </div>
     </Layout>
   );
 };
@@ -62,5 +70,17 @@ export default Canvas;
 const useStyles = makeStyles({
   avatars: {
     display: "flex",
+  },
+  top: {
+    position: "fixed",
+    height: "100px",
+  },
+  middle: {
+    paddingTop: "100px",
+  },
+  bottom: {
+    position: "fixed",
+    bottom: "5%",
+    left: "40%",
   },
 });
