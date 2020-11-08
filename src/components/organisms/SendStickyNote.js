@@ -16,8 +16,16 @@ const SendStickyNote = () => {
         multiline
         InputProps={{ disableUnderline: true }}
         onChange={(event) => handleChange(event.target.value)}
+        value={word}
       ></TextField>
-      <Button onClick={() => sendWord(word)}>送信</Button>
+      <Button
+        onClick={() => {
+          setWord("");
+          sendWord(word);
+        }}
+      >
+        送信
+      </Button>
     </div>
   );
 };
