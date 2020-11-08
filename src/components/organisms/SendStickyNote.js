@@ -20,8 +20,8 @@ const SendStickyNote = () => {
       ></TextField>
       <Button
         onClick={() => {
-          setWord("");
           sendWord(word);
+          setWord("");
         }}
       >
         送信

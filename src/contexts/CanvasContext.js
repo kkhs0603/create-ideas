@@ -97,11 +97,31 @@ const CanvasProvider = ({ children }) => {
       console.log(word);
       const canvasRef = await db.collection("canvases").doc(canvasId);
       const words = (await canvasRef.get()).data().words;
-      words.push(word);
+      words.push({
+        id: words.length,
+        word: word,
+        createdBy: auth.currentUser.uid,
+      });
       canvasRef.update({ words: words });
     } catch (error) {
       console.log(error.message);
     }
+  };
+
+  const deleteWord = async (id) => {
+    try {
+      console.log("id", id);
+      const canvasRef = await db.collection("canvases").doc(canvasId);
+      const words = (await canvasRef.get()).data().words;
+      const removedWords = words.filter((word) => word.id !== id);
+      canvasRef.update({ words: removedWords });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const deletable = (userId) => {
+    return auth.currentUser.uid === userId;
   };
 
   useEffect(() => {
@@ -122,6 +142,8 @@ const CanvasProvider = ({ children }) => {
         joinedUsers,
         canvasData,
         sendWord,
+        deleteWord,
+        deletable,
       }}
     >
       {children}
