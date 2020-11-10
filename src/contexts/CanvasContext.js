@@ -97,10 +97,15 @@ const CanvasProvider = ({ children }) => {
       console.log(word);
       const canvasRef = await db.collection("canvases").doc(canvasId);
       const words = (await canvasRef.get()).data().words;
+      const maxId = Math.max.apply(
+        null,
+        words.map((word) => word.id)
+      );
       words.push({
-        id: words.length,
+        id: maxId + 1,
         word: word,
         createdBy: auth.currentUser.uid,
+        position: { x: 0, y: 0 },
       });
       canvasRef.update({ words: words });
     } catch (error) {
@@ -124,6 +129,18 @@ const CanvasProvider = ({ children }) => {
     return auth.currentUser.uid === userId;
   };
 
+  const movedStickyNote = async (id, x, y) => {
+    try {
+      const canvasRef = await db.collection("canvases").doc(canvasId);
+      const words = (await canvasRef.get()).data().words;
+      const index = words.findIndex((word) => word.id === id);
+      words[index].position = { x: x, y: y };
+      canvasRef.update({ words: words });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -144,6 +161,7 @@ const CanvasProvider = ({ children }) => {
         sendWord,
         deleteWord,
         deletable,
+        movedStickyNote,
       }}
     >
       {children}
