@@ -98,10 +98,16 @@ const useStyles = makeStyles({
   container: {
     display: "inline-block",
     backgroundColor: "#FEF3B5",
-    padding: "10px",
     margin: "5px",
     whiteSpace: "pre-wrap",
-  },
+    padding:"0.5em 30px 0.5em",
+    position:"relative",
+    boxSizing:"border-box",
+    //border:"1px solid #EFEF93",
+    boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
+    backgroundImage:
+    "linear-gradient(180deg, hsla(0, 0%, 45%, .1) 0.5rem, hsla(0, 100%, 100%, 0) 2.5rem),linear-gradient(180deg, hsla(60, 100%, 85%, 1), hsla(60, 100%, 85%, 1))"
+  }
 });
 
 export default StickyNote;
