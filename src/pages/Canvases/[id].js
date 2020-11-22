@@ -6,6 +6,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import firebase from "../../firebase/firebase";
 import SendStickyNote from "../../components/organisms/SendStickyNote";
 import StickyNotesArea from "../../components/organisms/StickyNotesArea";
+import useSWR from 'swr'
+
 
 export async function getCanvasIds() {
   const db = firebase.firestore();
@@ -33,8 +35,7 @@ export async function getStaticProps({ params }) {
 
 const Canvas = (props) => {
   const classes = useStyles();
-  const { enterCanvas, joinedUsers, canvasData } = useContext(CanvasContext);
-  console.log(canvasData);
+  const { enterCanvas, joinedUsers, canvasData, words } = useContext(CanvasContext);
   const id = props.id;
 
   const users = joinedUsers.map((user) => (
@@ -43,8 +44,6 @@ const Canvas = (props) => {
   useEffect(() => {
     enterCanvas(id);
   }, []);
-
-  console.log(canvasData);
   return (
     <Layout>
       <Grid container spacing={3} className={classes.top}>
@@ -57,7 +56,7 @@ const Canvas = (props) => {
         </Grid>
       </Grid>
       <div className={classes.middle}>
-        <StickyNotesArea words={canvasData?.words} />
+        <StickyNotesArea words={words} />
       </div>
       <div className={classes.bottom}>
         <SendStickyNote />

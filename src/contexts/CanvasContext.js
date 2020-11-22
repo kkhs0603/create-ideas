@@ -9,6 +9,7 @@ const CanvasProvider = ({ children }) => {
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [canvasData, setCanvasData] = useState();
   const [canvasId, setCanvasId] = useState();
+  const [words,setWords] = useState([])
   const auth = firebase.auth();
 
   /////////
@@ -20,7 +21,6 @@ const CanvasProvider = ({ children }) => {
       const timestamp = firebase.firestore.Timestamp.now();
       await db.collection("canvases").add({
         name: canvasName,
-        words: [],
         ideas: [],
         joinedUsers: [],
         createdAt: timestamp,
@@ -62,7 +62,11 @@ const CanvasProvider = ({ children }) => {
   const enterCanvas = async (canvasId) => {
     try {
       setCanvasId(canvasId);
+      //TODO:修正
       //firebase canvasesのコレクションから参加しているユーザーID取得
+      //update→setcanvasではなく
+      //setCanvasしてupdate
+      //ローカルのデータを書き換えてから、firebaseのデータを書き換える。
       setJoinedUsers([]);
       const canvasesRef = await db.collection("canvases").doc(canvasId);
       await canvasesRef.onSnapshot((snapshot) => {
@@ -80,6 +84,9 @@ const CanvasProvider = ({ children }) => {
         const userdata = (await usersRef.get()).data();
         setJoinedUsers((user) => [...user, userdata]);
       });
+      //words
+      getWords(canvasId);
+
       await canvasesRef.onSnapshot((snapshot) => {
         if (snapshot.data().createdBy !== auth.currentUser.uid) {
           // console.log("not authoer");
@@ -92,22 +99,28 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  const getWords = async(canvasId) => {
+    
+    const wordsRef = await db.collection("canvases").doc(canvasId).collection("words");
+    //wordsRef
+    wordsRef.onSnapshot((snapshot) => {
+      setWords([])
+      snapshot.docs.forEach((word) => {
+        setWords((words)=>[...words,word.data()])
+      })
+    })
+  }
+
   const sendWord = async (word) => {
     try {
-      console.log(word);
-      const canvasRef = await db.collection("canvases").doc(canvasId);
-      const words = (await canvasRef.get()).data().words;
-      const maxId = Math.max.apply(
-        null,
-        words.map((word) => word.id)
-      );
-      words.push({
-        id: maxId + 1,
-        word: word,
-        createdBy: auth.currentUser.uid,
-        position: { x: 0, y: 0 },
-      });
-      canvasRef.update({ words: words });
+      const canvasRef = await db.collection("canvases").doc(canvasId).collection("words");
+      const result = await canvasRef.add({
+        word:word,
+        positionX:0, 
+        positionY:0,
+        createdBy:auth.currentUser.uid
+      })
+      canvasRef.doc(result.id).update({id:result.id})
     } catch (error) {
       console.log(error.message);
     }
@@ -115,7 +128,6 @@ const CanvasProvider = ({ children }) => {
 
   const deleteWord = async (id) => {
     try {
-      console.log("id", id);
       const canvasRef = await db.collection("canvases").doc(canvasId);
       const words = (await canvasRef.get()).data().words;
       const removedWords = words.filter((word) => word.id !== id);
@@ -131,11 +143,10 @@ const CanvasProvider = ({ children }) => {
 
   const movedStickyNote = async (id, x, y) => {
     try {
-      const canvasRef = await db.collection("canvases").doc(canvasId);
-      const words = (await canvasRef.get()).data().words;
-      const index = words.findIndex((word) => word.id === id);
-      words[index].position = { x: x, y: y };
-      canvasRef.update({ words: words });
+      setWords([])
+      await db.collection("canvases").doc(canvasId).collection("words").doc(id).update({ 
+        positionX: x, positionY: y
+      })
     } catch (error) {
       console.log(error.message);
     }
@@ -162,6 +173,8 @@ const CanvasProvider = ({ children }) => {
         deleteWord,
         deletable,
         movedStickyNote,
+        getWords,
+        words
       }}
     >
       {children}
