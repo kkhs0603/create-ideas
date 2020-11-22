@@ -23,13 +23,7 @@ const StickyNotesArea = (props) => {
 ///////
 const useStyles = makeStyles({
   container: {
-    // width: "100%",
     height: "80vh",
-    // backgroundColor: "#EEE",
-    // position: "relative",
-    // overflow: "auto",
-    // padding: "0",
-
     backgroundColor: "white",
     position: "relative",
     borderRadius: "5px",
