@@ -128,10 +128,8 @@ const CanvasProvider = ({ children }) => {
 
   const deleteWord = async (id) => {
     try {
-      const canvasRef = await db.collection("canvases").doc(canvasId);
-      const words = (await canvasRef.get()).data().words;
-      const removedWords = words.filter((word) => word.id !== id);
-      canvasRef.update({ words: removedWords });
+      const canvasRef = await db.collection("canvases").doc(canvasId).collection("words");
+      canvasRef.doc(id).delete()
     } catch (error) {
       console.log(error.message);
     }
@@ -143,7 +141,6 @@ const CanvasProvider = ({ children }) => {
 
   const movedStickyNote = async (id, x, y) => {
     try {
-      setWords([])
       await db.collection("canvases").doc(canvasId).collection("words").doc(id).update({ 
         positionX: x, positionY: y
       })

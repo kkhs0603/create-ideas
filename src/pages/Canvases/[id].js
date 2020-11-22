@@ -6,7 +6,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import firebase from "../../firebase/firebase";
 import SendStickyNote from "../../components/organisms/SendStickyNote";
 import StickyNotesArea from "../../components/organisms/StickyNotesArea";
-import useSWR from 'swr'
 
 
 export async function getCanvasIds() {

@@ -11,7 +11,6 @@ const initialState = {
 
 const StickyNote = (props) => {
   const classes = useStyles();
-  const ref = useRef();
   const { deleteWord, deletable, movedStickyNote } = useContext(CanvasContext);
   const [state, setState] = useState(initialState);
   const [position, setPosition] = useState({ x:props.data.positionX,y:props.data.positionY  });
@@ -22,6 +21,7 @@ const StickyNote = (props) => {
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
     });
+    
   };
 
   const handleClose = () => {
@@ -37,20 +37,10 @@ const StickyNote = (props) => {
   };
 
   const handleStop = (e, ui) => {
-    console.log('deltaX',ui);
     movedStickyNote(props.data.id, ui.x, ui.y);
   };
-
-  useEffect(() => {
-    //setPosition({ x:props.data.positionX,y:props.data.positionY  });
-  },[position])
-
+  const enableDelete = deletable(props.data.createdBy);
   
-  // const positionX = 
-  //   props.data.positionX === undefined ? 0 : props.data.position.x;
-  // const positionY =
-  //   props.data.position?.y === undefined ? 0 : props.data.position.y;
-
   return (
     <Draggable
       position={{x:position.x,y:position.y}}
@@ -61,9 +51,8 @@ const StickyNote = (props) => {
     >
       <div
         className={classes.container}
-        onClick={(e) => e.preventDefault}
+        onClick={(e) => {e.preventDefault()}}
         onContextMenu={handleClick}
-        ref={ref}
       >
         <p>{props.data.word}</p>
         <Menu
@@ -78,7 +67,7 @@ const StickyNote = (props) => {
           }
         >
           <MenuItem
-            disabled={!false}
+            disabled={!enableDelete}
             onClick={() => {
               deleteWord(props.data.id);
               handleClose();
@@ -103,7 +92,6 @@ const useStyles = makeStyles({
     padding:"0.5em 30px 0.5em",
     position:"relative",
     boxSizing:"border-box",
-    //border:"1px solid #EFEF93",
     boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
     backgroundImage:
     "linear-gradient(180deg, hsla(0, 0%, 45%, .1) 0.5rem, hsla(0, 100%, 100%, 0) 2.5rem),linear-gradient(180deg, hsla(60, 100%, 85%, 1), hsla(60, 100%, 85%, 1))"
