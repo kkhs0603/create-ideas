@@ -39,7 +39,7 @@ const Canvas = (props) => {
   const id = props.id;
 
   const users = joinedUsers.map((user) => (
-    <Avatar user={user} key={user.id} alt="user" src={user.imageUrl} />
+    <Avatar className={classes.small} user={user} key={user.id} alt="user" src={user.imageUrl} />
   ));
   useEffect(() => {
     enterCanvas(id);
@@ -51,8 +51,7 @@ const Canvas = (props) => {
           <div>canvas名：{canvasData?.name}</div>
         </Grid>
         <Grid item xs={6}>
-          <div>参加者</div>
-          <div className={classes.avatars}>{users}</div>
+          <div className={classes.avatars}>参加者：{users}</div>
         </Grid>
       </Grid>
       <div className={classes.middle}>
@@ -70,20 +69,24 @@ export default Canvas;
 ///////
 //Style
 ///////
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   avatars: {
     display: "flex",
   },
+  small: {
+    width: theme.spacing(3),
+    height: theme.spacing(3),
+  },
   top: {
     position: "fixed",
-    height: "100px",
+    height: "5vh",
   },
   middle: {
-    paddingTop: "100px",
+    paddingTop: "5vh",
   },
   bottom: {
     position: "fixed",
     bottom: "5%",
     left: "40%",
   },
-});
+}));
