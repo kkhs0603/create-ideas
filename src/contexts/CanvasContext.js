@@ -118,7 +118,8 @@ const CanvasProvider = ({ children }) => {
         word:word,
         positionX:0, 
         positionY:0,
-        createdBy:auth.currentUser.uid
+        createdBy:auth.currentUser.uid, 
+        color:"yellow"
       })
       canvasRef.doc(result.id).update({id:result.id})
     } catch (error) {
@@ -149,6 +150,16 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  const changeStickyNoteColor = async(id,color) => {
+    try {
+      await db.collection("canvases").doc(canvasId).collection("words").doc(id).update({ 
+        color:color
+      })
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -171,7 +182,8 @@ const CanvasProvider = ({ children }) => {
         deletable,
         movedStickyNote,
         getWords,
-        words
+        words,
+        changeStickyNoteColor
       }}
     >
       {children}
