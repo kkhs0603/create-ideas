@@ -34,6 +34,7 @@ const StickyNote = (props) => {
   };
 
   const handleDrag = (e, ui) => {
+    e.preventDefault();
     const nowPosition = position;
     setPosition({ x: nowPosition.x + ui.deltaX, y: nowPosition.y + ui.deltaY });
   };

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import StickyNote from "./StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const StickyNotesArea = (props) => {
   const ref = useRef(null);
@@ -13,8 +14,11 @@ const StickyNotesArea = (props) => {
     />
   ));
   return (
-    <div ref={ref} className={classes.container}>
-      {stickyNotes}
+    
+    <div ref={ref} className={classes.frame}>
+      <div className={classes.container}>
+        {stickyNotes}
+      </div>
     </div>
   );
 };
@@ -22,15 +26,19 @@ const StickyNotesArea = (props) => {
 //Style
 ///////
 const useStyles = makeStyles({
-  container: {
-    height: "80vh",
+  frame: {
+    height: "70vh",
     backgroundColor: "white",
     position: "relative",
     borderRadius: "5px",
     border: "10px solid #adb2bd",
     boxShadow: "inset -1px 2px 2px #404040, 6px 9px 1px rgba(0, 0, 0, 0.2)",
-    overflow: "hidden"
+    overflow: "scroll",
   },
+  container :{
+    height:"100vh",
+    width:"1200px",
+  }
 });
 
 export default StickyNotesArea;
