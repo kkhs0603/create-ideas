@@ -45,7 +45,7 @@ const Canvas = (props) => {
   }, []);
   return (
     <Layout>
-      <Grid container spacing={3} className={classes.top}>
+      <Grid container className={classes.top}>
         <Grid item xs={6}>
           <div>canvas名：{canvasData?.name}</div>
         </Grid>
@@ -78,14 +78,14 @@ const useStyles = makeStyles((theme) => ({
   },
   top: {
     position: "fixed",
-    height: "5vh",
+    height: "4vh",
   },
   middle: {
-    paddingTop: "5vh",
+    paddingTop: "4vh",
   },
   bottom: {
     position: "fixed",
-    bottom: "5%",
+    bottom: "1%",
     left: "40%",
   },
 }));
