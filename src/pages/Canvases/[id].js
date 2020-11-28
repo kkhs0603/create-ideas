@@ -7,13 +7,10 @@ import firebase from "../../firebase/firebase";
 import SendStickyNote from "../../components/organisms/SendStickyNote";
 import StickyNotesArea from "../../components/organisms/StickyNotesArea";
 
-
 export async function getCanvasIds() {
   const db = firebase.firestore();
   const snapshot = await db.collection("canvases").get();
-  const ids = snapshot.docs.map((doc) => {
-    return doc.id;
-  });
+  const ids = snapshot.docs.map((doc) => doc.id);
   return ids;
 }
 
@@ -34,14 +31,22 @@ export async function getStaticProps({ params }) {
 
 const Canvas = (props) => {
   const classes = useStyles();
-  const { enterCanvas, joinedUsers, canvasData, words } = useContext(CanvasContext);
+  const { enterCanvas, joinedUsers, canvasData, words } = useContext(
+    CanvasContext
+  );
   const id = props.id;
 
   const users = joinedUsers.map((user) => (
-    <Avatar className={classes.small} user={user} key={user.id} alt="user" src={user.imageUrl} />
+    <Avatar
+      className={classes.small}
+      user={user}
+      key={user.id}
+      alt="user"
+      src={user.imageUrl}
+    />
   ));
   useEffect(() => {
-    enterCanvas(id);
+    //enterCanvas(id);
   }, []);
   return (
     <Layout>
@@ -54,10 +59,10 @@ const Canvas = (props) => {
         </Grid>
       </Grid>
       <div className={classes.middle}>
-        <StickyNotesArea words={words} />
+        <StickyNotesArea id={id} />
       </div>
       <div className={classes.bottom}>
-        <SendStickyNote />
+        <SendStickyNote id={id} />
       </div>
     </Layout>
   );
