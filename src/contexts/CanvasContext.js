@@ -1,4 +1,6 @@
 import React, { useState, createContext, useEffect } from "react";
+import { useCollection } from "react-firebase-hooks/firestore";
+
 import firebase from "../firebase/firebase";
 
 const CanvasContext = createContext();
@@ -9,7 +11,7 @@ const CanvasProvider = ({ children }) => {
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [canvasData, setCanvasData] = useState();
   const [canvasId, setCanvasId] = useState();
-  const [words,setWords] = useState([])
+  const [words, setWords] = useState([]);
   const auth = firebase.auth();
 
   /////////
@@ -61,67 +63,64 @@ const CanvasProvider = ({ children }) => {
 
   const enterCanvas = async (canvasId) => {
     try {
+      console.log("enter canvas");
       setCanvasId(canvasId);
       //TODO:修正
       //firebase canvasesのコレクションから参加しているユーザーID取得
       //update→setcanvasではなく
       //setCanvasしてupdate
       //ローカルのデータを書き換えてから、firebaseのデータを書き換える。
-      setJoinedUsers([]);
-      const canvasesRef = await db.collection("canvases").doc(canvasId);
-      await canvasesRef.onSnapshot((snapshot) => {
-        setCanvasData(snapshot.data());
-      });
-      const joinedUserIds = canvasData.joinedUsers;
-      const myUserId = auth.currentUser.uid;
-      if (!joinedUserIds.includes(myUserId)) {
-        joinedUserIds.push(myUserId);
-        canvasesRef.update({ joinedUsers: joinedUserIds });
-      }
-      //取得したユーザーIDからユーザー情報取得
-      joinedUserIds.map(async (userId) => {
-        const usersRef = db.collection("users").doc(userId);
-        const userdata = (await usersRef.get()).data();
-        setJoinedUsers((user) => [...user, userdata]);
-      });
+      // setJoinedUsers([]);
+      //const canvasesRef = await db.collection("canvases").doc(canvasId);
+      // await canvasesRef.onSnapshot((snapshot) => {
+      //   setCanvasData(snapshot.data());
+      // });
+      // const joinedUserIds = canvasData.joinedUsers;
+      // const myUserId = auth.currentUser.uid;
+      // if (!joinedUserIds.includes(myUserId)) {
+      //   joinedUserIds.push(myUserId);
+      //   canvasesRef.update({ joinedUsers: joinedUserIds });
+      // }
+      // //取得したユーザーIDからユーザー情報取得
+      // joinedUserIds.map(async (userId) => {
+      //   const usersRef = db.collection("users").doc(userId);
+      //   const userdata = (await usersRef.get()).data();
+      //   setJoinedUsers((user) => [...user, userdata]);
+      // });
       //words
       getWords(canvasId);
-
-      await canvasesRef.onSnapshot((snapshot) => {
-        if (snapshot.data().createdBy !== auth.currentUser.uid) {
-          // console.log("not authoer");
-        } else {
-          // console.log("author");
-        }
-      });
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const getWords = async(canvasId) => {
-    
-    const wordsRef = await db.collection("canvases").doc(canvasId).collection("words");
+  const getWords = async (canvasId) => {
+    console.log("getwords");
+    const wordsRef = await db
+      .collection("canvases")
+      .doc(canvasId)
+      .collection("words");
     //wordsRef
     wordsRef.onSnapshot((snapshot) => {
-      setWords([])
-      snapshot.docs.forEach((word) => {
-        setWords((words)=>[...words,word.data()])
-      })
-    })
-  }
+      setWords([]);
+      setWords(snapshot.docs.map((word) => word.data()));
+    });
+  };
 
-  const sendWord = async (word) => {
+  const sendWord = async (id, word) => {
     try {
-      const canvasRef = await db.collection("canvases").doc(canvasId).collection("words");
+      const canvasRef = await db
+        .collection("canvases")
+        .doc(id)
+        .collection("words");
       const result = await canvasRef.add({
-        word:word,
-        positionX:0, 
-        positionY:0,
-        createdBy:auth.currentUser.uid, 
-        color:"yellow"
-      })
-      canvasRef.doc(result.id).update({id:result.id})
+        word: word,
+        positionX: 0,
+        positionY: 0,
+        createdBy: auth.currentUser.uid,
+        color: "yellow",
+      });
+      canvasRef.doc(result.id).update({ id: result.id });
     } catch (error) {
       console.log(error.message);
     }
@@ -129,8 +128,11 @@ const CanvasProvider = ({ children }) => {
 
   const deleteWord = async (id) => {
     try {
-      const canvasRef = await db.collection("canvases").doc(canvasId).collection("words");
-      canvasRef.doc(id).delete()
+      const canvasRef = await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("words");
+      canvasRef.doc(id).delete();
     } catch (error) {
       console.log(error.message);
     }
@@ -140,28 +142,42 @@ const CanvasProvider = ({ children }) => {
     return auth.currentUser.uid === userId;
   };
 
-  const movedStickyNote = async (id, x, y) => {
+  const moveStickyNote = async (canvasId, wordId, x, y) => {
     try {
-      await db.collection("canvases").doc(canvasId).collection("words").doc(id).update({ 
-        positionX: x, positionY: y
-      })
+      console.log("move stickyNote");
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("words")
+        .doc(wordId)
+        .update({
+          positionX: x,
+          positionY: y,
+        });
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const changeStickyNoteColor = async(id,color) => {
+  const changeStickyNoteColor = async (canvasId, wordId, color) => {
     try {
-      await db.collection("canvases").doc(canvasId).collection("words").doc(id).update({ 
-        color:color
-      })
+      console.log("change stickyNote color : " + color);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("words")
+        .doc(wordId)
+        .update({
+          color: color,
+        });
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
+      console.log("auth");
       if (user) {
         getCanvases();
       }
@@ -180,10 +196,10 @@ const CanvasProvider = ({ children }) => {
         sendWord,
         deleteWord,
         deletable,
-        movedStickyNote,
+        moveStickyNote,
         getWords,
         words,
-        changeStickyNoteColor
+        changeStickyNoteColor,
       }}
     >
       {children}
