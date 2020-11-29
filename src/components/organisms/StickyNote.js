@@ -96,7 +96,10 @@ const StickyNote = (props) => {
   };
 
   const handleStop = (e, ui) => {
-    setPosition({ x: ui.x, y: ui.y });
+    if (position.x !== ui.x || position.y !== ui.y) {
+      setPosition({ x: ui.x, y: ui.y });
+      moveStickyNote(props.canvasId, props.data.id, ui.x, ui.y);
+    }
     setCursor("grab");
   };
 
@@ -124,9 +127,9 @@ const StickyNote = (props) => {
       break;
   }
 
-  useEffect(() => {
-    moveStickyNote(props.canvasId, props.data.id, position.x, position.y);
-  }, [position.x, position.y]);
+  // useEffect(() => {
+
+  // }, [position.x, position.y]);
 
   return (
     <Draggable
@@ -180,7 +183,7 @@ const StickyNote = (props) => {
           <Divider />
           <MenuItem
             onClick={() => {
-              deleteWord(props.data.id);
+              deleteWord(props.canvasId, props.data.id);
               handleClose();
             }}
           >
@@ -201,7 +204,7 @@ const useStyles = makeStyles({
     margin: "5px",
     whiteSpace: "pre-wrap",
     padding: "0.5em 30px 0.5em",
-    position: "relative",
+    position: "absolute",
     boxSizing: "border-box",
     boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
   },
