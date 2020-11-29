@@ -4,7 +4,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import firebase from "../../firebase/firebase";
 
 const StickyNotesArea = (props) => {
-  //console.log("stickyNoteArea")
   const ref = useRef(null);
   const classes = useStyles();
   const [words, setWords] = useState([]);
@@ -16,11 +15,12 @@ const StickyNotesArea = (props) => {
       .doc(props.id)
       .collection("words");
     //wordsRef
-    wordsRef.onSnapshot((snapshot) => {
+    const unsubscribe = wordsRef.onSnapshot((snapshot) => {
       console.log("onsnap");
       setWords([]);
       setWords(snapshot.docs.map((word) => word.data()));
     });
+    return () => unsubscribe();
   }, []);
 
   const stickyNotes = words?.map((data, index) => (
@@ -51,6 +51,7 @@ const useStyles = makeStyles({
     overflow: "scroll",
   },
   container: {
+    position: "relative",
     height: "100vh",
     width: "1200px",
   },

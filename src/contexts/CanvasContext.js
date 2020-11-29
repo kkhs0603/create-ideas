@@ -126,13 +126,13 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
-  const deleteWord = async (id) => {
+  const deleteWord = async (canvasId, wordId) => {
     try {
       const canvasRef = await db
         .collection("canvases")
         .doc(canvasId)
         .collection("words");
-      canvasRef.doc(id).delete();
+      canvasRef.doc(wordId).delete();
     } catch (error) {
       console.log(error.message);
     }
@@ -144,7 +144,7 @@ const CanvasProvider = ({ children }) => {
 
   const moveStickyNote = async (canvasId, wordId, x, y) => {
     try {
-      console.log("move stickyNote");
+      console.log("move stickyNote: ", wordId);
       await db
         .collection("canvases")
         .doc(canvasId)
