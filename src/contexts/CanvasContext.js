@@ -12,6 +12,7 @@ const CanvasProvider = ({ children }) => {
   const [canvasData, setCanvasData] = useState();
   const [canvasId, setCanvasId] = useState();
   const [words, setWords] = useState([]);
+  const [lines, setLines] = useState([]);
   const auth = firebase.auth();
 
   /////////
@@ -138,10 +139,6 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
-  const deletable = (userId) => {
-    return auth.currentUser.uid === userId;
-  };
-
   const moveStickyNote = async (canvasId, wordId, x, y) => {
     try {
       console.log("move stickyNote: ", wordId);
@@ -175,6 +172,48 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  const drawLine = async (canvasId, vh, x, y) => {
+    try {
+      console.log("draw Line : " + vh + " x: " + x + " y: " + y);
+      const lineRef = db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("lines");
+      const result = await lineRef.add({ vh, x, y });
+      lineRef.doc(result.id).update({ id: result.id });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const getLines = async (canvasId) => {
+    try {
+      const lineRef = db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("lines");
+      lineRef.onSnapshot((snapshot) => {
+        setLines([]);
+        setLines(snapshot.docs.map((line) => line.data()));
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const moveLine = async (canvasId, lineId, x, y) => {
+    try {
+      const lineRef = db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("lines")
+        .doc(lineId);
+      await lineRef.update({ x: x, y: y });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       console.log("auth");
@@ -195,11 +234,14 @@ const CanvasProvider = ({ children }) => {
         canvasData,
         sendWord,
         deleteWord,
-        deletable,
         moveStickyNote,
         getWords,
         words,
         changeStickyNoteColor,
+        drawLine,
+        getLines,
+        lines,
+        moveLine,
       }}
     >
       {children}
