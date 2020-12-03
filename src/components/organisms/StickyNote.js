@@ -73,6 +73,7 @@ const StickyNote = (props) => {
   const handleClick = (e) => {
     setIsOpendMenu(true);
     e.preventDefault();
+    if (e.target.id !== "stickyNote") return;
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -140,6 +141,7 @@ const StickyNote = (props) => {
       bounds="parent"
     >
       <div
+        id="stickyNote"
         className={color}
         style={{ cursor: cursor }}
         onClick={(e) => {
