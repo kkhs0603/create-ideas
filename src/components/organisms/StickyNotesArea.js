@@ -44,6 +44,7 @@ const StickyNotesArea = (props) => {
 
   const handleClick = (e) => {
     e.preventDefault();
+    if (e.target.id !== "area") return;
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -81,6 +82,7 @@ const StickyNotesArea = (props) => {
   return (
     <div ref={ref} className={classes.frame}>
       <div
+        id="area"
         className={classes.container}
         onClick={(e) => {
           e.preventDefault();
