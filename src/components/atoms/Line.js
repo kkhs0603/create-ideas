@@ -3,6 +3,19 @@ import Draggable from "react-draggable";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { CanvasContext } from "../../contexts/CanvasContext";
+import {
+  Button,
+  TextField,
+  Menu,
+  MenuItem,
+  Radio,
+  Divider,
+} from "@material-ui/core";
+
+const initiaMouselState = {
+  mouseX: null,
+  mouseY: null,
+};
 
 const Line = (props) => {
   const [cursor, setCursor] = useState("grab");
@@ -10,8 +23,9 @@ const Line = (props) => {
     x: props.x,
     y: props.y,
   });
+  const [mouseState, setMouseState] = useState(initiaMouselState);
   const classes = useStyles();
-  const { moveLine } = useContext(CanvasContext);
+  const { moveLine, deleteLine } = useContext(CanvasContext);
 
   let lineClasses = classes.container;
   let axis = null;
@@ -39,6 +53,7 @@ const Line = (props) => {
 
   const handleStop = (e, ui) => {
     setCursor("grab");
+    if (props.x === ui.x && props.y === ui.y) return;
     if (props.vh === "vertical") {
       setPosition({ x: ui.x, y: 0 });
     } else if (props.vh === "horizontal") {
@@ -46,6 +61,20 @@ const Line = (props) => {
     }
     moveLine(props.canvasId, props.id, ui.x, ui.y);
   };
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (e.target.id !== "line") return;
+    setMouseState({
+      mouseX: e.clientX - 2,
+      mouseY: e.clientY - 4,
+    });
+  };
+
+  const handleClose = () => {
+    setMouseState(initiaMouselState);
+  };
+
   return (
     <Draggable
       axis={axis}
@@ -55,7 +84,35 @@ const Line = (props) => {
       position={{ x: position.x, y: position.y }}
       bounds="parent"
     >
-      <div className={lineClasses} style={{ cursor: cursor }}></div>
+      <div
+        id="line"
+        className={lineClasses}
+        style={{ cursor: cursor }}
+        onContextMenu={handleClick}
+      >
+        <Menu
+          keepMounted
+          open={mouseState.mouseY !== null}
+          onClose={handleClose}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            mouseState.mouseY !== null && mouseState.mouseX !== null
+              ? { top: mouseState.mouseY, left: mouseState.mouseX }
+              : undefined
+          }
+        >
+          <MenuItem disabled></MenuItem>
+          <Divider />
+          <MenuItem
+            onClick={() => {
+              deleteLine(props.canvasId, props.id);
+              handleClose();
+            }}
+          >
+            線を削除
+          </MenuItem>
+        </Menu>
+      </div>
     </Draggable>
   );
 };

@@ -95,6 +95,9 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  /* --------------------------
+  stickyNote
+  -------------------------- */
   const getWords = async (canvasId) => {
     console.log("getwords");
     const wordsRef = await db
@@ -172,6 +175,9 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  /* --------------------------
+  Line
+  -------------------------- */
   const drawLine = async (canvasId, vh, x, y) => {
     try {
       console.log("draw Line : " + vh + " x: " + x + " y: " + y);
@@ -203,12 +209,26 @@ const CanvasProvider = ({ children }) => {
 
   const moveLine = async (canvasId, lineId, x, y) => {
     try {
+      console.log("move line");
       const lineRef = db
         .collection("canvases")
         .doc(canvasId)
         .collection("lines")
         .doc(lineId);
       await lineRef.update({ x: x, y: y });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const deleteLine = async (canvasId, lineId) => {
+    try {
+      console.log("delete line");
+      db.collection("canvases")
+        .doc(canvasId)
+        .collection("lines")
+        .doc(lineId)
+        .delete();
     } catch (error) {
       console.log(error.message);
     }
@@ -242,6 +262,7 @@ const CanvasProvider = ({ children }) => {
         getLines,
         lines,
         moveLine,
+        deleteLine,
       }}
     >
       {children}
