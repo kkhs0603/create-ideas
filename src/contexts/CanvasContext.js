@@ -113,6 +113,8 @@ const CanvasProvider = ({ children }) => {
 
   const sendWord = async (id, word) => {
     try {
+      const zIndeices = await getAllZindices(id);
+      const maxZindex = Math.max.apply(null, zIndeices);
       const canvasRef = await db
         .collection("canvases")
         .doc(id)
@@ -123,6 +125,7 @@ const CanvasProvider = ({ children }) => {
         positionY: 0,
         createdBy: auth.currentUser.uid,
         color: "yellow",
+        zIndex: maxZindex + 1,
       });
       canvasRef.doc(result.id).update({ id: result.id });
     } catch (error) {
@@ -175,18 +178,113 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  //前面へ
+  const bringForward = async (canvasId, objName, id, zIndex) => {
+    try {
+      console.log("bringFoward : " + objName);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection(objName)
+        .doc(id)
+        .update({
+          zIndex: zIndex + 1,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //最前面へ
+  const bringToFront = async (canvasId, objName, id) => {
+    try {
+      console.log("bringToFront : " + objName);
+      const zIndeices = await getAllZindices(canvasId);
+      console.log(zIndeices);
+      const maxZindex = Math.max.apply(null, zIndeices);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection(objName)
+        .doc(id)
+        .update({
+          zIndex: maxZindex + 1,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //背面へ
+  const sendBackward = async (canvasId, objName, id, zIndex) => {
+    try {
+      console.log("sendBackward : " + objName);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection(objName)
+        .doc(id)
+        .update({
+          zIndex: zIndex - 1,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //最背面へ
+  const sendToBack = async (canvasId, objName, id) => {
+    try {
+      console.log("sendToBack : " + objName);
+      const zIndeices = await getAllZindices(canvasId);
+      const maxZindex = Math.min.apply(null, zIndeices);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection(objName)
+        .doc(id)
+        .update({
+          zIndex: maxZindex - 1,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //全オブジェクトのzIndex取得
+  const getAllZindices = async (canvasId) => {
+    const wordsRef = await db
+      .collection("canvases")
+      .doc(canvasId)
+      .collection("words");
+    const words = await (await wordsRef.get()).docs;
+    const zIndices = words.map((word) => word.data().zIndex);
+
+    const linesRef = await db
+      .collection("canvases")
+      .doc(canvasId)
+      .collection("lines");
+    const lines = await (await linesRef.get()).docs;
+    const linesZindices = lines.map((line) => line.data().zIndex);
+    const result = zIndices.concat(linesZindices);
+    console.log(result);
+    return result;
+  };
+
   /* --------------------------
   Line
   -------------------------- */
   const drawLine = async (canvasId, vh, x, y) => {
     try {
       console.log("draw Line : " + vh + " x: " + x + " y: " + y);
+      const zIndeices = await getAllZindices(canvasId);
+      const maxZindex = Math.max.apply(null, zIndeices);
       const lineRef = db
         .collection("canvases")
         .doc(canvasId)
         .collection("lines");
       const result = await lineRef.add({ vh, x, y });
-      lineRef.doc(result.id).update({ id: result.id });
+      lineRef.doc(result.id).update({ id: result.id, zIndex: maxZindex + 1 });
     } catch (error) {
       console.log(error.message);
     }
@@ -235,12 +333,13 @@ const CanvasProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    const authState = auth.onAuthStateChanged((user) => {
       console.log("auth");
       if (user) {
         getCanvases();
       }
     });
+    return () => authState();
   }, [auth]);
 
   return (
@@ -263,6 +362,10 @@ const CanvasProvider = ({ children }) => {
         lines,
         moveLine,
         deleteLine,
+        bringForward,
+        bringToFront,
+        sendBackward,
+        sendToBack,
       }}
     >
       {children}
