@@ -24,8 +24,15 @@ const Line = (props) => {
     y: props.y,
   });
   const [mouseState, setMouseState] = useState(initiaMouselState);
-  const classes = useStyles();
-  const { moveLine, deleteLine } = useContext(CanvasContext);
+  const classes = useStyles(props);
+  const {
+    moveLine,
+    deleteLine,
+    bringForward,
+    sendBackward,
+    bringToFront,
+    sendToBack,
+  } = useContext(CanvasContext);
 
   let lineClasses = classes.container;
   let axis = null;
@@ -101,8 +108,34 @@ const Line = (props) => {
               : undefined
           }
         >
-          <MenuItem disabled></MenuItem>
-          <Divider />
+          <MenuItem
+            onClick={() => {
+              bringForward(props.canvasId, "lines", props.id, props.zIndex);
+            }}
+          >
+            前面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              bringToFront(props.canvasId, "lines", props.id);
+            }}
+          >
+            最前面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              sendBackward(props.canvasId, "lines", props.id, props.zIndex);
+            }}
+          >
+            背面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              sendToBack(props.canvasId, "lines", props.id);
+            }}
+          >
+            最後面へ
+          </MenuItem>
           <MenuItem
             onClick={() => {
               deleteLine(props.canvasId, props.id);
@@ -124,6 +157,7 @@ const useStyles = makeStyles({
   container: {
     position: "absolute",
     backgroundColor: "black",
+    zIndex: (props) => props.zIndex,
   },
   vertical: {
     width: "5px",

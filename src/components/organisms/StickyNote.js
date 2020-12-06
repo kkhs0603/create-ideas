@@ -57,10 +57,16 @@ const BlueRadio = withStyles({
 })((props) => <Radio color="default" {...props} />);
 
 const StickyNote = (props) => {
-  const classes = useStyles();
-  const { moveStickyNote, deleteWord, changeStickyNoteColor } = useContext(
-    CanvasContext
-  );
+  const classes = useStyles(props);
+  const {
+    moveStickyNote,
+    deleteWord,
+    changeStickyNoteColor,
+    bringForward,
+    sendBackward,
+    bringToFront,
+    sendToBack,
+  } = useContext(CanvasContext);
   const [mouseState, setMouseState] = useState(initiaMouselState);
   const [position, setPosition] = useState({
     x: props.data.positionX,
@@ -161,6 +167,45 @@ const StickyNote = (props) => {
               : undefined
           }
         >
+          <MenuItem
+            onClick={() => {
+              bringForward(
+                props.canvasId,
+                "words",
+                props.data.id,
+                props.data.zIndex
+              );
+            }}
+          >
+            前面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              bringToFront(props.canvasId, "words", props.data.id);
+            }}
+          >
+            最前面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              sendBackward(
+                props.canvasId,
+                "words",
+                props.data.id,
+                props.data.zIndex
+              );
+            }}
+          >
+            背面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              sendToBack(props.canvasId, "words", props.data.id);
+            }}
+          >
+            最後面へ
+          </MenuItem>
+          <Divider />
           <MenuItem disabled>付箋の色</MenuItem>
           <YellowRadio
             checked={selectedColor === "yellow"}
@@ -202,13 +247,13 @@ const StickyNote = (props) => {
 const useStyles = makeStyles({
   container: {
     userSelect: "none",
-    display: "inline-block",
     margin: "5px",
     whiteSpace: "pre-wrap",
     padding: "0.5em 30px 0.5em",
     position: "absolute",
     boxSizing: "border-box",
     boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
+    zIndex: (props) => props.data.zIndex,
   },
   yellow: {
     backgroundColor: "#FFFCB3",

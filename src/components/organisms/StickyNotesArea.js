@@ -20,7 +20,7 @@ const initiaMouselState = {
 
 const StickyNotesArea = (props) => {
   const ref = useRef(null);
-  const classes = useStyles();
+  const classes = useStyles(props);
   const [words, setWords] = useState([]);
   const [mouseState, setMouseState] = useState(initiaMouselState);
   const { drawLine, getLines, lines } = useContext(CanvasContext);
@@ -76,6 +76,7 @@ const StickyNotesArea = (props) => {
           vh={line.vh}
           x={line.x}
           y={line.y}
+          zIndex={line.zIndex}
         ></Line>
       ))
     );
@@ -140,6 +141,7 @@ const StickyNotesArea = (props) => {
 ///////
 const useStyles = makeStyles({
   frame: {
+    width: "100%",
     height: "70vh",
     backgroundColor: "white",
     position: "relative",
@@ -150,8 +152,9 @@ const useStyles = makeStyles({
   },
   container: {
     position: "relative",
-    height: "100vh",
-    width: "1200px",
+    height: "100%",
+    width: "100%",
+    zIndex: "1",
   },
 });
 
