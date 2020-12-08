@@ -24,6 +24,7 @@ const StickyNotesArea = (props) => {
   const [words, setWords] = useState([]);
   const [mouseState, setMouseState] = useState(initiaMouselState);
   const { drawLine, getLines, lines } = useContext(CanvasContext);
+  const [isAreaClicked, setIsAreaClicked] = useState(false);
 
   useEffect(() => {
     const wordsRef = firebase
@@ -52,6 +53,7 @@ const StickyNotesArea = (props) => {
   };
 
   const handleClose = () => {
+    console.log("hoge");
     setMouseState(initiaMouselState);
   };
 
@@ -61,6 +63,8 @@ const StickyNotesArea = (props) => {
       key={index}
       parent={ref.current?.getBoundingClientRect()}
       canvasId={props.id}
+      isAreaClicked={isAreaClicked}
+      setIsAreaClicked={setIsAreaClicked}
     />
   ));
 
@@ -87,6 +91,9 @@ const StickyNotesArea = (props) => {
         className={classes.container}
         onClick={(e) => {
           e.preventDefault();
+          if (e.target.id !== "area") return;
+          console.log("area click");
+          setIsAreaClicked(true);
         }}
         onContextMenu={handleClick}
       >

@@ -178,6 +178,22 @@ const CanvasProvider = ({ children }) => {
     }
   };
 
+  const editStickyNoteWord = async (canvasId, wordId, word) => {
+    try {
+      console.log("editStickyNoteWord : " + word);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("words")
+        .doc(wordId)
+        .update({
+          word: word,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   //前面へ
   const bringForward = async (canvasId, objName, id, zIndex) => {
     try {
@@ -357,6 +373,7 @@ const CanvasProvider = ({ children }) => {
         getWords,
         words,
         changeStickyNoteColor,
+        editStickyNoteWord,
         drawLine,
         getLines,
         lines,

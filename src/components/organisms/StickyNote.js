@@ -9,6 +9,7 @@ import {
   MenuItem,
   Radio,
   Divider,
+  InputBase,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Draggable from "react-draggable";
@@ -66,6 +67,7 @@ const StickyNote = (props) => {
     sendBackward,
     bringToFront,
     sendToBack,
+    editStickyNoteWord,
   } = useContext(CanvasContext);
   const [mouseState, setMouseState] = useState(initiaMouselState);
   const [position, setPosition] = useState({
@@ -75,11 +77,13 @@ const StickyNote = (props) => {
   const [cursor, setCursor] = useState("grab");
   const [isOpendMenu, setIsOpendMenu] = useState(false);
   const [selectedColor, setSelectedColor] = useState(props.data.color);
+  const [isEdit, setIsEdit] = useState(false);
+  const [tempWord, setTempWord] = useState(props.data.word);
 
   const handleClick = (e) => {
     setIsOpendMenu(true);
-    e.preventDefault();
-    if (e.target.id !== "stickyNote") return;
+    if (e.target.id !== `stickyNote${props.data.id}`) return;
+    props.setIsAreaClicked(false);
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -111,7 +115,6 @@ const StickyNote = (props) => {
   };
 
   const handleChangeColor = (event) => {
-    //setSelectedColor(event.target.value);
     changeStickyNoteColor(props.canvasId, props.data.id, event.target.value);
   };
 
@@ -134,30 +137,62 @@ const StickyNote = (props) => {
       break;
   }
 
-  // useEffect(() => {
+  const finishWordEdit = (e) => {
+    if (
+      ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
+      e.key === "Enter"
+    ) {
+      if (props.data.word !== tempWord) {
+        editStickyNoteWord(props.canvasId, props.data.id, e.target.value);
+      }
+      setIsEdit(false);
+    }
+  };
 
-  // }, [position.x, position.y]);
+  const word = isEdit ? (
+    props.isAreaClicked ? (
+      <div>{tempWord}</div>
+    ) : (
+      <TextField
+        multiline={true}
+        value={tempWord}
+        onChange={(e) => {
+          setTempWord(e.target.value);
+        }}
+        onKeyDown={(e) => finishWordEdit(e)}
+        style={{ width: 100 }}
+      />
+    )
+  ) : (
+    <div>{tempWord}</div>
+  );
 
+  useEffect(() => {
+    //編集状態を解除する
+    setIsEdit(false);
+    setTempWord(props.data.word);
+  }, [props.isAreaClicked]);
   return (
     <Draggable
       position={{ x: position.x, y: position.y }}
       onStart={handleStart}
       onDrag={handleDrag}
       onStop={handleStop}
-      bounds="parent"
     >
       <div
-        id="stickyNote"
+        id={`stickyNote${props.data.id}`}
         className={color}
         style={{ cursor: cursor }}
-        onClick={(e) => {
-          e.preventDefault();
-        }}
         onContextMenu={handleClick}
+        onClick={() => {
+          props.setIsAreaClicked(false);
+        }}
+        onDoubleClick={() => {
+          setIsEdit(true);
+        }}
       >
-        <p>{props.data.word}</p>
+        {word}
         <Menu
-          keepMounted
           open={mouseState.mouseY !== null}
           onClose={handleClose}
           anchorReference="anchorPosition"
@@ -167,6 +202,14 @@ const StickyNote = (props) => {
               : undefined
           }
         >
+          <MenuItem
+            onClick={() => {
+              setIsEdit(true);
+              handleClose();
+            }}
+          >
+            編集
+          </MenuItem>
           <MenuItem
             onClick={() => {
               bringForward(
