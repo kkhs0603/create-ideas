@@ -82,7 +82,7 @@ const StickyNote = (props) => {
 
   const handleClick = (e) => {
     setIsOpendMenu(true);
-    if (e.target.id !== `stickyNote${props.data.id}`) return;
+    if (e.target.id !== "stickyNote") return;
     props.setIsAreaClicked(false);
     setMouseState({
       mouseX: e.clientX - 2,
@@ -180,7 +180,7 @@ const StickyNote = (props) => {
       onStop={handleStop}
     >
       <div
-        id={`stickyNote${props.data.id}`}
+        id={"stickyNote"}
         className={color}
         style={{ cursor: cursor }}
         onContextMenu={handleClick}
@@ -296,6 +296,7 @@ const useStyles = makeStyles({
     position: "absolute",
     boxSizing: "border-box",
     boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
+    border: "1px solid black",
     zIndex: (props) => props.data.zIndex,
   },
   yellow: {
