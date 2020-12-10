@@ -1,7 +1,7 @@
 import React, { useState, createContext, useEffect } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 
-import firebase from "../firebase/firebase";
+import firebase from "../firebase/firebase.ts";
 
 const CanvasContext = createContext();
 const db = firebase.firestore();

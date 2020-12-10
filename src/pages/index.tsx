@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Layout from "../components/templates/Layout/Layout";
-import Title from "../components/atoms/Title/Title";
+import Title from "../components/atoms/Title";
 import TopSlider from "../components/molecules/TopSlider/TopSlider";
 import { SignIn } from "../components/organisms/SignIn";
 import { SignUp } from "../components/organisms/SignUp";

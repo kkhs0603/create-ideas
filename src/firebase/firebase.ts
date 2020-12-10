@@ -1,7 +1,7 @@
-import * as firebase from "../../node_modules/firebase/app";
+import * as firebase from "firebase";
 import "@firebase/firestore";
-import "../../node_modules/firebase/auth";
-import "../../node_modules/firebase/database";
+import "firebase/empty-import";
+import "firebase/empty-import";
 import "firebase/storage";
 
 const config = {
