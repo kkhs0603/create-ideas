@@ -1,6 +1,6 @@
 import React, { useState, createContext, useEffect } from "react";
-import firebase from "../firebase/firebase";
-import ErrorMessage from "../firebase/ErrorMessage.js";
+import firebase from "../firebase/firebase.ts";
+import ErrorMessage from "../firebase/ErrorMessage.ts";
 import { useRouter } from "next/router";
 
 const AuthContext = createContext();

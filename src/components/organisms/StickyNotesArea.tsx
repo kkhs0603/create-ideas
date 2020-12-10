@@ -86,7 +86,7 @@ const StickyNotesArea = (props) => {
     );
   return (
     <div ref={ref} className={classes.frame}>
-      <Image src={"/swot.png"} alt="swot" layout="fill" />
+      <Image src={"/swot.png"} alt="swot" layout="fill" unsized />
       <div
         id="area"
         className={classes.container}

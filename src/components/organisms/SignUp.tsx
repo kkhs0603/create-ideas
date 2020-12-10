@@ -1,5 +1,5 @@
 import React from "react";
-import { useSignUp } from "../../hooks/useSignUp.js";
+import { useSignUp } from "../../hooks/useSignUp";
 import { makeStyles } from "@material-ui/core/styles";
 import { TextField, Button } from "@material-ui/core";
 
