@@ -1,7 +1,5 @@
 import * as firebase from "firebase";
 import "@firebase/firestore";
-import "firebase/empty-import";
-import "firebase/empty-import";
 import "firebase/storage";
 
 const config = {

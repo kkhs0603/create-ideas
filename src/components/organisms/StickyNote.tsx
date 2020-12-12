@@ -2,15 +2,7 @@ import React, { useState, useContext, useRef, useEffect } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { yellow, green, red, blue } from "@material-ui/core/colors";
 import { CanvasContext } from "../../contexts/CanvasContext";
-import {
-  Button,
-  TextField,
-  Menu,
-  MenuItem,
-  Radio,
-  Divider,
-  InputBase,
-} from "@material-ui/core";
+import { TextField, Menu, MenuItem, Radio, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Draggable from "react-draggable";
 import classNames from "classnames";
@@ -61,7 +53,7 @@ const StickyNote = (props) => {
   const classes = useStyles(props);
   const {
     moveStickyNote,
-    deleteWord,
+    deleteStickyNote,
     changeStickyNoteColor,
     bringForward,
     sendBackward,
@@ -214,7 +206,7 @@ const StickyNote = (props) => {
             onClick={() => {
               bringForward(
                 props.canvasId,
-                "words",
+                "stickyNotes",
                 props.data.id,
                 props.data.zIndex
               );
@@ -224,7 +216,7 @@ const StickyNote = (props) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              bringToFront(props.canvasId, "words", props.data.id);
+              bringToFront(props.canvasId, "stickyNotes", props.data.id);
             }}
           >
             最前面へ
@@ -233,7 +225,7 @@ const StickyNote = (props) => {
             onClick={() => {
               sendBackward(
                 props.canvasId,
-                "words",
+                "stickyNotes",
                 props.data.id,
                 props.data.zIndex
               );
@@ -243,7 +235,7 @@ const StickyNote = (props) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              sendToBack(props.canvasId, "words", props.data.id);
+              sendToBack(props.canvasId, "stickyNotes", props.data.id);
             }}
           >
             最後面へ
@@ -273,7 +265,7 @@ const StickyNote = (props) => {
           <Divider />
           <MenuItem
             onClick={() => {
-              deleteWord(props.canvasId, props.data.id);
+              deleteStickyNote(props.canvasId, props.data.id);
               handleClose();
             }}
           >

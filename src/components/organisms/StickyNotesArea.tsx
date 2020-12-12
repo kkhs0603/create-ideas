@@ -14,17 +14,21 @@ import {
 import Line from "../atoms/Line";
 import Image from "next/image";
 
+type Props = {
+  id: string;
+};
+
 const initiaMouselState = {
   mouseX: null,
   mouseY: null,
 };
 
-const StickyNotesArea = (props) => {
+const StickyNotesArea: React.FC<Props> = (props) => {
   const ref = useRef(null);
   const classes = useStyles(props);
   const [words, setWords] = useState([]);
   const [mouseState, setMouseState] = useState(initiaMouselState);
-  const { drawLine, getLines, lines } = useContext(CanvasContext);
+  const { addLine, getAllLines, lines } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState(false);
 
   useEffect(() => {
@@ -32,7 +36,7 @@ const StickyNotesArea = (props) => {
       .firestore()
       .collection("canvases")
       .doc(props.id)
-      .collection("words");
+      .collection("stickyNotes");
     //wordsRef
     const unsubscribe = wordsRef.onSnapshot((snapshot) => {
       console.log("onsnap");
@@ -40,7 +44,7 @@ const StickyNotesArea = (props) => {
       setWords(snapshot.docs.map((word) => word.data()));
     });
 
-    getLines(props.id);
+    getAllLines(props.id);
     return () => unsubscribe();
   }, []);
 
@@ -78,15 +82,15 @@ const StickyNotesArea = (props) => {
           canvasId={props.id}
           id={line.id}
           vh={line.vh}
-          x={line.x}
-          y={line.y}
+          x={line.positionX}
+          y={line.positionY}
           zIndex={line.zIndex}
         ></Line>
       ))
     );
   return (
     <div ref={ref} className={classes.frame}>
-      <Image src={"/swot.png"} alt="swot" layout="fill" unsized />
+      {/* <Image src={"/swot.png"} alt="swot" layout="fill" unsized /> */}
       <div
         id="area"
         className={classes.container}
@@ -114,7 +118,7 @@ const StickyNotesArea = (props) => {
           <Divider />
           <MenuItem
             onClick={() => {
-              drawLine(
+              addLine(
                 props.id,
                 "vertical",
                 mouseState.mouseX - ref.current.getBoundingClientRect().x,
@@ -127,7 +131,7 @@ const StickyNotesArea = (props) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              drawLine(
+              addLine(
                 props.id,
                 "horizontal",
                 0,

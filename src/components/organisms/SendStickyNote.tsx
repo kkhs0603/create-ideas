@@ -6,7 +6,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const SendStickyNote = (props) => {
   const classes = useStyles();
   const [word, setWord] = useState();
-  const { sendWord } = useContext(CanvasContext);
+  const { addStickyNote } = useContext(CanvasContext);
   const handleChange = (word) => {
     setWord(word);
   };
@@ -20,7 +20,7 @@ const SendStickyNote = (props) => {
       ></TextField>
       <Button
         onClick={() => {
-          sendWord(props.id, word);
+          addStickyNote(props.id, word);
           setWord("");
         }}
       >
