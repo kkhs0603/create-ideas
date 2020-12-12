@@ -31,9 +31,7 @@ export async function getStaticProps({ params }) {
 
 const Canvas = (props) => {
   const classes = useStyles();
-  const { enterCanvas, joinedUsers, canvasData, words } = useContext(
-    CanvasContext
-  );
+  const { enterCanvas, joinedUsers, canvasData } = useContext(CanvasContext);
   const id = props.id;
 
   const users = joinedUsers.map((user) => (

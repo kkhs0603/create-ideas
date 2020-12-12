@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Button, TextField } from "@material-ui/core";
 import { CanvasContext } from "../../contexts/CanvasContext";
 import { withStyles } from "@material-ui/core/styles";
@@ -15,11 +15,11 @@ const ColorButton = withStyles((theme) => ({
 }))(Button);
 
 const CreateCanvas = () => {
-  const { createCanvas, handleCanvasName } = useContext(CanvasContext);
-
+  const { createCanvas } = useContext(CanvasContext);
+  const [canvasName, setCanvasName] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
-    createCanvas();
+    createCanvas(canvasName);
   };
   return (
     <div>
@@ -30,7 +30,7 @@ const CreateCanvas = () => {
           label="Canvas名"
           variant="outlined"
           required
-          onChange={handleCanvasName}
+          onChange={(e) => setCanvasName(e.target.value)}
         />
         <ColorButton type="submit">Canvas作成</ColorButton>
       </form>

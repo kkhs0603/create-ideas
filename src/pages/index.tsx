@@ -13,10 +13,10 @@ const useStyles = makeStyles({
   },
 });
 
-const SignInPage = () => {
+const SignInPage: React.FC = () => {
   const classes = useStyles();
-  const [isSignIn, setIsSignIn] = useState(true);
-  const caption = isSignIn ? "登録しますか？" : "サインインしますか？";
+  const [isSignIn, setIsSignIn] = useState<Boolean>(true);
+  const caption:string = isSignIn ? "登録しますか？" : "サインインしますか？";
   return (
     <Layout>
       <Title />
