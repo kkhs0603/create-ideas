@@ -28,7 +28,9 @@ const StickyNotesArea: React.FC<Props> = (props) => {
   const classes = useStyles(props);
   const [words, setWords] = useState([]);
   const [mouseState, setMouseState] = useState(initiaMouselState);
-  const { addLine, getAllLines, lines } = useContext(CanvasContext);
+  const { addLine, getAllLines, lines, addStickyNote } = useContext(
+    CanvasContext
+  );
   const [isAreaClicked, setIsAreaClicked] = useState(false);
 
   useEffect(() => {
@@ -114,7 +116,19 @@ const StickyNotesArea: React.FC<Props> = (props) => {
               : undefined
           }
         >
-          <MenuItem disabled></MenuItem>
+          <MenuItem
+            onClick={() => {
+              addStickyNote(
+                props.id,
+                mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                mouseState.mouseY - ref.current.getBoundingClientRect().y
+              );
+              setIsAreaClicked(false);
+              handleClose();
+            }}
+          >
+            新規付箋
+          </MenuItem>
           <Divider />
           <MenuItem
             onClick={() => {
@@ -160,12 +174,13 @@ const useStyles = makeStyles({
     border: "10px solid #adb2bd",
     boxShadow: "inset -1px 2px 2px #404040, 6px 9px 1px rgba(0, 0, 0, 0.2)",
     overflow: "scroll",
+    zIndex: 1,
   },
   container: {
     position: "relative",
     height: "100%",
     width: "100%",
-    zIndex: "1",
+    zIndex: 1,
   },
 });
 

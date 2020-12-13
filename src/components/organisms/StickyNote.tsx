@@ -4,8 +4,26 @@ import { yellow, green, red, blue } from "@material-ui/core/colors";
 import { CanvasContext } from "../../contexts/CanvasContext";
 import { TextField, Menu, MenuItem, Radio, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import Draggable from "react-draggable";
 import classNames from "classnames";
+import { Rnd } from "react-rnd";
+
+type Props = {
+  canvasId: string;
+  setIsAreaClicked: (isAreaClicked: boolean) => void;
+  isAreaClicked: boolean;
+  data: {
+    color: string;
+    createdBy: string;
+    height: number;
+    width: number;
+    id: string;
+    isEdit: boolean;
+    word: string;
+    zIndex: number;
+    positionX: number;
+    positionY: number;
+  };
+};
 
 const initiaMouselState = {
   mouseX: null,
@@ -49,7 +67,7 @@ const BlueRadio = withStyles({
   checked: {},
 })((props) => <Radio color="default" {...props} />);
 
-const StickyNote = (props) => {
+const StickyNote: React.FC<Props> = (props) => {
   const classes = useStyles(props);
   const {
     moveStickyNote,
@@ -60,16 +78,21 @@ const StickyNote = (props) => {
     bringToFront,
     sendToBack,
     editStickyNoteWord,
+    resizeStickyNote,
   } = useContext(CanvasContext);
   const [mouseState, setMouseState] = useState(initiaMouselState);
   const [position, setPosition] = useState({
     x: props.data.positionX,
     y: props.data.positionY,
   });
+  const [size, setSize] = useState({
+    width: props.data.width,
+    height: props.data.height,
+  });
   const [cursor, setCursor] = useState("grab");
   const [isOpendMenu, setIsOpendMenu] = useState(false);
   const [selectedColor, setSelectedColor] = useState(props.data.color);
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState<boolean>(props.data.isEdit);
   const [tempWord, setTempWord] = useState(props.data.word);
 
   const handleClick = (e) => {
@@ -98,10 +121,10 @@ const StickyNote = (props) => {
     }
   };
 
-  const handleStop = (e, ui) => {
-    if (position.x !== ui.x || position.y !== ui.y) {
-      setPosition({ x: ui.x, y: ui.y });
-      moveStickyNote(props.canvasId, props.data.id, ui.x, ui.y);
+  const handleStop = (e, d) => {
+    if (position.x !== d.x || position.y !== d.y) {
+      setPosition({ x: d.x, y: d.y });
+      moveStickyNote(props.canvasId, props.data.id, d.x, d.y);
     }
     setCursor("grab");
   };
@@ -129,6 +152,19 @@ const StickyNote = (props) => {
       break;
   }
 
+  const handleResizeStop = (e, direction, ref, delta, position) => {
+    setSize({ width: ref.style.width, height: ref.style.height });
+    setPosition({ x: position.x, y: position.y });
+    resizeStickyNote(
+      props.canvasId,
+      props.data.id,
+      position.x,
+      position.y,
+      ref.style.width,
+      ref.style.height
+    );
+  };
+
   const finishWordEdit = (e) => {
     if (
       ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
@@ -142,34 +178,39 @@ const StickyNote = (props) => {
   };
 
   const word = isEdit ? (
-    props.isAreaClicked ? (
-      <div>{tempWord}</div>
-    ) : (
-      <TextField
-        multiline={true}
-        value={tempWord}
-        onChange={(e) => {
-          setTempWord(e.target.value);
-        }}
-        onKeyDown={(e) => finishWordEdit(e)}
-        style={{ width: 100 }}
-      />
-    )
+    <TextField
+      multiline={true}
+      value={tempWord}
+      onChange={(e) => {
+        setTempWord(e.target.value);
+      }}
+      onKeyDown={(e) => finishWordEdit(e)}
+      style={{ width: 100 }}
+    />
   ) : (
     <div>{tempWord}</div>
   );
 
   useEffect(() => {
     //編集状態を解除する
-    setIsEdit(false);
-    setTempWord(props.data.word);
+    if (props.isAreaClicked) {
+      setIsEdit(false);
+      if (props.data.word !== tempWord) {
+        editStickyNoteWord(props.canvasId, props.data.id, tempWord);
+      }
+    }
   }, [props.isAreaClicked]);
   return (
-    <Draggable
+    <Rnd
+      style={{ zIndex: props.data.zIndex }}
+      default={{ width: props.data.width, height: props.data.height }}
       position={{ x: position.x, y: position.y }}
-      onStart={handleStart}
+      onDragStart={handleStart}
       onDrag={handleDrag}
-      onStop={handleStop}
+      onDragStop={handleStop}
+      onResizeStop={handleResizeStop}
+      minHeight="50"
+      minWidth="50"
     >
       <div
         id={"stickyNote"}
@@ -210,6 +251,7 @@ const StickyNote = (props) => {
                 props.data.id,
                 props.data.zIndex
               );
+              props.setIsAreaClicked(true);
             }}
           >
             前面へ
@@ -217,6 +259,7 @@ const StickyNote = (props) => {
           <MenuItem
             onClick={() => {
               bringToFront(props.canvasId, "stickyNotes", props.data.id);
+              props.setIsAreaClicked(true);
             }}
           >
             最前面へ
@@ -229,6 +272,7 @@ const StickyNote = (props) => {
                 props.data.id,
                 props.data.zIndex
               );
+              props.setIsAreaClicked(true);
             }}
           >
             背面へ
@@ -236,9 +280,10 @@ const StickyNote = (props) => {
           <MenuItem
             onClick={() => {
               sendToBack(props.canvasId, "stickyNotes", props.data.id);
+              props.setIsAreaClicked(true);
             }}
           >
-            最後面へ
+            最背面へ
           </MenuItem>
           <Divider />
           <MenuItem disabled>付箋の色</MenuItem>
@@ -273,7 +318,7 @@ const StickyNote = (props) => {
           </MenuItem>
         </Menu>
       </div>
-    </Draggable>
+    </Rnd>
   );
 };
 ///////
@@ -281,15 +326,17 @@ const StickyNote = (props) => {
 ///////
 const useStyles = makeStyles({
   container: {
-    userSelect: "none",
-    margin: "5px",
+    //userSelect: "none",
+    // margin: "5px",
     whiteSpace: "pre-wrap",
-    padding: "0.5em 30px 0.5em",
+    // padding: "0.5em 30px 0.5em",
     position: "absolute",
     boxSizing: "border-box",
     boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
     border: "1px solid black",
-    zIndex: (props) => props.data.zIndex,
+    height: "100%",
+    width: "100%",
+    zIndex: (props: Props) => props.data.zIndex,
   },
   yellow: {
     backgroundColor: "#FFFCB3",
