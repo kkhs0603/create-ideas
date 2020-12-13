@@ -59,9 +59,9 @@ const Canvas = (props) => {
       <div className={classes.middle}>
         <StickyNotesArea id={id} />
       </div>
-      <div className={classes.bottom}>
+      {/* <div className={classes.bottom}>
         <SendStickyNote id={id} />
-      </div>
+      </div> */}
     </Layout>
   );
 };

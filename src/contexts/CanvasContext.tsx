@@ -33,7 +33,7 @@ const CanvasContext = createContext(
     canvases: Array<Canvas>;
     enterCanvas: (canvasId: string) => void;
     joinedUsers;
-    addStickyNote: (stickyNoteId: string, word: string) => void;
+    addStickyNote: (id: string, positionX: number, positionY: number) => void;
     deleteStickyNote: (canvasId: string, stickyNoteId: string) => void;
     moveStickyNote: (
       canvasId: string,
@@ -52,6 +52,14 @@ const CanvasContext = createContext(
       canvasId: string,
       stickyNoteId: string,
       word: string
+    ) => void;
+    resizeStickyNote: (
+      canvasId: string,
+      stickyNoteId: string,
+      positionX: number,
+      positionY: number,
+      width: number,
+      height: number
     ) => void;
     getAllLines: (canvasId: string) => void;
     lines: Array<Line>;
@@ -177,7 +185,11 @@ const CanvasProvider: React.FC = ({ children }) => {
     });
   };
 
-  const addStickyNote = async (id: string, word: string) => {
+  const addStickyNote = async (
+    id: string,
+    positionX: number,
+    positionY: number
+  ) => {
     try {
       const zIndeices = await getAllZindices(id);
       const maxZindex = Math.max.apply(null, zIndeices);
@@ -186,12 +198,15 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(id)
         .collection("stickyNotes");
       const result = await canvasRef.add({
-        word: word,
-        positionX: 0,
-        positionY: 0,
+        word: "",
+        positionX: positionX,
+        positionY: positionY,
+        width: 50,
+        height: 50,
         createdBy: auth.currentUser.uid,
         color: "yellow",
         zIndex: maxZindex + 1,
+        isEdit: true,
       });
       canvasRef.doc(result.id).update({ id: result.id });
     } catch (error) {
@@ -227,6 +242,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           positionX: x,
           positionY: y,
+          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
@@ -247,6 +263,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(stickyNoteId)
         .update({
           color: color,
+          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
@@ -267,6 +284,33 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(stickyNoteId)
         .update({
           word: word,
+          isEdit: false,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const resizeStickyNote = (
+    canvasId: string,
+    stickyNoteId: string,
+    positionX: number,
+    positionY: number,
+    width: number,
+    height: number
+  ) => {
+    try {
+      console.log("resize StickyNote");
+      db.collection("canvases")
+        .doc(canvasId)
+        .collection("stickyNotes")
+        .doc(stickyNoteId)
+        .update({
+          positionX,
+          positionY,
+          width,
+          height,
+          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
@@ -475,6 +519,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         stickyNotes,
         changeStickyNoteColor,
         editStickyNoteWord,
+        resizeStickyNote,
         addLine,
         getAllLines,
         lines,

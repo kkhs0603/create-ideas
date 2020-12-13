@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-import Draggable from "react-draggable";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { CanvasContext } from "../../contexts/CanvasContext";
@@ -11,13 +10,23 @@ import {
   Radio,
   Divider,
 } from "@material-ui/core";
+import { Rnd } from "react-rnd";
+
+type Props = {
+  canvasId: string;
+  id: string;
+  x: number;
+  y: number;
+  vh: string;
+  zIndex: number;
+};
 
 const initiaMouselState = {
   mouseX: null,
   mouseY: null,
 };
 
-const Line = (props) => {
+const Line: React.FC<Props> = (props) => {
   const [cursor, setCursor] = useState("grab");
   const [position, setPosition] = useState({
     x: props.x,
@@ -36,14 +45,20 @@ const Line = (props) => {
 
   let lineClasses = classes.container;
   let axis = null;
+  let width = null;
+  let height = null;
   switch (props.vh) {
     case "vertical":
       lineClasses = classNames(classes.container, classes.vertical);
+      width = "5px";
+      height = "100%";
       axis = "x";
       break;
     case "horizontal":
       lineClasses = classNames(classes.container, classes.horizontal);
       axis = "y";
+      width = "100%";
+      height = "5px";
       break;
     default:
       lineClasses = classes.container;
@@ -83,13 +98,16 @@ const Line = (props) => {
   };
 
   return (
-    <Draggable
-      axis={axis}
-      onStart={handleStart}
+    <Rnd
+      dragAxis={axis}
+      onDragStart={handleStart}
       onDrag={handleDrag}
-      onStop={handleStop}
+      onDragStop={handleStop}
       position={{ x: position.x, y: position.y }}
       bounds="parent"
+      style={{ zIndex: props.zIndex }}
+      default={{ width: width, height: height }}
+      enableResizing={false}
     >
       <div
         id="line"
@@ -146,7 +164,7 @@ const Line = (props) => {
           </MenuItem>
         </Menu>
       </div>
-    </Draggable>
+    </Rnd>
   );
 };
 
@@ -157,7 +175,7 @@ const useStyles = makeStyles({
   container: {
     position: "absolute",
     backgroundColor: "black",
-    zIndex: (props) => props.zIndex,
+    zIndex: (props: Props) => props.zIndex,
   },
   vertical: {
     width: "5px",
