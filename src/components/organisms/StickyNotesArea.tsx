@@ -13,9 +13,20 @@ import {
 } from "@material-ui/core";
 import Line from "../atoms/Line";
 import Image from "next/image";
+import NestedMenuItem from "material-ui-nested-menu-item";
 
-type Props = {
+type StickyNoteAreaProps = {
   id: string;
+};
+
+type StickyNote = {
+  color: string;
+  createdBy: string;
+  id: string;
+  positionX: number;
+  positionY: number;
+  word: string;
+  zIndex: number;
 };
 
 const initiaMouselState = {
@@ -23,15 +34,20 @@ const initiaMouselState = {
   mouseY: null,
 };
 
-const StickyNotesArea: React.FC<Props> = (props) => {
+const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
+  props: StickyNoteAreaProps
+) => {
   const ref = useRef(null);
   const classes = useStyles(props);
-  const [words, setWords] = useState([]);
-  const [mouseState, setMouseState] = useState(initiaMouselState);
-  const { addLine, getAllLines, lines, addStickyNote } = useContext(
+  const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
+  const [mouseState, setMouseState] = useState<{
+    mouseX: number;
+    mouseY: number;
+  }>(initiaMouselState);
+  const { addLine, getAllLines, lines, addStickyNote, isEdit } = useContext(
     CanvasContext
   );
-  const [isAreaClicked, setIsAreaClicked] = useState(false);
+  const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
 
   useEffect(() => {
     const wordsRef = firebase
@@ -42,8 +58,8 @@ const StickyNotesArea: React.FC<Props> = (props) => {
     //wordsRef
     const unsubscribe = wordsRef.onSnapshot((snapshot) => {
       console.log("onsnap");
-      setWords([]);
-      setWords(snapshot.docs.map((word) => word.data()));
+      setStickyNotes([]);
+      setStickyNotes(snapshot.docs.map((word) => word.data()));
     });
 
     getAllLines(props.id);
@@ -57,13 +73,14 @@ const StickyNotesArea: React.FC<Props> = (props) => {
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
     });
+    setIsAreaClicked(true);
   };
 
   const handleClose = () => {
     setMouseState(initiaMouselState);
   };
 
-  const stickyNotes = words?.map((data, index) => (
+  const stickyNotesComponent = stickyNotes?.map((data, index) => (
     <StickyNote
       data={data}
       key={index}
@@ -71,6 +88,7 @@ const StickyNotesArea: React.FC<Props> = (props) => {
       canvasId={props.id}
       isAreaClicked={isAreaClicked}
       setIsAreaClicked={setIsAreaClicked}
+      isEdit={(isEdit(data.createdBy) && data.word === "") || false}
     />
   ));
 
@@ -103,7 +121,7 @@ const StickyNotesArea: React.FC<Props> = (props) => {
         }}
         onContextMenu={handleClick}
       >
-        {stickyNotes}
+        {stickyNotesComponent}
         {linesComponent}
         <Menu
           keepMounted
@@ -116,46 +134,93 @@ const StickyNotesArea: React.FC<Props> = (props) => {
               : undefined
           }
         >
-          <MenuItem
-            onClick={() => {
-              addStickyNote(
-                props.id,
-                mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                mouseState.mouseY - ref.current.getBoundingClientRect().y
-              );
-              setIsAreaClicked(false);
-              handleClose();
-            }}
-          >
-            新規付箋
-          </MenuItem>
-          <Divider />
-          <MenuItem
-            onClick={() => {
-              addLine(
-                props.id,
-                "vertical",
-                mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                0
-              );
-              handleClose();
-            }}
-          >
-            縦線を引く
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              addLine(
-                props.id,
-                "horizontal",
-                0,
-                mouseState.mouseY - ref.current.getBoundingClientRect().y
-              );
-              handleClose();
-            }}
-          >
-            横線を引く
-          </MenuItem>
+          <div style={{ paddingTop: 10 }}>
+            <NestedMenuItem label="新規付箋" parentMenuOpen={!!mouseState}>
+              <MenuItem
+                onClick={() => {
+                  addStickyNote(
+                    props.id,
+                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                    "yellow"
+                  );
+                  handleClose();
+                  setIsAreaClicked(false);
+                }}
+              >
+                黄
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  addStickyNote(
+                    props.id,
+                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                    "red"
+                  );
+                  handleClose();
+                  setIsAreaClicked(false);
+                }}
+              >
+                赤
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  addStickyNote(
+                    props.id,
+                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                    "blue"
+                  );
+                  handleClose();
+                  setIsAreaClicked(false);
+                }}
+              >
+                青
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  addStickyNote(
+                    props.id,
+                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                    "green"
+                  );
+                  handleClose();
+                  setIsAreaClicked(false);
+                }}
+              >
+                緑
+              </MenuItem>
+            </NestedMenuItem>
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                addLine(
+                  props.id,
+                  "vertical",
+                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                  0
+                );
+                handleClose();
+              }}
+            >
+              縦線を引く
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                addLine(
+                  props.id,
+                  "horizontal",
+                  0,
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y
+                );
+                handleClose();
+              }}
+            >
+              横線を引く
+            </MenuItem>
+          </div>
         </Menu>
       </div>
     </div>

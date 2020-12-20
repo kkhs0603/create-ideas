@@ -27,12 +27,15 @@ const initiaMouselState = {
 };
 
 const Line: React.FC<Props> = (props) => {
-  const [cursor, setCursor] = useState("grab");
-  const [position, setPosition] = useState({
+  const [cursor, setCursor] = useState<string>("grab");
+  const [position, setPosition] = useState<{ x: number; y: number }>({
     x: props.x,
     y: props.y,
   });
-  const [mouseState, setMouseState] = useState(initiaMouselState);
+  const [mouseState, setMouseState] = useState<{
+    mouseX: number;
+    mouseY: number;
+  }>(initiaMouselState);
   const classes = useStyles(props);
   const {
     moveLine,

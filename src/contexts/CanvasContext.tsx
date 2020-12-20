@@ -26,65 +26,71 @@ type Line = {
   positionY: number;
   zIndex: number;
 };
+//interface
+interface IContextProps {
+  createCanvas: (canvasName: string) => void;
+  canvases: Array<Canvas>;
+  enterCanvas: (canvasId: string) => void;
+  joinedUsers;
+  addStickyNote: (
+    id: string,
+    positionX: number,
+    positionY: number,
+    color: string
+  ) => void;
+  deleteStickyNote: (canvasId: string, stickyNoteId: string) => void;
+  moveStickyNote: (
+    canvasId: string,
+    stickyNoteId: string,
+    x: number,
+    y: number
+  ) => void;
+  getAllStickyNote: (canvasId: string) => void;
+  stickyNotes: Array<StickyNote>;
+  changeStickyNoteColor: (
+    canvasId: string,
+    stickyNoteId: string,
+    color: string
+  ) => void;
+  editStickyNoteWord: (
+    canvasId: string,
+    stickyNoteId: string,
+    word: string
+  ) => void;
+  resizeStickyNote: (
+    canvasId: string,
+    stickyNoteId: string,
+    positionX: number,
+    positionY: number,
+    width: number,
+    height: number
+  ) => void;
+  getAllLines: (canvasId: string) => void;
+  lines: Array<Line>;
+  addLine: (canvasId: string, vh: string, x: number, y: number) => void;
+  moveLine: (canvasId: string, lineId: string, x: number, y: number) => void;
+  deleteLine: (canvasId: string, lineId: string) => void;
+  bringForward: (
+    canvasId: string,
+    objName: string,
+    id: string,
+    zIndex: number
+  ) => void;
+  bringToFront: (canvasId: string, objName: string, id: string) => void;
+  sendBackward: (
+    canvasId: string,
+    objName: string,
+    id: string,
+    zIndex: number
+  ) => void;
+  sendToBack: (canvasId: string, objName: string, id: string) => void;
+  isEdit: (createdBy: string) => boolean;
+}
 
-const CanvasContext = createContext(
-  {} as {
-    createCanvas: (canvasName: string) => void;
-    canvases: Array<Canvas>;
-    enterCanvas: (canvasId: string) => void;
-    joinedUsers;
-    addStickyNote: (id: string, positionX: number, positionY: number) => void;
-    deleteStickyNote: (canvasId: string, stickyNoteId: string) => void;
-    moveStickyNote: (
-      canvasId: string,
-      stickyNoteId: string,
-      x: number,
-      y: number
-    ) => void;
-    getAllStickyNote: (canvasId: string) => void;
-    stickyNotes: Array<StickyNote>;
-    changeStickyNoteColor: (
-      canvasId: string,
-      stickyNoteId: string,
-      color: string
-    ) => void;
-    editStickyNoteWord: (
-      canvasId: string,
-      stickyNoteId: string,
-      word: string
-    ) => void;
-    resizeStickyNote: (
-      canvasId: string,
-      stickyNoteId: string,
-      positionX: number,
-      positionY: number,
-      width: number,
-      height: number
-    ) => void;
-    getAllLines: (canvasId: string) => void;
-    lines: Array<Line>;
-    addLine: (canvasId: string, vh: string, x: number, y: number) => void;
-    moveLine: (canvasId: string, lineId: string, x: number, y: number) => void;
-    deleteLine: (canvasId: string, lineId: string) => void;
-    bringForward: (
-      canvasId: string,
-      objName: string,
-      id: string,
-      zIndex: number
-    ) => void;
-    bringToFront: (canvasId: string, objName: string, id: string) => void;
-    sendBackward: (
-      canvasId: string,
-      objName: string,
-      id: string,
-      zIndex: number
-    ) => void;
-    sendToBack: (canvasId: string, objName: string, id: string) => void;
-  }
-);
+const CanvasContext = createContext({} as IContextProps);
 const db = firebase.firestore();
 const CanvasProvider: React.FC = ({ children }) => {
-  const [canvases, setCanvases] = useState([]);
+  const [canvases, setCanvases] = useState<Array<Canvas>>([]);
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
   const [lines, setLines] = useState([]);
@@ -188,7 +194,8 @@ const CanvasProvider: React.FC = ({ children }) => {
   const addStickyNote = async (
     id: string,
     positionX: number,
-    positionY: number
+    positionY: number,
+    color: string
   ) => {
     try {
       const zIndeices = await getAllZindices(id);
@@ -204,9 +211,8 @@ const CanvasProvider: React.FC = ({ children }) => {
         width: 50,
         height: 50,
         createdBy: auth.currentUser.uid,
-        color: "yellow",
+        color: color,
         zIndex: maxZindex + 1,
-        isEdit: true,
       });
       canvasRef.doc(result.id).update({ id: result.id });
     } catch (error) {
@@ -214,7 +220,10 @@ const CanvasProvider: React.FC = ({ children }) => {
     }
   };
 
-  const deleteStickyNote = async (canvasId: string, wordId: string) => {
+  const deleteStickyNote = async (
+    canvasId: string,
+    wordId: string
+  ): Promise<void> => {
     try {
       const canvasRef = await db
         .collection("canvases")
@@ -242,7 +251,6 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           positionX: x,
           positionY: y,
-          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
@@ -263,7 +271,6 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(stickyNoteId)
         .update({
           color: color,
-          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
@@ -284,7 +291,6 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(stickyNoteId)
         .update({
           word: word,
-          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
@@ -310,12 +316,19 @@ const CanvasProvider: React.FC = ({ children }) => {
           positionY,
           width,
           height,
-          isEdit: false,
         });
     } catch (error) {
       console.log(error.message);
     }
   };
+
+  const isEdit = (createdBy: string) => {
+    return auth.currentUser.uid === createdBy;
+  };
+
+  /* --------------------------
+  toBack/toFront
+  -------------------------- */
 
   //前面へ
   const bringForward = async (
@@ -432,7 +445,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     vh: string,
     x: number,
     y: number
-  ) => {
+  ): Promise<void> => {
     try {
       console.log("add Line : " + vh + " x: " + x + " y: " + y);
       const zIndeices = await getAllZindices(canvasId);
@@ -529,6 +542,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         bringToFront,
         sendBackward,
         sendToBack,
+        isEdit,
       }}
     >
       {children}

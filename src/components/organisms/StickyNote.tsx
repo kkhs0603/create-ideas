@@ -80,25 +80,26 @@ const StickyNote: React.FC<Props> = (props) => {
     editStickyNoteWord,
     resizeStickyNote,
   } = useContext(CanvasContext);
-  const [mouseState, setMouseState] = useState(initiaMouselState);
-  const [position, setPosition] = useState({
+  const [mouseState, setMouseState] = useState<{
+    mouseX: number;
+    mouseY: number;
+  }>(initiaMouselState);
+  const [position, setPosition] = useState<{ x: number; y: number }>({
     x: props.data.positionX,
     y: props.data.positionY,
   });
-  const [size, setSize] = useState({
+  const [size, setSize] = useState<{ width: number; height: number }>({
     width: props.data.width,
     height: props.data.height,
   });
-  const [cursor, setCursor] = useState("grab");
-  const [isOpendMenu, setIsOpendMenu] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(props.data.color);
-  const [isEdit, setIsEdit] = useState<boolean>(props.data.isEdit);
-  const [tempWord, setTempWord] = useState(props.data.word);
+  const [cursor, setCursor] = useState<string>("grab");
+  const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
+  const [selectedColor, setSelectedColor] = useState<string>(props.data.color);
+  const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
+  const [tempWord, setTempWord] = useState<string>(props.data.word);
 
   const handleClick = (e) => {
     setIsOpendMenu(true);
-    if (e.target.id !== "stickyNote") return;
-    props.setIsAreaClicked(false);
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -111,6 +112,7 @@ const StickyNote: React.FC<Props> = (props) => {
   };
 
   const handleStart = () => {
+    props.setIsAreaClicked(false);
     if (isOpendMenu) return false;
     setCursor("grabbing");
   };
@@ -185,10 +187,19 @@ const StickyNote: React.FC<Props> = (props) => {
         setTempWord(e.target.value);
       }}
       onKeyDown={(e) => finishWordEdit(e)}
-      style={{ width: 100 }}
+      style={{
+        width: "100%",
+        height: "100%",
+        padding: 0,
+        margin: 0,
+      }}
+      autoFocus={true}
+      onFocus={(e) => {
+        e.currentTarget.select();
+      }}
     />
   ) : (
-    <div>{tempWord}</div>
+    <div id={props.data.id}>{tempWord}</div>
   );
 
   useEffect(() => {
@@ -213,15 +224,17 @@ const StickyNote: React.FC<Props> = (props) => {
       minWidth="50"
     >
       <div
-        id={"stickyNote"}
+        id={props.data.id}
         className={color}
         style={{ cursor: cursor }}
         onContextMenu={handleClick}
         onClick={() => {
           props.setIsAreaClicked(false);
         }}
-        onDoubleClick={() => {
-          setIsEdit(true);
+        onDoubleClick={(e) => {
+          console.log(e.target.id === props.data.id);
+          setIsEdit(e.target.id === props.data.id);
+          props.setIsAreaClicked(false);
         }}
       >
         {word}
@@ -236,7 +249,7 @@ const StickyNote: React.FC<Props> = (props) => {
           }
         >
           <MenuItem
-            onClick={() => {
+            onClick={(e) => {
               setIsEdit(true);
               handleClose();
             }}
@@ -251,7 +264,6 @@ const StickyNote: React.FC<Props> = (props) => {
                 props.data.id,
                 props.data.zIndex
               );
-              props.setIsAreaClicked(true);
             }}
           >
             前面へ
@@ -259,7 +271,6 @@ const StickyNote: React.FC<Props> = (props) => {
           <MenuItem
             onClick={() => {
               bringToFront(props.canvasId, "stickyNotes", props.data.id);
-              props.setIsAreaClicked(true);
             }}
           >
             最前面へ
@@ -272,7 +283,6 @@ const StickyNote: React.FC<Props> = (props) => {
                 props.data.id,
                 props.data.zIndex
               );
-              props.setIsAreaClicked(true);
             }}
           >
             背面へ
@@ -280,7 +290,6 @@ const StickyNote: React.FC<Props> = (props) => {
           <MenuItem
             onClick={() => {
               sendToBack(props.canvasId, "stickyNotes", props.data.id);
-              props.setIsAreaClicked(true);
             }}
           >
             最背面へ
