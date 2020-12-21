@@ -138,7 +138,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
                   setIsAreaClicked(false);
                 }}
               >
-                黄
+                <div className={classes.stickyNoteYellow}>黄色</div>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -152,7 +152,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
                   setIsAreaClicked(false);
                 }}
               >
-                赤
+                <div className={classes.stickyNoteRed}>赤色</div>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -166,7 +166,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
                   setIsAreaClicked(false);
                 }}
               >
-                青
+                <div className={classes.stickyNoteBlue}>青色</div>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -180,7 +180,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
                   setIsAreaClicked(false);
                 }}
               >
-                緑
+                <div className={classes.stickyNoteGreen}>緑色</div>
               </MenuItem>
             </NestedMenuItem>
             <Divider />
@@ -196,6 +196,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
               }}
             >
               縦線を引く
+              <div className={classes.menuIconContainer}>
+                <div className={classes.lineVertical}></div>
+              </div>
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -209,6 +212,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
               }}
             >
               横線を引く
+              <div className={classes.menuIconContainer}>
+                <div className={classes.lineHorizonral}></div>
+              </div>
             </MenuItem>
           </div>
         </Menu>
@@ -236,6 +242,45 @@ const useStyles = makeStyles({
     height: "100%",
     width: "100%",
     zIndex: 1,
+  },
+  stickyNoteYellow: {
+    border: "1px solid black",
+    backgroundColor: "#FFFCB3",
+    padding: 3,
+  },
+  stickyNoteRed: {
+    border: "1px solid black",
+    backgroundColor: "#F6C0AF",
+    padding: 3,
+  },
+  stickyNoteBlue: {
+    border: "1px solid black",
+    backgroundColor: "#AEDCF4",
+    padding: 3,
+  },
+  stickyNoteGreen: {
+    border: "1px solid black",
+    backgroundColor: "#CDFDB3",
+    padding: 3,
+  },
+
+  lineVertical: {
+    width: 12,
+    height: 12,
+    marginLeft: 4,
+    borderLeft: "4px solid black",
+  },
+  lineHorizonral: {
+    width: 12,
+    height: 12,
+    marginTop: 4,
+    borderTop: "4px solid black",
+  },
+  menuIconContainer: {
+    marginLeft: 3,
+    border: "1px solid black",
+    height: 12,
+    width: 12,
   },
 });
 
