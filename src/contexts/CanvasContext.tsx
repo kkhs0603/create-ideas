@@ -17,6 +17,8 @@ type StickyNote = {
   positionY: number;
   word: string;
   zIndex: number;
+  width: string;
+  height: string;
 };
 
 type Line = {
@@ -26,6 +28,26 @@ type Line = {
   positionY: number;
   zIndex: number;
 };
+
+type Label = {
+  id: string;
+  word: string;
+  positionX: number;
+  positionY: number;
+  zIndex: number;
+  width: string;
+  height: string;
+  createdBy: string;
+};
+
+const CanvasObject = {
+  StickyNotes: "StickyNotes",
+  Lines: "Lines",
+  Labels: "Labels",
+} as const;
+
+type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+
 //interface
 interface IContextProps {
   createCanvas: (canvasName: string) => void;
@@ -86,6 +108,18 @@ interface IContextProps {
   ) => void;
   sendToBack: (canvasId: string, objName: string, id: string) => void;
   isEdit: (createdBy: string) => boolean;
+  addLabel: (canvasId: string, x: number, y: number) => void;
+  labels: Array<Label>;
+  moveLabel: (canvasId: string, labelId: string, x: number, y: number) => void;
+  resizeLabel: (
+    canvasId: string,
+    labelId: string,
+    positionX: number,
+    positionY: number,
+    width: number,
+    height: number
+  ) => void;
+  editLabelWord: (canvasId: string, labelId: string, word: string) => void;
 }
 
 const CanvasContext = createContext({} as IContextProps);
@@ -95,6 +129,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
   const [lines, setLines] = useState<Array<Line>>([]);
+  const [labels, setLabels] = useState<Array<Label>>([]);
   const auth = firebase.auth();
 
   /////////
@@ -176,6 +211,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     try {
       getAllStickyNotes(canvasId);
       getAllLines(canvasId);
+      getAllLabels(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -514,6 +550,116 @@ const CanvasProvider: React.FC = ({ children }) => {
     }
   };
 
+  /* --------------------------
+  Label
+  -------------------------- */
+
+  const addLabel = async (
+    canvasId: string,
+    x: number,
+    y: number
+  ): Promise<void> => {
+    try {
+      console.log("add Label x: " + x + " y: " + y);
+      const zIndeices = await getAllZindices(canvasId);
+      const maxZindex = Math.max.apply(null, zIndeices);
+      const labelRef = db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("labels");
+      const result = await labelRef.add({
+        positionX: x,
+        positionY: y,
+        word: "",
+        width: "100px",
+        height: "100px",
+        createdBy: auth.currentUser.uid,
+      });
+      labelRef.doc(result.id).update({ id: result.id, zIndex: maxZindex + 1 });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const getAllLabels = async (canvasId: string) => {
+    try {
+      const labelRef = db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("labels");
+      labelRef.onSnapshot((snapshot) => {
+        setLabels([]);
+        setLabels(snapshot.docs.map((label) => label.data()));
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const moveLabel = async (
+    canvasId: string,
+    labelId: string,
+    x: number,
+    y: number
+  ) => {
+    try {
+      console.log("move labels");
+      const labelRef = db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("labels")
+        .doc(labelId);
+      await labelRef.update({ positionX: x, positionY: y });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const resizeLabel = (
+    canvasId: string,
+    labelId: string,
+    positionX: number,
+    positionY: number,
+    width: number,
+    height: number
+  ) => {
+    try {
+      console.log("resize Label");
+      db.collection("canvases")
+        .doc(canvasId)
+        .collection("labels")
+        .doc(labelId)
+        .update({
+          positionX,
+          positionY,
+          width,
+          height,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const editLabelWord = async (
+    canvasId: string,
+    labelId: string,
+    word: string
+  ) => {
+    try {
+      console.log("editLabelWord : " + word);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection("labels")
+        .doc(labelId)
+        .update({
+          word: word,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     const authState = auth.onAuthStateChanged((user) => {
       console.log("auth");
@@ -550,6 +696,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         sendToBack,
         isEdit,
         getAllCanvasDatas,
+        addLabel,
+        labels,
+        moveLabel,
+        resizeLabel,
+        editLabelWord,
       }}
     >
       {children}
