@@ -32,6 +32,7 @@ interface IContextProps {
   canvases: Array<Canvas>;
   enterCanvas: (canvasId: string) => void;
   joinedUsers;
+  getAllCanvasDatas: (canvasId: string) => void;
   addStickyNote: (
     id: string,
     positionX: number,
@@ -45,7 +46,7 @@ interface IContextProps {
     x: number,
     y: number
   ) => void;
-  getAllStickyNote: (canvasId: string) => void;
+  getAllStickyNotes: (canvasId: string) => void;
   stickyNotes: Array<StickyNote>;
   changeStickyNoteColor: (
     canvasId: string,
@@ -93,7 +94,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   const [canvases, setCanvases] = useState<Array<Canvas>>([]);
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
-  const [lines, setLines] = useState([]);
+  const [lines, setLines] = useState<Array<Line>>([]);
   const auth = firebase.auth();
 
   /////////
@@ -139,10 +140,6 @@ const CanvasProvider: React.FC = ({ children }) => {
     }
   };
 
-  // const handleCanvasName = (event) => {
-  //   setCanvasName(event.target.value);
-  // };
-
   const enterCanvas = async (canvasId: string) => {
     try {
       console.log("enter canvas");
@@ -169,7 +166,16 @@ const CanvasProvider: React.FC = ({ children }) => {
       //   setJoinedUsers((user) => [...user, userdata]);
       // });
       //words
-      getAllStickyNote(canvasId);
+      getAllStickyNotes(canvasId);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const getAllCanvasDatas = (canvasId: string) => {
+    try {
+      getAllStickyNotes(canvasId);
+      getAllLines(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -178,7 +184,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   /* --------------------------
   stickyNote
   -------------------------- */
-  const getAllStickyNote = async (canvasId: string) => {
+  const getAllStickyNotes = async (canvasId: string) => {
     console.log("getwords");
     const wordsRef = await db
       .collection("canvases")
@@ -528,7 +534,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         addStickyNote,
         deleteStickyNote,
         moveStickyNote,
-        getAllStickyNote,
+        getAllStickyNotes,
         stickyNotes,
         changeStickyNoteColor,
         editStickyNoteWord,
@@ -543,6 +549,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         sendBackward,
         sendToBack,
         isEdit,
+        getAllCanvasDatas,
       }}
     >
       {children}

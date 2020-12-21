@@ -335,10 +335,7 @@ const StickyNote: React.FC<Props> = (props) => {
 ///////
 const useStyles = makeStyles({
   container: {
-    //userSelect: "none",
-    // margin: "5px",
     whiteSpace: "pre-wrap",
-    // padding: "0.5em 30px 0.5em",
     position: "absolute",
     boxSizing: "border-box",
     boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",

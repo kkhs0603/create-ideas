@@ -4,7 +4,6 @@ import Layout from "../../components/templates/Layout/Layout";
 import { TextField, Button, Avatar, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import firebase from "../../firebase/firebase";
-import SendStickyNote from "../../components/organisms/SendStickyNote";
 import StickyNotesArea from "../../components/organisms/StickyNotesArea";
 
 export async function getCanvasIds() {
@@ -31,7 +30,7 @@ export async function getStaticProps({ params }) {
 
 const Canvas = (props) => {
   const classes = useStyles();
-  const { enterCanvas, joinedUsers, canvasData } = useContext(CanvasContext);
+  const { joinedUsers, canvasData } = useContext(CanvasContext);
   const id = props.id;
 
   const users = joinedUsers.map((user) => (
@@ -43,9 +42,7 @@ const Canvas = (props) => {
       src={user.imageUrl}
     />
   ));
-  useEffect(() => {
-    //enterCanvas(id);
-  }, []);
+  useEffect(() => {}, []);
   return (
     <Layout>
       <Grid container className={classes.top}>

@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useMemo, useState, useContext } from "react";
 import StickyNote from "./StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
-import firebase from "../../firebase/firebase";
 import { CanvasContext } from "../../contexts/CanvasContext";
 import {
   Button,
@@ -39,31 +38,22 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
 ) => {
   const ref = useRef(null);
   const classes = useStyles(props);
-  const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
     mouseY: number;
   }>(initiaMouselState);
-  const { addLine, getAllLines, lines, addStickyNote, isEdit } = useContext(
-    CanvasContext
-  );
+  const {
+    getAllCanvasDatas,
+    stickyNotes,
+    addLine,
+    lines,
+    addStickyNote,
+    isEdit,
+  } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
 
   useEffect(() => {
-    const wordsRef = firebase
-      .firestore()
-      .collection("canvases")
-      .doc(props.id)
-      .collection("stickyNotes");
-    //wordsRef
-    const unsubscribe = wordsRef.onSnapshot((snapshot) => {
-      console.log("onsnap");
-      setStickyNotes([]);
-      setStickyNotes(snapshot.docs.map((word) => word.data()));
-    });
-
-    getAllLines(props.id);
-    return () => unsubscribe();
+    getAllCanvasDatas(props.id);
   }, []);
 
   const handleClick = (e) => {
@@ -231,8 +221,8 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
 ///////
 const useStyles = makeStyles({
   frame: {
-    width: "100%",
-    height: "70vh",
+    //margin: 10,
+    height: "80vh",
     backgroundColor: "white",
     position: "relative",
     borderRadius: "5px",
