@@ -11,6 +11,7 @@ import {
   Divider,
 } from "@material-ui/core";
 import Line from "../atoms/Line";
+import Label from "../atoms/Label";
 import Image from "next/image";
 import NestedMenuItem from "material-ui-nested-menu-item";
 
@@ -49,6 +50,8 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     lines,
     addStickyNote,
     isEdit,
+    addLabel,
+    labels,
   } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
 
@@ -98,6 +101,25 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
         ></Line>
       ))
     );
+
+  const labelsComponent = labels?.map((label, index) => (
+    <Label
+      key={index}
+      canvasId={props.id}
+      id={label.id}
+      positionX={label.positionX}
+      positionY={label.positionY}
+      width={label.width}
+      height={label.height}
+      zIndex={label.zIndex}
+      word={label.word}
+      isEdit={(isEdit(label.createdBy) && label.word === "") || false}
+      setIsAreaClicked={setIsAreaClicked}
+      isAreaClicked={isAreaClicked}
+      createdBy={label.createdBy}
+    />
+  ));
+
   return (
     <div ref={ref} className={classes.frame}>
       {/* <Image src={"/swot.png"} alt="swot" layout="fill" unsized /> */}
@@ -113,6 +135,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       >
         {stickyNotesComponent}
         {linesComponent}
+        {labelsComponent}
         <Menu
           keepMounted
           open={mouseState.mouseY !== null}
@@ -216,6 +239,22 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
                 <div className={classes.lineHorizonral}></div>
               </div>
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                addLabel(
+                  props.id,
+                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y
+                );
+                handleClose();
+                setIsAreaClicked(false);
+              }}
+            >
+              新規ラベル
+              <div className={classes.menuIconContainer}>
+                <div style={{ fontSize: 12, paddingLeft: 3 }}>A</div>
+              </div>
+            </MenuItem>
           </div>
         </Menu>
       </div>
@@ -265,22 +304,22 @@ const useStyles = makeStyles({
   },
 
   lineVertical: {
-    width: 12,
-    height: 12,
-    marginLeft: 4,
+    width: 15,
+    height: 15,
+    marginLeft: 5,
     borderLeft: "4px solid black",
   },
   lineHorizonral: {
-    width: 12,
-    height: 12,
-    marginTop: 4,
+    width: 15,
+    height: 15,
+    marginTop: 5,
     borderTop: "4px solid black",
   },
   menuIconContainer: {
     marginLeft: 3,
     border: "1px solid black",
-    height: 12,
-    width: 12,
+    height: 15,
+    width: 15,
   },
 });
 
