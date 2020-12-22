@@ -8,9 +8,21 @@ import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import { Textfit } from "react-textfit";
 
+const CanvasObject = {
+  StickyNotes: "stickyNotes",
+  Lines: "lines",
+  Labels: "labels",
+} as const;
+
+type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+
 const Label = (props) => {
   const classes = useStyles(props);
-  const { moveLabel, resizeLabel, editLabelWord } = useContext(CanvasContext);
+  const {
+    moveCanvasObject,
+    resizeCanvasObject,
+    editCanvasObjectWord,
+  } = useContext(CanvasContext);
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: props.positionX,
     y: props.positionY,
@@ -21,13 +33,14 @@ const Label = (props) => {
   const handleStop = (e, d) => {
     if (position.x !== d.x || position.y !== d.y) {
       setPosition({ x: d.x, y: d.y });
-      moveLabel(props.canvasId, props.id, d.x, d.y);
+      moveCanvasObject(props.canvasId, CanvasObject.Labels, props.id, d.x, d.y);
     }
   };
   const handleResizeStop = (e, direction, ref, delta, position) => {
     setPosition({ x: position.x, y: position.y });
-    resizeLabel(
+    resizeCanvasObject(
       props.canvasId,
+      CanvasObject.Labels,
       props.id,
       position.x,
       position.y,
@@ -57,7 +70,12 @@ const Label = (props) => {
     if (props.isAreaClicked) {
       setIsEdit(false);
       if (props.word !== tempWord) {
-        editLabelWord(props.canvasId, props.id, tempWord);
+        editCanvasObjectWord(
+          props.canvasId,
+          CanvasObject.Labels,
+          props.id,
+          tempWord
+        );
       }
     }
   }, [props.isAreaClicked]);

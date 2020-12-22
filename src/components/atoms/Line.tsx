@@ -21,6 +21,14 @@ type Props = {
   zIndex: number;
 };
 
+const CanvasObject = {
+  StickyNotes: "stickyNotes",
+  Lines: "lines",
+  Labels: "labels",
+} as const;
+
+type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+
 const initiaMouselState = {
   mouseX: null,
   mouseY: null,
@@ -38,8 +46,8 @@ const Line: React.FC<Props> = (props) => {
   }>(initiaMouselState);
   const classes = useStyles(props);
   const {
-    moveLine,
-    deleteLine,
+    moveCanvasObject,
+    deleteCanvasObject,
     bringForward,
     sendBackward,
     bringToFront,
@@ -84,7 +92,7 @@ const Line: React.FC<Props> = (props) => {
     } else if (props.vh === "horizontal") {
       setPosition({ x: 0, y: ui.y });
     }
-    moveLine(props.canvasId, props.id, ui.x, ui.y);
+    moveCanvasObject(props.canvasId, CanvasObject.Lines, props.id, ui.x, ui.y);
   };
 
   const handleClick = (e) => {
@@ -131,35 +139,45 @@ const Line: React.FC<Props> = (props) => {
         >
           <MenuItem
             onClick={() => {
-              bringForward(props.canvasId, "lines", props.id, props.zIndex);
+              bringForward(
+                props.canvasId,
+                CanvasObject.Lines,
+                props.id,
+                props.zIndex
+              );
             }}
           >
             前面へ
           </MenuItem>
           <MenuItem
             onClick={() => {
-              bringToFront(props.canvasId, "lines", props.id);
+              bringToFront(props.canvasId, CanvasObject.Lines, props.id);
             }}
           >
             最前面へ
           </MenuItem>
           <MenuItem
             onClick={() => {
-              sendBackward(props.canvasId, "lines", props.id, props.zIndex);
+              sendBackward(
+                props.canvasId,
+                CanvasObject.Lines,
+                props.id,
+                props.zIndex
+              );
             }}
           >
             背面へ
           </MenuItem>
           <MenuItem
             onClick={() => {
-              sendToBack(props.canvasId, "lines", props.id);
+              sendToBack(props.canvasId, CanvasObject.Lines, props.id);
             }}
           >
             最後面へ
           </MenuItem>
           <MenuItem
             onClick={() => {
-              deleteLine(props.canvasId, props.id);
+              deleteCanvasObject(props.canvasId, CanvasObject.Lines, props.id);
               handleClose();
             }}
           >
