@@ -29,6 +29,14 @@ type StickyNote = {
   zIndex: number;
 };
 
+const CanvasObject = {
+  StickyNotes: "stickyNotes",
+  Lines: "lines",
+  Labels: "labels",
+} as const;
+
+type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+
 const initiaMouselState = {
   mouseX: null,
   mouseY: null,
@@ -46,11 +54,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
   const {
     getAllCanvasDatas,
     stickyNotes,
-    addLine,
+    addCanvasObject,
     lines,
-    addStickyNote,
     isEdit,
-    addLabel,
     labels,
   } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
@@ -151,8 +157,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
             <NestedMenuItem label="新規付箋" parentMenuOpen={!!mouseState}>
               <MenuItem
                 onClick={() => {
-                  addStickyNote(
+                  addCanvasObject(
                     props.id,
+                    CanvasObject.StickyNotes,
                     mouseState.mouseX - ref.current.getBoundingClientRect().x,
                     mouseState.mouseY - ref.current.getBoundingClientRect().y,
                     "yellow"
@@ -165,8 +172,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  addStickyNote(
+                  addCanvasObject(
                     props.id,
+                    CanvasObject.StickyNotes,
                     mouseState.mouseX - ref.current.getBoundingClientRect().x,
                     mouseState.mouseY - ref.current.getBoundingClientRect().y,
                     "red"
@@ -179,8 +187,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  addStickyNote(
+                  addCanvasObject(
                     props.id,
+                    CanvasObject.StickyNotes,
                     mouseState.mouseX - ref.current.getBoundingClientRect().x,
                     mouseState.mouseY - ref.current.getBoundingClientRect().y,
                     "blue"
@@ -193,8 +202,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  addStickyNote(
+                  addCanvasObject(
                     props.id,
+                    CanvasObject.StickyNotes,
                     mouseState.mouseX - ref.current.getBoundingClientRect().x,
                     mouseState.mouseY - ref.current.getBoundingClientRect().y,
                     "green"
@@ -209,11 +219,12 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
             <Divider />
             <MenuItem
               onClick={() => {
-                addLine(
+                addCanvasObject(
                   props.id,
-                  "vertical",
+                  CanvasObject.Lines,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  0
+                  0,
+                  "vertical"
                 );
                 handleClose();
               }}
@@ -225,11 +236,12 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
             </MenuItem>
             <MenuItem
               onClick={() => {
-                addLine(
+                addCanvasObject(
                   props.id,
-                  "horizontal",
+                  CanvasObject.Lines,
                   0,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  "horizontal"
                 );
                 handleClose();
               }}
@@ -241,10 +253,12 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
             </MenuItem>
             <MenuItem
               onClick={() => {
-                addLabel(
+                addCanvasObject(
                   props.id,
+                  CanvasObject.Labels,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  ""
                 );
                 handleClose();
                 setIsAreaClicked(false);

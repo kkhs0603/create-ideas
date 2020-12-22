@@ -25,6 +25,14 @@ type Props = {
   };
 };
 
+const CanvasObject = {
+  StickyNotes: "stickyNotes",
+  Lines: "lines",
+  Labels: "labels",
+} as const;
+
+type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+
 const initiaMouselState = {
   mouseX: null,
   mouseY: null,
@@ -70,15 +78,15 @@ const BlueRadio = withStyles({
 const StickyNote: React.FC<Props> = (props) => {
   const classes = useStyles(props);
   const {
-    moveStickyNote,
-    deleteStickyNote,
+    moveCanvasObject,
+    deleteCanvasObject,
+    editCanvasObjectWord,
+    resizeCanvasObject,
     changeStickyNoteColor,
     bringForward,
     sendBackward,
     bringToFront,
     sendToBack,
-    editStickyNoteWord,
-    resizeStickyNote,
   } = useContext(CanvasContext);
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
@@ -126,7 +134,13 @@ const StickyNote: React.FC<Props> = (props) => {
   const handleStop = (e, d) => {
     if (position.x !== d.x || position.y !== d.y) {
       setPosition({ x: d.x, y: d.y });
-      moveStickyNote(props.canvasId, props.data.id, d.x, d.y);
+      moveCanvasObject(
+        props.canvasId,
+        CanvasObject.StickyNotes,
+        props.data.id,
+        d.x,
+        d.y
+      );
     }
     setCursor("grab");
   };
@@ -157,8 +171,9 @@ const StickyNote: React.FC<Props> = (props) => {
   const handleResizeStop = (e, direction, ref, delta, position) => {
     setSize({ width: ref.style.width, height: ref.style.height });
     setPosition({ x: position.x, y: position.y });
-    resizeStickyNote(
+    resizeCanvasObject(
       props.canvasId,
+      CanvasObject.StickyNotes,
       props.data.id,
       position.x,
       position.y,
@@ -173,7 +188,12 @@ const StickyNote: React.FC<Props> = (props) => {
       e.key === "Enter"
     ) {
       if (props.data.word !== tempWord) {
-        editStickyNoteWord(props.canvasId, props.data.id, e.target.value);
+        editCanvasObjectWord(
+          props.canvasId,
+          CanvasObject.StickyNotes,
+          props.data.id,
+          e.target.value
+        );
       }
       setIsEdit(false);
     }
@@ -207,7 +227,12 @@ const StickyNote: React.FC<Props> = (props) => {
     if (props.isAreaClicked) {
       setIsEdit(false);
       if (props.data.word !== tempWord) {
-        editStickyNoteWord(props.canvasId, props.data.id, tempWord);
+        editCanvasObjectWord(
+          props.canvasId,
+          CanvasObject.StickyNotes,
+          props.data.id,
+          tempWord
+        );
       }
     }
   }, [props.isAreaClicked]);
@@ -260,7 +285,7 @@ const StickyNote: React.FC<Props> = (props) => {
             onClick={() => {
               bringForward(
                 props.canvasId,
-                "stickyNotes",
+                CanvasObject.StickyNotes,
                 props.data.id,
                 props.data.zIndex
               );
@@ -270,7 +295,11 @@ const StickyNote: React.FC<Props> = (props) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              bringToFront(props.canvasId, "stickyNotes", props.data.id);
+              bringToFront(
+                props.canvasId,
+                CanvasObject.StickyNotes,
+                props.data.id
+              );
             }}
           >
             最前面へ
@@ -279,7 +308,7 @@ const StickyNote: React.FC<Props> = (props) => {
             onClick={() => {
               sendBackward(
                 props.canvasId,
-                "stickyNotes",
+                CanvasObject.StickyNotes,
                 props.data.id,
                 props.data.zIndex
               );
@@ -289,7 +318,11 @@ const StickyNote: React.FC<Props> = (props) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              sendToBack(props.canvasId, "stickyNotes", props.data.id);
+              sendToBack(
+                props.canvasId,
+                CanvasObject.StickyNotes,
+                props.data.id
+              );
             }}
           >
             最背面へ
@@ -319,7 +352,11 @@ const StickyNote: React.FC<Props> = (props) => {
           <Divider />
           <MenuItem
             onClick={() => {
-              deleteStickyNote(props.canvasId, props.data.id);
+              deleteCanvasObject(
+                props.canvasId,
+                CanvasObject.StickyNotes,
+                props.data.id
+              );
               handleClose();
             }}
           >
