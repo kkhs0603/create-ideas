@@ -16,12 +16,22 @@ const CanvasObject = {
 
 type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
 
+const initiaMouselState = {
+  mouseX: null,
+  mouseY: null,
+};
+
 const Label = (props) => {
   const classes = useStyles(props);
   const {
     moveCanvasObject,
     resizeCanvasObject,
     editCanvasObjectWord,
+    deleteCanvasObject,
+    bringForward,
+    sendBackward,
+    bringToFront,
+    sendToBack,
   } = useContext(CanvasContext);
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: props.positionX,
@@ -30,6 +40,12 @@ const Label = (props) => {
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
   const [tempWord, setTempWord] = useState<string>(props.word);
+  const [mouseState, setMouseState] = useState<{
+    mouseX: number;
+    mouseY: number;
+  }>(initiaMouselState);
+  const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
+
   const handleStop = (e, d) => {
     if (position.x !== d.x || position.y !== d.y) {
       setPosition({ x: d.x, y: d.y });
@@ -48,6 +64,20 @@ const Label = (props) => {
       ref.style.height
     );
   };
+
+  const handleClick = (e) => {
+    setIsOpendMenu(true);
+    setMouseState({
+      mouseX: e.clientX - 2,
+      mouseY: e.clientY - 4,
+    });
+  };
+
+  const handleClose = () => {
+    setIsOpendMenu(false);
+    setMouseState(initiaMouselState);
+  };
+
   const word = isEdit ? (
     <TextField
       multiline={true}
@@ -108,8 +138,75 @@ const Label = (props) => {
           setIsEdit(true);
           props.setIsAreaClicked(false);
         }}
+        onContextMenu={handleClick}
       >
         <Textfit className={style}>{word}</Textfit>
+
+        <Menu
+          open={mouseState.mouseY !== null}
+          onClose={handleClose}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            mouseState.mouseY !== null && mouseState.mouseX !== null
+              ? { top: mouseState.mouseY, left: mouseState.mouseX }
+              : undefined
+          }
+        >
+          <MenuItem
+            onClick={(e) => {
+              setIsEdit(true);
+              handleClose();
+            }}
+          >
+            編集
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              bringForward(
+                props.canvasId,
+                CanvasObject.Labels,
+                props.id,
+                props.zIndex
+              );
+            }}
+          >
+            前面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              bringToFront(props.canvasId, CanvasObject.Labels, props.id);
+            }}
+          >
+            最前面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              sendBackward(
+                props.canvasId,
+                CanvasObject.Labels,
+                props.id,
+                props.zIndex
+              );
+            }}
+          >
+            背面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              sendToBack(props.canvasId, CanvasObject.Labels, props.id);
+            }}
+          >
+            最背面へ
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              deleteCanvasObject(props.canvasId, CanvasObject.Labels, props.id);
+              handleClose();
+            }}
+          >
+            削除
+          </MenuItem>
+        </Menu>
       </div>
     </Rnd>
   );
