@@ -14,6 +14,7 @@ import Line from "../atoms/Line";
 import Label from "../atoms/Label";
 import Image from "next/image";
 import NestedMenuItem from "material-ui-nested-menu-item";
+import html2canvas from "html2canvas";
 
 type StickyNoteAreaProps = {
   id: string;
@@ -45,7 +46,7 @@ const initiaMouselState = {
 const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
   props: StickyNoteAreaProps
 ) => {
-  const ref = useRef(null);
+  const ref = useRef();
   const classes = useStyles(props);
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
@@ -60,9 +61,14 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     labels,
   } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
+  const [scrollSize, setScrollSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     getAllCanvasDatas(props.id);
+    setScrollSize({
+      width: ref.current.scrollWidth,
+      height: ref.current.scrollHeight,
+    });
   }, []);
 
   const handleClick = (e) => {
@@ -77,6 +83,26 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
 
   const handleClose = () => {
     setMouseState(initiaMouselState);
+  };
+  const saveAsImage = (uri) => {
+    const downloadLink = document.createElement("a");
+    if (typeof downloadLink.download === "string") {
+      downloadLink.href = uri;
+      downloadLink.download = "idea.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } else {
+      window.open(uri);
+    }
+  };
+
+  const onClickExport = () => {
+    const target = document.getElementById("area");
+    html2canvas(target).then((canvas) => {
+      const targetImgUri = canvas.toDataURL("img/png");
+      saveAsImage(targetImgUri);
+    });
   };
 
   const stickyNotesComponent = stickyNotes?.map((data, index) => (
@@ -104,6 +130,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
           x={line.positionX}
           y={line.positionY}
           zIndex={line.zIndex}
+          scrollSize={scrollSize}
         ></Line>
       ))
     );
@@ -127,7 +154,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
   ));
 
   return (
-    <div ref={ref} className={classes.frame}>
+    <div className={classes.frame}>
       {/* <Image src={"/swot.png"} alt="swot" layout="fill" unsized /> */}
       <div
         id="area"
@@ -138,6 +165,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
           setIsAreaClicked(true);
         }}
         onContextMenu={handleClick}
+        ref={ref}
       >
         {stickyNotesComponent}
         {linesComponent}
@@ -269,6 +297,14 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
                 <div style={{ fontSize: 12, paddingLeft: 3 }}>A</div>
               </div>
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onClickExport();
+              }}
+            >
+              PNG出力
+            </MenuItem>
           </div>
         </Menu>
       </div>
@@ -287,7 +323,7 @@ const useStyles = makeStyles({
     borderRadius: "5px",
     border: "10px solid #adb2bd",
     boxShadow: "inset -1px 2px 2px #404040, 6px 9px 1px rgba(0, 0, 0, 0.2)",
-    overflow: "scroll",
+    overflow: "auto",
     zIndex: 1,
   },
   container: {

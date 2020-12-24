@@ -375,7 +375,6 @@ const useStyles = makeStyles({
     whiteSpace: "pre-wrap",
     position: "absolute",
     boxSizing: "border-box",
-    boxShadow: "0 .25rem .25rem hsla(0, 0%, 0%, .1)",
     border: "1px solid black",
     height: "100%",
     width: "100%",
