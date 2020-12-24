@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { CanvasContext } from "../../contexts/CanvasContext";
@@ -68,7 +68,7 @@ const Line: React.FC<Props> = (props) => {
     case "horizontal":
       lineClasses = classNames(classes.container, classes.horizontal);
       axis = "y";
-      width = "100%";
+      width = props.scrollSize.width;
       height = "5px";
       break;
     default:
@@ -107,6 +107,8 @@ const Line: React.FC<Props> = (props) => {
   const handleClose = () => {
     setMouseState(initiaMouselState);
   };
+
+  useEffect(() => {}, []);
 
   return (
     <Rnd
@@ -200,11 +202,11 @@ const useStyles = makeStyles({
   },
   vertical: {
     width: "5px",
-    height: "100%",
+    height: (props) => props.scrollSize.height,
     margin: "0px 5px",
   },
   horizontal: {
-    width: "100%",
+    width: (props) => props.scrollSize.width,
     height: "5px",
     margin: "5px 0px",
   },
