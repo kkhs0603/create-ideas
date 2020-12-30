@@ -6,6 +6,7 @@ import { TextField, Menu, MenuItem, Radio, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Rnd } from "react-rnd";
+import LockButton from "../atoms/LockButton";
 
 type Props = {
   canvasId: string;
@@ -93,18 +94,19 @@ const StickyNote: React.FC<Props> = (props) => {
     mouseY: number;
   }>(initiaMouselState);
   const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: props.data.positionX,
-    y: props.data.positionY,
+    x: props.positionX,
+    y: props.positionY,
   });
   const [size, setSize] = useState<{ width: number; height: number }>({
-    width: props.data.width,
-    height: props.data.height,
+    width: props.width,
+    height: props.height,
   });
   const [cursor, setCursor] = useState<string>("grab");
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
-  const [selectedColor, setSelectedColor] = useState<string>(props.data.color);
+  const [selectedColor, setSelectedColor] = useState<string>(props.color);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
-  const [tempWord, setTempWord] = useState<string>(props.data.word);
+  const [tempWord, setTempWord] = useState<string>(props.word);
+  const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
 
   const handleClick = (e) => {
     setIsOpendMenu(true);
@@ -132,25 +134,27 @@ const StickyNote: React.FC<Props> = (props) => {
   };
 
   const handleStop = (e, d) => {
-    if (position.x !== d.x || position.y !== d.y) {
-      setPosition({ x: d.x, y: d.y });
+    const positionX = d.x;
+    const positionY = d.y;
+    if (position.x !== positionX || position.y !== positionY) {
+      setPosition({ x: positionX, y: positionY });
       moveCanvasObject(
         props.canvasId,
         CanvasObject.StickyNotes,
-        props.data.id,
-        d.x,
-        d.y
+        props.id,
+        positionX,
+        positionY
       );
     }
     setCursor("grab");
   };
 
   const handleChangeColor = (event) => {
-    changeStickyNoteColor(props.canvasId, props.data.id, event.target.value);
+    changeStickyNoteColor(props.canvasId, props.id, event.target.value);
   };
 
   let color = classNames(classes.yellow, classes.container);
-  switch (props.data.color) {
+  switch (props.color) {
     case "yellow":
       color = classNames(classes.yellow, classes.container);
       break;
@@ -169,17 +173,23 @@ const StickyNote: React.FC<Props> = (props) => {
   }
 
   const handleResizeStop = (e, direction, ref, delta, position) => {
-    setSize({ width: ref.style.width, height: ref.style.height });
-    setPosition({ x: position.x, y: position.y });
-    resizeCanvasObject(
-      props.canvasId,
-      CanvasObject.StickyNotes,
-      props.data.id,
-      position.x,
-      position.y,
-      ref.style.width,
-      ref.style.height
-    );
+    const changedWidth = size.width + delta.width;
+    const changedHeight = size.height + delta.height;
+    const positionX = position.x;
+    const positionY = position.y;
+    if (size.width !== changedWidth || size.height !== changedHeight) {
+      setSize({ width: changedWidth, height: changedHeight });
+      setPosition({ x: positionX, y: positionY });
+      resizeCanvasObject(
+        props.canvasId,
+        CanvasObject.StickyNotes,
+        props.id,
+        positionX,
+        positionY,
+        changedWidth,
+        changedHeight
+      );
+    }
   };
 
   const finishWordEdit = (e) => {
@@ -187,11 +197,11 @@ const StickyNote: React.FC<Props> = (props) => {
       ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
       e.key === "Enter"
     ) {
-      if (props.data.word !== tempWord) {
+      if (tempWord === "" || props.word !== tempWord) {
         editCanvasObjectWord(
           props.canvasId,
           CanvasObject.StickyNotes,
-          props.data.id,
+          props.id,
           e.target.value
         );
       }
@@ -219,27 +229,36 @@ const StickyNote: React.FC<Props> = (props) => {
       }}
     />
   ) : (
-    <div id={props.data.id}>{tempWord}</div>
+    <div id={props.id}>{tempWord}</div>
   );
 
   useEffect(() => {
     //編集状態を解除する
     if (props.isAreaClicked) {
       setIsEdit(false);
-      if (props.data.word !== tempWord) {
+      if (props.word !== tempWord) {
         editCanvasObjectWord(
           props.canvasId,
           CanvasObject.StickyNotes,
-          props.data.id,
+          props.id,
           tempWord
         );
       }
     }
   }, [props.isAreaClicked]);
+
+  // useEffect(() => {
+  //   console.log("scale", props.scale);
+  // }, [[props.scale]]);
   return (
     <Rnd
-      style={{ zIndex: props.data.zIndex }}
-      default={{ width: props.data.width, height: props.data.height }}
+      style={{
+        zIndex: props.zIndex,
+      }}
+      size={{
+        width: size.width,
+        height: size.height,
+      }}
       position={{ x: position.x, y: position.y }}
       onDragStart={handleStart}
       onDrag={handleDrag}
@@ -247,9 +266,13 @@ const StickyNote: React.FC<Props> = (props) => {
       onResizeStop={handleResizeStop}
       minHeight="50"
       minWidth="50"
+      disableDragging={isLocked}
+      enableResizing={!isLocked}
+      // onMouseEnter={() => props.setDisabledPanZoom(true)}
+      // onMouseLeave={() => props.setDisabledPanZoom(false)}
     >
       <div
-        id={props.data.id}
+        id={props.id}
         className={color}
         style={{ cursor: cursor }}
         onContextMenu={handleClick}
@@ -257,8 +280,8 @@ const StickyNote: React.FC<Props> = (props) => {
           props.setIsAreaClicked(false);
         }}
         onDoubleClick={(e) => {
-          console.log(e.target.id === props.data.id);
-          setIsEdit(e.target.id === props.data.id);
+          console.log(e.target.id === props.id);
+          setIsEdit(e.target.id === props.id);
           props.setIsAreaClicked(false);
         }}
       >
@@ -273,7 +296,14 @@ const StickyNote: React.FC<Props> = (props) => {
               : undefined
           }
         >
+          <LockButton
+            isLocked={props.isLocked}
+            canvasId={props.canvasId}
+            objName={CanvasObject.StickyNotes}
+            id={props.id}
+          />
           <MenuItem
+            disabled={isLocked}
             onClick={(e) => {
               setIsEdit(true);
               handleClose();
@@ -282,47 +312,43 @@ const StickyNote: React.FC<Props> = (props) => {
             編集
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               bringForward(
                 props.canvasId,
                 CanvasObject.StickyNotes,
-                props.data.id,
-                props.data.zIndex
+                props.id,
+                props.zIndex
               );
             }}
           >
             前面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
-              bringToFront(
-                props.canvasId,
-                CanvasObject.StickyNotes,
-                props.data.id
-              );
+              bringToFront(props.canvasId, CanvasObject.StickyNotes, props.id);
             }}
           >
             最前面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               sendBackward(
                 props.canvasId,
                 CanvasObject.StickyNotes,
-                props.data.id,
-                props.data.zIndex
+                props.id,
+                props.zIndex
               );
             }}
           >
             背面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
-              sendToBack(
-                props.canvasId,
-                CanvasObject.StickyNotes,
-                props.data.id
-              );
+              sendToBack(props.canvasId, CanvasObject.StickyNotes, props.id);
             }}
           >
             最背面へ
@@ -331,31 +357,36 @@ const StickyNote: React.FC<Props> = (props) => {
           <MenuItem disabled>付箋の色</MenuItem>
           <YellowRadio
             checked={selectedColor === "yellow"}
+            disabled={isLocked}
             onChange={handleChangeColor}
             value="yellow"
           />
           <GreenRadio
+            disabled={isLocked}
             checked={selectedColor === "green"}
             onChange={handleChangeColor}
             value="green"
           />
           <RedRadio
+            disabled={isLocked}
             checked={selectedColor === "red"}
             onChange={handleChangeColor}
             value="red"
           />
           <BlueRadio
+            disabled={isLocked}
             checked={selectedColor === "blue"}
             onChange={handleChangeColor}
             value="blue"
           />
           <Divider />
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               deleteCanvasObject(
                 props.canvasId,
                 CanvasObject.StickyNotes,
-                props.data.id
+                props.id
               );
               handleClose();
             }}
@@ -378,7 +409,7 @@ const useStyles = makeStyles({
     border: "1px solid black",
     height: "100%",
     width: "100%",
-    zIndex: (props: Props) => props.data.zIndex,
+    zIndex: (props: Props) => props.zIndex,
   },
   yellow: {
     backgroundColor: "#FFFCB3",

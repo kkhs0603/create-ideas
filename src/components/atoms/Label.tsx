@@ -2,11 +2,19 @@ import React, { useState, useContext, useRef, useEffect } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { yellow, green, red, blue } from "@material-ui/core/colors";
 import { CanvasContext } from "../../contexts/CanvasContext";
-import { TextField, Menu, MenuItem, Radio, Divider } from "@material-ui/core";
+import {
+  TextField,
+  Menu,
+  MenuItem,
+  Radio,
+  Divider,
+  FormControlLabel,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import { Textfit } from "react-textfit";
+import LockButton from "./LockButton";
 
 const CanvasObject = {
   StickyNotes: "stickyNotes",
@@ -45,24 +53,45 @@ const Label = (props) => {
     mouseY: number;
   }>(initiaMouselState);
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
+  const [size, setSize] = useState({
+    width: props.width,
+    height: props.height,
+  });
+  const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
 
   const handleStop = (e, d) => {
-    if (position.x !== d.x || position.y !== d.y) {
-      setPosition({ x: d.x, y: d.y });
-      moveCanvasObject(props.canvasId, CanvasObject.Labels, props.id, d.x, d.y);
+    const positionX = d.x;
+    const positionY = d.y;
+    if (position.x !== positionX || position.y !== positionY) {
+      setPosition({ x: positionX, y: positionY });
+      moveCanvasObject(
+        props.canvasId,
+        CanvasObject.Labels,
+        props.id,
+        positionX,
+        positionY
+      );
     }
   };
+
   const handleResizeStop = (e, direction, ref, delta, position) => {
-    setPosition({ x: position.x, y: position.y });
-    resizeCanvasObject(
-      props.canvasId,
-      CanvasObject.Labels,
-      props.id,
-      position.x,
-      position.y,
-      ref.style.width,
-      ref.style.height
-    );
+    const changedWidth = size.width + delta.width;
+    const changedHeight = size.height + delta.height;
+    const positionX = position.x;
+    const positionY = position.y;
+    if (size.width !== changedWidth || size.height !== changedHeight) {
+      setSize({ width: changedWidth, height: changedHeight });
+      setPosition({ x: positionX, y: positionY });
+      resizeCanvasObject(
+        props.canvasId,
+        CanvasObject.Labels,
+        props.id,
+        positionX,
+        positionY,
+        changedWidth,
+        changedHeight
+      );
+    }
   };
 
   const handleClick = (e) => {
@@ -78,23 +107,24 @@ const Label = (props) => {
     setMouseState(initiaMouselState);
   };
 
-  const word = isEdit ? (
-    <TextField
-      multiline={true}
-      value={tempWord}
-      onChange={(e) => {
-        setTempWord(e.target.value);
-      }}
-      //onKeyDown={(e) => finishWordEdit(e)}
+  const word =
+    !isLocked && isEdit ? (
+      <TextField
+        multiline={true}
+        value={tempWord}
+        onChange={(e) => {
+          setTempWord(e.target.value);
+        }}
+        //onKeyDown={(e) => finishWordEdit(e)}
 
-      autoFocus={true}
-      onFocus={(e) => {
-        e.currentTarget.select();
-      }}
-    />
-  ) : (
-    <div id={props.id}>{tempWord}</div>
-  );
+        autoFocus={true}
+        onFocus={(e) => {
+          e.currentTarget.select();
+        }}
+      />
+    ) : (
+      <div id={props.id}>{tempWord}</div>
+    );
   useEffect(() => {
     //編集状態を解除する
     if (props.isAreaClicked) {
@@ -112,7 +142,10 @@ const Label = (props) => {
   return (
     <Rnd
       style={{ zIndex: props.zIndex }}
-      default={{ width: props.width, height: props.height }}
+      size={{
+        width: size.width,
+        height: size.height,
+      }}
       position={{ x: position.x, y: position.y }}
       // onDragStart={handleStart}
       // onDrag={handleDrag}
@@ -121,16 +154,20 @@ const Label = (props) => {
       minHeight="50"
       minWidth="50"
       onMouseOver={() => {
-        if (style !== classes.onHoverContainer) {
+        if (!isLocked && style !== classes.onHoverContainer) {
           setStyle(classes.onHoverContainer);
         }
       }}
       onMouseLeave={() => {
-        if (style !== classes.container) {
+        if (!isLocked && style !== classes.container) {
           setStyle(classes.container);
         }
       }}
       id={props.id}
+      // onMouseEnter={() => props.setDisabledPanZoom(true)}
+      // onMouseLeave={() => props.setDisabledPanZoom(false)}
+      disableDragging={isLocked}
+      enableResizing={!isLocked}
     >
       <div
         onDoubleClick={(e) => {
@@ -152,7 +189,14 @@ const Label = (props) => {
               : undefined
           }
         >
+          <LockButton
+            isLocked={props.isLocked}
+            canvasId={props.canvasId}
+            objName={CanvasObject.Labels}
+            id={props.id}
+          />
           <MenuItem
+            disabled={isLocked}
             onClick={(e) => {
               setIsEdit(true);
               handleClose();
@@ -161,6 +205,7 @@ const Label = (props) => {
             編集
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               bringForward(
                 props.canvasId,
@@ -173,6 +218,7 @@ const Label = (props) => {
             前面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               bringToFront(props.canvasId, CanvasObject.Labels, props.id);
             }}
@@ -180,6 +226,7 @@ const Label = (props) => {
             最前面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               sendBackward(
                 props.canvasId,
@@ -192,6 +239,7 @@ const Label = (props) => {
             背面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               sendToBack(props.canvasId, CanvasObject.Labels, props.id);
             }}
@@ -199,6 +247,7 @@ const Label = (props) => {
             最背面へ
           </MenuItem>
           <MenuItem
+            disabled={isLocked}
             onClick={() => {
               deleteCanvasObject(props.canvasId, CanvasObject.Labels, props.id);
               handleClose();

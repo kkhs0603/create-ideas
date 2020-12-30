@@ -17,8 +17,8 @@ type StickyNote = {
   positionY: number;
   word: string;
   zIndex: number;
-  width: string;
-  height: string;
+  width: number;
+  height: number;
 };
 
 type Line = {
@@ -35,8 +35,8 @@ type Label = {
   positionX: number;
   positionY: number;
   zIndex: number;
-  width: string;
-  height: string;
+  width: number;
+  height: number;
   createdBy: string;
 };
 
@@ -111,8 +111,14 @@ interface IContextProps {
     objId: string,
     positionX: number,
     positionY: number,
-    width: string,
-    height: string
+    width: number,
+    height: number
+  ) => void;
+  lockCanvasObject: (
+    canvasId: string,
+    objName: CanvasObject,
+    objId: string,
+    isLocked: boolean
   ) => void;
 }
 
@@ -213,6 +219,7 @@ const CanvasProvider: React.FC = ({ children }) => {
             createdBy: auth.currentUser.uid,
             color: option,
             zIndex: maxZindex + 1,
+            isLocked: false,
           });
           ref.doc(StickyResult.id).update({ id: StickyResult.id });
           break;
@@ -222,6 +229,7 @@ const CanvasProvider: React.FC = ({ children }) => {
             vh: option,
             positionX,
             positionY,
+            isLocked: false,
           });
           ref
             .doc(lineResult.id)
@@ -233,9 +241,10 @@ const CanvasProvider: React.FC = ({ children }) => {
             positionX,
             positionY,
             word: "",
-            width: "100px",
-            height: "100px",
+            width: 100,
+            height: 100,
             createdBy: auth.currentUser.uid,
+            isLocked: false,
           });
           ref
             .doc(labelResult.id)
@@ -255,6 +264,8 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(canvasId)
         .collection(objName);
 
+      //初回getで全部とる
+      //変更があった場合、変更があったものだけ配列の中身をかえる
       ref.onSnapshot((snapshot) => {
         switch (objName) {
           case CanvasObject.StickyNotes:
@@ -343,8 +354,8 @@ const CanvasProvider: React.FC = ({ children }) => {
     objId: string,
     positionX: number,
     positionY: number,
-    width: string,
-    height: string
+    width: number,
+    height: number
   ) => {
     try {
       console.log("resize", objName);
@@ -357,6 +368,27 @@ const CanvasProvider: React.FC = ({ children }) => {
           positionY,
           width,
           height,
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const lockCanvasObject = async (
+    canvasId: string,
+    objName: CanvasObject,
+    objId: string,
+    isLocked: boolean
+  ) => {
+    try {
+      console.log("lock " + objName);
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection(objName)
+        .doc(objId)
+        .update({
+          isLocked,
         });
     } catch (error) {
       console.log(error.message);
@@ -532,6 +564,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         moveCanvasObject,
         editCanvasObjectWord,
         resizeCanvasObject,
+        lockCanvasObject,
 
         stickyNotes,
         changeStickyNoteColor,
