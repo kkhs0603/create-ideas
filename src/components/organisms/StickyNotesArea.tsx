@@ -15,6 +15,7 @@ import Label from "../atoms/Label";
 import Image from "next/image";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import html2canvas from "html2canvas";
+import { PanZoom } from "react-easy-panzoom";
 
 type StickyNoteAreaProps = {
   id: string;
@@ -38,7 +39,7 @@ const CanvasObject = {
 
 type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
 
-const initiaMouselState = {
+const initialMouseState = {
   mouseX: null,
   mouseY: null,
 };
@@ -47,11 +48,10 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
   props: StickyNoteAreaProps
 ) => {
   const ref = useRef();
-  const classes = useStyles(props);
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
     mouseY: number;
-  }>(initiaMouselState);
+  }>(initialMouseState);
   const {
     getAllCanvasDatas,
     stickyNotes,
@@ -61,14 +61,13 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     labels,
   } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
-  const [scrollSize, setScrollSize] = useState({ width: 0, height: 0 });
+  const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
+  const [scale, setScale] = useState<number>(1);
+  // const [disabledPanZoom, setDisabledPanZoom] = useState<boolean>(false);
 
+  const classes = useStyles(areaSize);
   useEffect(() => {
     getAllCanvasDatas(props.id);
-    setScrollSize({
-      width: ref.current.scrollWidth,
-      height: ref.current.scrollHeight,
-    });
   }, []);
 
   const handleClick = (e) => {
@@ -79,10 +78,13 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       mouseY: e.clientY - 4,
     });
     setIsAreaClicked(true);
+    // setDisabledPanZoom(false);
   };
 
   const handleClose = () => {
-    setMouseState(initiaMouselState);
+    if (mouseState !== initialMouseState) {
+      setMouseState(initialMouseState);
+    }
   };
   const saveAsImage = (uri) => {
     const downloadLink = document.createElement("a");
@@ -105,15 +107,17 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     });
   };
 
-  const stickyNotesComponent = stickyNotes?.map((data, index) => (
+  const stickyNotesComponent = stickyNotes?.map((stickyNote, index) => (
     <StickyNote
-      data={data}
       key={index}
       parent={ref.current?.getBoundingClientRect()}
       canvasId={props.id}
       isAreaClicked={isAreaClicked}
       setIsAreaClicked={setIsAreaClicked}
-      isEdit={(isEdit(data.createdBy) && data.word === "") || false}
+      isEdit={(isEdit(stickyNote.createdBy) && stickyNote.word === "") || false}
+      {...stickyNote}
+      // scale={scale}
+      // setDisabledPanZoom={setDisabledPanZoom}
     />
   ));
 
@@ -125,13 +129,11 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
         <Line
           key={index}
           canvasId={props.id}
-          id={line.id}
-          vh={line.vh}
-          x={line.positionX}
-          y={line.positionY}
-          zIndex={line.zIndex}
-          scrollSize={scrollSize}
-        ></Line>
+          areaSize={areaSize}
+          {...line}
+          // scale={scale}
+          // setDisabledPanZoom={setDisabledPanZoom}
+        />
       ))
     );
 
@@ -139,198 +141,205 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     <Label
       key={index}
       canvasId={props.id}
-      id={label.id}
-      positionX={label.positionX}
-      positionY={label.positionY}
-      width={label.width}
-      height={label.height}
-      zIndex={label.zIndex}
-      word={label.word}
       isEdit={(isEdit(label.createdBy) && label.word === "") || false}
       setIsAreaClicked={setIsAreaClicked}
       isAreaClicked={isAreaClicked}
-      createdBy={label.createdBy}
+      {...label}
+      // scale={scale}
+      // setDisabledPanZoom={setDisabledPanZoom}
     />
   ));
 
   return (
-    <div className={classes.frame}>
-      {/* <Image src={"/swot.png"} alt="swot" layout="fill" unsized /> */}
-      <div
-        id="area"
-        className={classes.container}
-        onClick={(e) => {
-          e.preventDefault();
-          if (e.target.id !== "area") return;
-          setIsAreaClicked(true);
-        }}
-        onContextMenu={handleClick}
-        ref={ref}
+    // <div>
+    //   {scale}
+
+    //   <PanZoom
+    //     id="panZoom"
+    //     onContextMenu={handleClick}
+    //     onClick={(e) => {
+    //       e.preventDefault();
+    //       if (e.target.id !== "area") return;
+    //       setIsAreaClicked(true);
+    //     }}
+    //     // style={{ backgroundColor: "#ccc" }}
+    //     disabled={disabledPanZoom}
+    //     zoomSpeed={0.4}
+    //     onStateChange={(e) => {
+    //       setScale(e.scale);
+    //     }}
+    //   >
+    <div
+      id="area"
+      className={classes.container}
+      ref={ref}
+      onContextMenu={handleClick}
+      onClick={(e) => {
+        e.preventDefault();
+        if (e.target.id !== "area") return;
+        setIsAreaClicked(true);
+      }}
+    >
+      {stickyNotesComponent}
+      {linesComponent}
+      {labelsComponent}
+      <Menu
+        keepMounted
+        open={mouseState.mouseY !== null}
+        onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          mouseState.mouseY !== null && mouseState.mouseX !== null
+            ? { top: mouseState.mouseY, left: mouseState.mouseX }
+            : undefined
+        }
       >
-        {stickyNotesComponent}
-        {linesComponent}
-        {labelsComponent}
-        <Menu
-          keepMounted
-          open={mouseState.mouseY !== null}
-          onClose={handleClose}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            mouseState.mouseY !== null && mouseState.mouseX !== null
-              ? { top: mouseState.mouseY, left: mouseState.mouseX }
-              : undefined
-          }
-        >
-          <div style={{ paddingTop: 10 }}>
-            <NestedMenuItem label="新規付箋" parentMenuOpen={!!mouseState}>
-              <MenuItem
-                onClick={() => {
-                  addCanvasObject(
-                    props.id,
-                    CanvasObject.StickyNotes,
-                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
-                    "yellow"
-                  );
-                  handleClose();
-                  setIsAreaClicked(false);
-                }}
-              >
-                <div className={classes.stickyNoteYellow}>黄色</div>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  addCanvasObject(
-                    props.id,
-                    CanvasObject.StickyNotes,
-                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
-                    "red"
-                  );
-                  handleClose();
-                  setIsAreaClicked(false);
-                }}
-              >
-                <div className={classes.stickyNoteRed}>赤色</div>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  addCanvasObject(
-                    props.id,
-                    CanvasObject.StickyNotes,
-                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
-                    "blue"
-                  );
-                  handleClose();
-                  setIsAreaClicked(false);
-                }}
-              >
-                <div className={classes.stickyNoteBlue}>青色</div>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  addCanvasObject(
-                    props.id,
-                    CanvasObject.StickyNotes,
-                    mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                    mouseState.mouseY - ref.current.getBoundingClientRect().y,
-                    "green"
-                  );
-                  handleClose();
-                  setIsAreaClicked(false);
-                }}
-              >
-                <div className={classes.stickyNoteGreen}>緑色</div>
-              </MenuItem>
-            </NestedMenuItem>
-            <Divider />
+        <div style={{ paddingTop: 10 }}>
+          <NestedMenuItem label="新規付箋" parentMenuOpen={!!mouseState}>
             <MenuItem
               onClick={() => {
                 addCanvasObject(
                   props.id,
-                  CanvasObject.Lines,
-                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  0,
-                  "vertical"
-                );
-                handleClose();
-              }}
-            >
-              縦線を引く
-              <div className={classes.menuIconContainer}>
-                <div className={classes.lineVertical}></div>
-              </div>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                addCanvasObject(
-                  props.id,
-                  CanvasObject.Lines,
-                  0,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
-                  "horizontal"
-                );
-                handleClose();
-              }}
-            >
-              横線を引く
-              <div className={classes.menuIconContainer}>
-                <div className={classes.lineHorizonral}></div>
-              </div>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                addCanvasObject(
-                  props.id,
-                  CanvasObject.Labels,
+                  CanvasObject.StickyNotes,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
                   mouseState.mouseY - ref.current.getBoundingClientRect().y,
-                  ""
+                  "yellow"
                 );
                 handleClose();
                 setIsAreaClicked(false);
               }}
             >
-              新規ラベル
-              <div className={classes.menuIconContainer}>
-                <div style={{ fontSize: 12, paddingLeft: 3 }}>A</div>
-              </div>
+              <div className={classes.stickyNoteYellow}>黄色</div>
             </MenuItem>
             <MenuItem
               onClick={() => {
+                addCanvasObject(
+                  props.id,
+                  CanvasObject.StickyNotes,
+                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  "red"
+                );
                 handleClose();
-                onClickExport();
+                setIsAreaClicked(false);
               }}
             >
-              PNG出力
+              <div className={classes.stickyNoteRed}>赤色</div>
             </MenuItem>
-          </div>
-        </Menu>
-      </div>
+            <MenuItem
+              onClick={() => {
+                addCanvasObject(
+                  props.id,
+                  CanvasObject.StickyNotes,
+                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  "blue"
+                );
+                handleClose();
+                setIsAreaClicked(false);
+              }}
+            >
+              <div className={classes.stickyNoteBlue}>青色</div>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                addCanvasObject(
+                  props.id,
+                  CanvasObject.StickyNotes,
+                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  "green"
+                );
+                handleClose();
+                setIsAreaClicked(false);
+              }}
+            >
+              <div className={classes.stickyNoteGreen}>緑色</div>
+            </MenuItem>
+          </NestedMenuItem>
+          <Divider />
+          <MenuItem
+            onClick={() => {
+              addCanvasObject(
+                props.id,
+                CanvasObject.Lines,
+                mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                0,
+                "vertical"
+              );
+              handleClose();
+            }}
+          >
+            縦線を引く
+            <div className={classes.menuIconContainer}>
+              <div className={classes.lineVertical}></div>
+            </div>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              addCanvasObject(
+                props.id,
+                CanvasObject.Lines,
+                0,
+                mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                "horizontal"
+              );
+              handleClose();
+            }}
+          >
+            横線を引く
+            <div className={classes.menuIconContainer}>
+              <div className={classes.lineHorizonral}></div>
+            </div>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              addCanvasObject(
+                props.id,
+                CanvasObject.Labels,
+                mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                ""
+              );
+              handleClose();
+              setIsAreaClicked(false);
+            }}
+          >
+            新規ラベル
+            <div className={classes.menuIconContainer}>
+              <div style={{ fontSize: 12, paddingLeft: 3 }}>A</div>
+            </div>
+          </MenuItem>
+          {/* <MenuItem onClick={zoomOut}>縮小</MenuItem>
+            <MenuItem onClick={zoomIn}>拡大</MenuItem> */}
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onClickExport();
+            }}
+          >
+            PNG出力
+          </MenuItem>
+        </div>
+      </Menu>
     </div>
+    //   </PanZoom>
+    // </div>
   );
 };
 ///////
 //Style
 ///////
 const useStyles = makeStyles({
-  frame: {
-    //margin: 10,
-    height: "80vh",
-    backgroundColor: "white",
+  container: {
+    height: "90vh",
     position: "relative",
     borderRadius: "5px",
-    border: "10px solid #adb2bd",
-    boxShadow: "inset -1px 2px 2px #404040, 6px 9px 1px rgba(0, 0, 0, 0.2)",
-    overflow: "auto",
+    // height: "100%",
+    // width: "auto",
+    // width: "100vw",
     zIndex: 1,
-  },
-  container: {
-    position: "relative",
-    height: "100%",
-    width: "100%",
-    zIndex: 1,
+    // backgroundColor: "gray",
   },
   stickyNoteYellow: {
     border: "1px solid black",
