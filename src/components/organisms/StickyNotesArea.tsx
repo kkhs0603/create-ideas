@@ -59,6 +59,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     lines,
     isEdit,
     labels,
+    uploadTemplate,
   } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
@@ -319,6 +320,14 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
             }}
           >
             PNG出力
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              uploadTemplate();
+              handleClose();
+            }}
+          >
+            templateへ保存
           </MenuItem>
         </div>
       </Menu>
