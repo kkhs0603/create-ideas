@@ -48,6 +48,13 @@ const CanvasObject = {
 
 type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
 
+type Template = {
+  name: string;
+  labels: Array<Label>;
+  lines: Array<Line>;
+  stickyNotes: Array<StickyNote>;
+};
+
 //interface
 interface IContextProps {
   createCanvas: (canvasName: string) => void;
@@ -130,6 +137,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
   const [lines, setLines] = useState<Array<Line>>([]);
   const [labels, setLabels] = useState<Array<Label>>([]);
+  const [templates, setTemplates] = useState<Array<Template>>([]);
   const auth = firebase.auth();
 
   /* --------------------------
@@ -541,6 +549,30 @@ const CanvasProvider: React.FC = ({ children }) => {
   Label
   -------------------------- */
 
+  /* --------------------------
+  Template
+  -------------------------- */
+  const getTemplate = async () => {
+    const ref = await db.collection("templates");
+    const result = await ref.get();
+    setTemplates(result.docs);
+  };
+
+  const uploadTemplate = async () => {
+    const ref = await db.collection("templates");
+    const result = await ref.add({ name: "PDCA" });
+
+    stickyNotes.map((stickyNote) =>
+      ref.doc(result.id).collection(CanvasObject.StickyNotes).add(stickyNote)
+    );
+    labels.map((label) =>
+      ref.doc(result.id).collection(CanvasObject.Labels).add(label)
+    );
+    lines.map((line) =>
+      ref.doc(result.id).collection(CanvasObject.Lines).add(line)
+    );
+  };
+
   useEffect(() => {
     const authState = auth.onAuthStateChanged((user) => {
       console.log("auth");
@@ -577,6 +609,10 @@ const CanvasProvider: React.FC = ({ children }) => {
         isEdit,
         getAllCanvasDatas,
         labels,
+
+        getTemplate,
+        uploadTemplate,
+        templates,
       }}
     >
       {children}

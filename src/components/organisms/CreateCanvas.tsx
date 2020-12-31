@@ -15,7 +15,7 @@ const ColorButton = withStyles((theme) => ({
 }))(Button);
 
 const CreateCanvas = () => {
-  const { createCanvas } = useContext(CanvasContext);
+  const { createCanvas, templates } = useContext(CanvasContext);
   const [canvasName, setCanvasName] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
