@@ -132,8 +132,6 @@ const Line: React.FC<Props> = (props) => {
       style={{ zIndex: props.zIndex }}
       size={{ width: width, height: height }}
       enableResizing={false}
-      // onMouseEnter={() => props.setDisabledPanZoom(true)}
-      // onMouseLeave={() => props.setDisabledPanZoom(false)}
       id="line"
       disableDragging={isLocked}
     >
@@ -226,13 +224,13 @@ const useStyles = makeStyles({
     zIndex: (props: Props) => props.zIndex,
   },
   vertical: {
-    width: (props) => 5,
-    height: (props) => "100%",
+    width: 5,
+    height: (props) => (props.areaSize ? props.areaSize.height : "100%"),
     margin: "0px 5px",
   },
   horizontal: {
-    width: (props) => "100%",
-    height: (props) => 5,
+    width: (props) => (props.areaSize ? props.areaSize.width : "100%"),
+    height: 5,
     margin: "5px 0px",
   },
 });
