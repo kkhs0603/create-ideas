@@ -28,9 +28,9 @@ export default function App(props: AppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
         <AuthProvider>
           <CanvasProvider>
-            <CssBaseline />
             <Component {...pageProps} />
           </CanvasProvider>
         </AuthProvider>

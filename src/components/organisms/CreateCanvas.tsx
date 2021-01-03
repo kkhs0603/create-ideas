@@ -1,7 +1,18 @@
 import React, { useContext, useState } from "react";
-import { Button, TextField } from "@material-ui/core";
+import {
+  Button,
+  TextField,
+  Card,
+  CardActionArea,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Typography,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core";
 import { CanvasContext } from "../../contexts/CanvasContext";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 import { orange } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
@@ -14,26 +25,111 @@ const ColorButton = withStyles((theme) => ({
   },
 }))(Button);
 
+const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
+  container: {
+    backgroundColor: "white",
+    padding: 100,
+    borderRadius: 10,
+  },
+  section: {
+    margin: "50px 0",
+  },
+  templates: {
+    display: "flex",
+  },
+  active: {
+    maxWidth: 345,
+    margin: 10,
+    border: "3px solid black",
+  },
+  inactive: {
+    maxWidth: 345,
+    margin: 10,
+  },
+  media: {
+    height: 140,
+  },
+}));
+
 const CreateCanvas = () => {
   const { createCanvas, templates } = useContext(CanvasContext);
   const [canvasName, setCanvasName] = useState("");
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    createCanvas(canvasName);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isOpendBackdrop, setIsOpendBackdrop] = useState<boolean>(false);
+  const classes = useStyles();
+
+  const handleSubmit = () => {
+    if (canvasName === "") {
+      setIsSubmitted(true);
+    } else {
+      setIsOpendBackdrop(true);
+      const tempId = templates[selectedIndex].id;
+      createCanvas(canvasName, tempId);
+    }
   };
+
+  const templatesComponent = templates.map((template, index) => (
+    <Card
+      className={`${
+        index === selectedIndex ? classes.active : classes.inactive
+      }`}
+      key={index}
+      variant="outlined"
+    >
+      <CardActionArea onClick={() => setSelectedIndex(index)}>
+        <CardMedia
+          className={classes.media}
+          image="/static/images/cards/contemplative-reptile.jpg"
+          title="Contemplative Reptile"
+        />
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2">
+            {template.name}
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {template.description}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  ));
+
   return (
-    <div>
-      <span>Canvasを作る</span>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
+    <div className={classes.container}>
+      <Backdrop className={classes.backdrop} open={isOpendBackdrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Typography gutterBottom variant="h4">
+        Canvas作成
+      </Typography>
+      <div className={classes.section}>
+        <Typography variant="h6">テンプレート</Typography>
+        <div className={classes.templates}>{templatesComponent}</div>
+      </div>
+      <div className={classes.section}>
+        <Typography variant="h6">Canvas名</Typography>
         <TextField
+          error={isSubmitted && canvasName === ""}
+          helperText={
+            isSubmitted && canvasName === "" ? "Canvas名を入力してください" : ""
+          }
           id="outlined-basic"
-          label="Canvas名"
           variant="outlined"
           required
+          fullWidth
           onChange={(e) => setCanvasName(e.target.value)}
         />
-        <ColorButton type="submit">Canvas作成</ColorButton>
-      </form>
+      </div>
+      <div className={classes.section}>
+        <ColorButton fullWidth onClick={handleSubmit}>
+          Canvas作成
+        </ColorButton>
+      </div>
     </div>
   );
 };

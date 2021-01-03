@@ -1,17 +1,52 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CanvasContext } from "../contexts/CanvasContext";
 import Layout from "../components/templates/Layout/Layout";
 import CreateCanvas from "../components/organisms/CreateCanvas";
 import SelectCanvas from "../components/organisms/SelectCanvas";
+import { Grid, Modal, Container, Button } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  modal: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+}));
 
 const CanvasListPage = () => {
-  const { canvases } = useContext(CanvasContext);
+  const classes = useStyles();
+  const [isOpenedModal, setIsOpenedModal] = useState(false);
 
+  const { canvases } = useContext(CanvasContext);
+  const handleOpen = () => {
+    setIsOpenedModal(true);
+  };
+  const handleClose = () => {
+    setIsOpenedModal(false);
+  };
   return (
     <Layout>
-      <CreateCanvas />
-      <div>Canvas一覧</div>
-      <SelectCanvas canvases={canvases} />
+      <Container>
+        <Modal
+          className={classes.modal}
+          open={isOpenedModal}
+          onClose={handleClose}
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+        >
+          <CreateCanvas />
+        </Modal>
+        <Grid container direction="row" justify="flex-end" alignItems="center">
+          <Button variant="contained" onClick={handleOpen}>
+            Canvas追加
+          </Button>
+        </Grid>
+        <div style={{ height: "70vh" }}>
+          <div>Canvas一覧</div>
+          <SelectCanvas canvases={canvases} />
+        </div>
+      </Container>
     </Layout>
   );
 };
