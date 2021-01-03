@@ -15,7 +15,6 @@ import Label from "../atoms/Label";
 import Image from "next/image";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import html2canvas from "html2canvas";
-import { PanZoom } from "react-easy-panzoom";
 
 type StickyNoteAreaProps = {
   id: string;
@@ -64,11 +63,14 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState<number>(1);
-  // const [disabledPanZoom, setDisabledPanZoom] = useState<boolean>(false);
 
   const classes = useStyles(areaSize);
   useEffect(() => {
     getAllCanvasDatas(props.id);
+    setAreaSize({
+      width: ref.current.scrollWidth,
+      height: ref.current.scrollHeight,
+    });
   }, []);
 
   const handleClick = (e) => {
@@ -79,7 +81,6 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       mouseY: e.clientY - 4,
     });
     setIsAreaClicked(true);
-    // setDisabledPanZoom(false);
   };
 
   const handleClose = () => {
@@ -117,8 +118,6 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       setIsAreaClicked={setIsAreaClicked}
       isEdit={(isEdit(stickyNote.createdBy) && stickyNote.word === "") || false}
       {...stickyNote}
-      // scale={scale}
-      // setDisabledPanZoom={setDisabledPanZoom}
     />
   ));
 
@@ -127,14 +126,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       <div>line</div>
     ) : (
       lines?.map((line, index) => (
-        <Line
-          key={index}
-          canvasId={props.id}
-          areaSize={areaSize}
-          {...line}
-          // scale={scale}
-          // setDisabledPanZoom={setDisabledPanZoom}
-        />
+        <Line key={index} canvasId={props.id} areaSize={areaSize} {...line} />
       ))
     );
 
@@ -146,30 +138,10 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       setIsAreaClicked={setIsAreaClicked}
       isAreaClicked={isAreaClicked}
       {...label}
-      // scale={scale}
-      // setDisabledPanZoom={setDisabledPanZoom}
     />
   ));
 
   return (
-    // <div>
-    //   {scale}
-
-    //   <PanZoom
-    //     id="panZoom"
-    //     onContextMenu={handleClick}
-    //     onClick={(e) => {
-    //       e.preventDefault();
-    //       if (e.target.id !== "area") return;
-    //       setIsAreaClicked(true);
-    //     }}
-    //     // style={{ backgroundColor: "#ccc" }}
-    //     disabled={disabledPanZoom}
-    //     zoomSpeed={0.4}
-    //     onStateChange={(e) => {
-    //       setScale(e.scale);
-    //     }}
-    //   >
     <div
       id="area"
       className={classes.container}
@@ -332,8 +304,6 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
         </div>
       </Menu>
     </div>
-    //   </PanZoom>
-    // </div>
   );
 };
 ///////
