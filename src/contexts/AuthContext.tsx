@@ -3,7 +3,6 @@ import firebase from "../firebase/firebase";
 import ErrorMessage from "../firebase/ErrorMessage";
 import { useRouter } from "next/router";
 
-
 const AuthContext = React.createContext({});
 
 const AuthProvider = ({ children }) => {
@@ -53,7 +52,11 @@ const AuthProvider = ({ children }) => {
       await db
         .collection("users")
         .doc(userId)
-        .update({ name: name, image_url: imageUrl });
+        .update({
+          name: name,
+          image_url: imageUrl,
+          updatedAt: new Date().toLocaleString("ja"),
+        });
     } catch (error) {
       console.log(error);
     }
@@ -78,13 +81,12 @@ const AuthProvider = ({ children }) => {
       setUser(user);
       const userRef = await db.collection("users").doc(user.uid);
       if (!userRef.get().exists) {
-        const timestamp = firebase.firestore.Timestamp.now();
         await userRef.set({
           id: user.uid,
           name: user.displayName,
           imageUrl: user.photoURL,
-          createdAt: timestamp,
-          updatedAt: timestamp,
+          createdAt: new Date().toLocaleString("ja"),
+          updatedAt: new Date().toLocaleString("ja"),
         });
       }
       router.push("/CanvasList");

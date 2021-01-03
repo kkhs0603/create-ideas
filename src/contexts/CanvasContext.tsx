@@ -1,5 +1,6 @@
 import React, { useState, createContext, useEffect } from "react";
 import firebase from "../firebase/firebase";
+import { useRouter } from "next/router";
 
 type Canvas = {
   //TODO:型直す
@@ -57,7 +58,7 @@ type Template = {
 
 //interface
 interface IContextProps {
-  createCanvas: (canvasName: string) => void;
+  createCanvas: (canvasName: string, templateId: string) => void;
   canvases: Array<Canvas>;
   enterCanvas: (canvasId: string) => void;
   joinedUsers;
@@ -139,23 +140,78 @@ const CanvasProvider: React.FC = ({ children }) => {
   const [labels, setLabels] = useState<Array<Label>>([]);
   const [templates, setTemplates] = useState<Array<Template>>([]);
   const auth = firebase.auth();
-
+  const router = useRouter();
   /* --------------------------
   Canvas
   -------------------------- */
-  const createCanvas = async (canvasName: string) => {
+  const createCanvas = async (canvasName: string, templateId: string) => {
     try {
       //canvases
-      const timestamp = firebase.firestore.Timestamp.now();
-      await db.collection("canvases").add({
+      const result = await db.collection("canvases").add({
         name: canvasName,
         ideas: [],
         joinedUsers: [],
-        createdAt: timestamp,
+        createdAt: new Date().toLocaleString("ja"),
         createdBy: auth.currentUser.uid,
-        updatedAt: timestamp,
+        updatedAt: new Date().toLocaleString("ja"),
       });
+
+      const stickyNotesRef = await db
+        .collection("templates")
+        .doc(templateId)
+        .collection(CanvasObject.StickyNotes)
+        .get();
+      const stickyNotes = stickyNotesRef.docs.map((stickyNote) =>
+        stickyNote.data()
+      );
+
+      const linesRef = await db
+        .collection("templates")
+        .doc(templateId)
+        .collection(CanvasObject.Lines)
+        .get();
+      const lines = linesRef.docs.map((line) => line.data());
+
+      const labelsRef = await db
+        .collection("templates")
+        .doc(templateId)
+        .collection(CanvasObject.Labels)
+        .get();
+      const labels = labelsRef.docs.map((label) => label.data());
+
+      console.log("stickyNotes writing");
+      await stickyNotes.forEach(async (stickyNote) => {
+        const stickyResult = await result
+          .collection(CanvasObject.StickyNotes)
+          .add(stickyNote);
+        result
+          .collection(CanvasObject.StickyNotes)
+          .doc(stickyResult.id)
+          .update({ id: stickyResult.id });
+      });
+      console.log("labels writing");
+      await labels.forEach(async (label) => {
+        const labelResult = await result
+          .collection(CanvasObject.Labels)
+          .add(label);
+        result
+          .collection(CanvasObject.Labels)
+          .doc(labelResult.id)
+          .update({ id: labelResult.id });
+      });
+      console.log("lines writing");
+      await lines.forEach(async (line) => {
+        const lineResult = await result
+          .collection(CanvasObject.Lines)
+          .add(line);
+        result
+          .collection(CanvasObject.Lines)
+          .doc(lineResult.id)
+          .update({ id: lineResult.id });
+      });
+
       console.log("new canvas created!");
+      router.push("/Canvases/" + result.id);
     } catch (error) {
       console.log(error);
     }
@@ -165,15 +221,19 @@ const CanvasProvider: React.FC = ({ children }) => {
     try {
       const canvasesRef = await db.collection("canvases");
       canvasesRef.onSnapshot((snapshot) => {
-        snapshot.docs.forEach((change) => {
-          const date = change.data().createdAt.toDate();
+        snapshot.docs.forEach(async (change) => {
+          const userRef = await db
+            .collection("users")
+            .doc(change.data().createdBy)
+            .get();
           setCanvases((values) => [
             ...values,
             {
               id: change.id,
               name: change.data().name,
-              createdBy: change.data().createdBy,
-              createdAt: date,
+              createdBy: userRef.data().name,
+              createdAt: change.data().createdAt,
+              updatedAt: change.data().updatedAt,
             },
           ]);
         });
@@ -204,7 +264,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   canvasObject
   -------------------------- */
   const addCanvasObject = async (
-    id: string,
+    canvasId: string,
     objName: CanvasObject,
     positionX: number,
     positionY: number,
@@ -212,9 +272,12 @@ const CanvasProvider: React.FC = ({ children }) => {
   ) => {
     try {
       console.log("add", objName);
-      const zIndeices = await getAllZindices(id);
+      const zIndeices = await getAllZindices(canvasId);
       const maxZindex = Math.max.apply(null, zIndeices);
-      const ref = await db.collection("canvases").doc(id).collection(objName);
+      const ref = await db
+        .collection("canvases")
+        .doc(canvasId)
+        .collection(objName);
 
       switch (objName) {
         case CanvasObject.StickyNotes:
@@ -259,6 +322,7 @@ const CanvasProvider: React.FC = ({ children }) => {
             .update({ id: labelResult.id, zIndex: maxZindex + 1 });
           break;
       }
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -307,6 +371,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .collection(objName)
         .doc(objId)
         .delete();
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -330,6 +395,7 @@ const CanvasProvider: React.FC = ({ children }) => {
           positionX: x,
           positionY: y,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -351,12 +417,13 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           word: word,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const resizeCanvasObject = (
+  const resizeCanvasObject = async (
     canvasId: string,
     objName: CanvasObject,
     objId: string,
@@ -367,7 +434,8 @@ const CanvasProvider: React.FC = ({ children }) => {
   ) => {
     try {
       console.log("resize", objName);
-      db.collection("canvases")
+      await db
+        .collection("canvases")
         .doc(canvasId)
         .collection(objName)
         .doc(objId)
@@ -377,6 +445,7 @@ const CanvasProvider: React.FC = ({ children }) => {
           width,
           height,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -398,6 +467,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           isLocked,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -421,6 +491,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           color: color,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -428,6 +499,17 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const isEdit = (createdBy: string) => {
     return auth.currentUser.uid === createdBy;
+  };
+
+  const updateCanvasChangedTime = async (canvasId: string) => {
+    try {
+      await db
+        .collection("canvases")
+        .doc(canvasId)
+        .update({ updatedAt: new Date().toLocaleString("ja") });
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   /* --------------------------
@@ -451,6 +533,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: zIndex + 1,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -475,6 +558,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: maxZindex + 1,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -497,6 +581,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: zIndex - 1,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -516,6 +601,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: maxZindex - 1,
         });
+      await updateCanvasChangedTime(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -552,10 +638,11 @@ const CanvasProvider: React.FC = ({ children }) => {
   /* --------------------------
   Template
   -------------------------- */
-  const getTemplate = async () => {
+  const getTemplates = async () => {
     const ref = await db.collection("templates");
-    const result = await ref.get();
-    setTemplates(result.docs);
+    const docs = await (await ref.get()).docs;
+    const temps = await docs.map((doc) => doc.data());
+    setTemplates(temps);
   };
 
   const uploadTemplate = async () => {
@@ -575,13 +662,13 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     const authState = auth.onAuthStateChanged((user) => {
-      console.log("auth");
       if (user) {
         getCanvases();
+        getTemplates();
       }
     });
     return () => authState();
-  }, [auth]);
+  }, []);
 
   return (
     <CanvasContext.Provider
@@ -610,7 +697,6 @@ const CanvasProvider: React.FC = ({ children }) => {
         getAllCanvasDatas,
         labels,
 
-        getTemplate,
         uploadTemplate,
         templates,
       }}
