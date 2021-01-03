@@ -273,7 +273,8 @@ const CanvasProvider: React.FC = ({ children }) => {
     try {
       console.log("add", objName);
       const zIndeices = await getAllZindices(canvasId);
-      const maxZindex = Math.max.apply(null, zIndeices);
+      const maxZindex =
+        zIndeices.length !== 0 ? Math.max.apply(null, zIndeices) : 0;
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
@@ -623,7 +624,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     const lines = await (await linesRef.get()).docs;
     const linesZindices = lines.map((line) => line.data().zIndex);
     const result = zIndices.concat(linesZindices);
-    console.log(result);
+    console.log("zindex", result);
     return result;
   };
 
