@@ -5,9 +5,15 @@ import { useUserSetting } from "../hooks/useUserSetting";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
-  large: {
-    width: "50%",
-    height: "50%",
+  section: {
+    margin: "0 auto",
+    padding: 20,
+    maxWidth: 600,
+  },
+  avatar: {
+    width: 300,
+    height: 300,
+    margin: "0 auto",
   },
 }));
 
@@ -24,27 +30,36 @@ const UserSettingsPage = () => {
   return (
     <Layout>
       <Container>
-        <Avatar alt="user" src={imageUrl} className={classes.large} />
-        <input type="file" onChange={handleSaveTempImage} />
+        <Avatar alt="user" src={imageUrl} className={classes.avatar} />
+        <div className={classes.section}>
+          <div>プロフィール画像</div>
+          <input type="file" onChange={handleSaveTempImage} />
+        </div>
 
-        <TextField
-          // className={classes.textField}
-          id="username"
-          label="UserName"
-          type="text"
-          autoComplete="off"
-          helperText={""}
-          fullWidth
-          variant="outlined"
-          defaultValue={username}
-          onChange={handleUserNameOnChanged}
-        />
-        <Button variant="contained" onClick={handleGoBack}>
-          戻る
-        </Button>
-        <Button variant="contained" color="primary" onClick={updateUserSetting}>
-          保存
-        </Button>
+        <div className={classes.section}>
+          <div>ユーザー名</div>
+          <TextField
+            // className={classes.textField}
+            id="username"
+            type="text"
+            autoComplete="off"
+            helperText={""}
+            variant="outlined"
+            defaultValue={username}
+            onChange={handleUserNameOnChanged}
+            fullWidth
+          />
+        </div>
+        <div className={classes.section}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={updateUserSetting}
+          >
+            更新
+          </Button>
+        </div>
       </Container>
     </Layout>
   );
