@@ -8,8 +8,10 @@ import {
   Menu,
   MenuItem,
   Avatar,
+  Button,
+  Icon,
 } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
+import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,13 +23,19 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   title: {
-    flexGrow: 1,
+    margin: "0 auto",
   },
 }));
 
 const Header = () => {
   const classes = useStyles();
-  const { user, signout, handleGoUserSetting } = useContext(AuthContext);
+  const {
+    user,
+    signout,
+    handleGoUserSetting,
+    handleGoBack,
+    router,
+  } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event) => {
@@ -36,10 +44,18 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  console.log(router.pathname);
   return (
     <AppBar>
       <Toolbar>
         <div className={classes.root}>
+          {router.pathname === "/" ? (
+            <></>
+          ) : (
+            <IconButton onClick={handleGoBack} aria-controls="menu-appbar">
+              <KeyboardBackspaceIcon style={{ color: "white" }} />
+            </IconButton>
+          )}
           <div className={classes.title}>Create Ideas</div>
           {user == null ? (
             <></>

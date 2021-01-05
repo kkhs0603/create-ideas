@@ -5,7 +5,7 @@ import TopSlider from "../components/molecules/TopSlider/TopSlider";
 import { SignIn } from "../components/organisms/SignIn";
 import { SignUp } from "../components/organisms/SignUp";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
+import { Button, Container } from "@material-ui/core";
 
 const useStyles = makeStyles({
   button: {
@@ -16,19 +16,21 @@ const useStyles = makeStyles({
 const SignInPage: React.FC = () => {
   const classes = useStyles();
   const [isSignIn, setIsSignIn] = useState<Boolean>(true);
-  const caption:string = isSignIn ? "登録しますか？" : "サインインしますか？";
+  const caption: string = isSignIn ? "登録しますか？" : "サインインしますか？";
   return (
     <Layout>
-      <Title />
-      <TopSlider />
-      {isSignIn ? <SignIn /> : <SignUp />}
-      <Button
-        className={classes.button}
-        onClick={() => setIsSignIn(!isSignIn)}
-        disableRipple
-      >
-        {caption}
-      </Button>
+      <Container>
+        <Title />
+        <TopSlider />
+        {isSignIn ? <SignIn /> : <SignUp />}
+        <Button
+          className={classes.button}
+          onClick={() => setIsSignIn(!isSignIn)}
+          disableRipple
+        >
+          {caption}
+        </Button>
+      </Container>
     </Layout>
   );
 };
