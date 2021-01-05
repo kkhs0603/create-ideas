@@ -51,7 +51,9 @@ const useStyles = makeStyles((theme) => ({
     margin: 10,
   },
   media: {
-    height: 140,
+    border: "1px solid #f1f1f1",
+    height: 80,
+    width: "100%",
   },
 }));
 
@@ -82,11 +84,7 @@ const CreateCanvas = () => {
       variant="outlined"
     >
       <CardActionArea onClick={() => setSelectedIndex(index)}>
-        <CardMedia
-          className={classes.media}
-          image="/static/images/cards/contemplative-reptile.jpg"
-          title="Contemplative Reptile"
-        />
+        <CardMedia className={classes.media} image={template.imageUrl} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
             {template.name}

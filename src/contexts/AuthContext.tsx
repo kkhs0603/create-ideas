@@ -104,6 +104,7 @@ const AuthProvider = ({ children }) => {
         handleGoUserSetting,
         handleGoBack,
         updateUser,
+        router,
       }}
     >
       {children}
