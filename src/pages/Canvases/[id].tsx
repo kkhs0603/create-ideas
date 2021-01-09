@@ -3,36 +3,14 @@ import { CanvasContext } from "../../contexts/CanvasContext";
 import Layout from "../../components/templates/Layout/Layout";
 import { TextField, Button, Avatar, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import firebase from "../../firebase/firebase";
 import StickyNotesArea from "../../components/organisms/StickyNotesArea";
+import { useRouter } from "next/router";
 
-export async function getCanvasIds() {
-  const db = firebase.firestore();
-  const snapshot = await db.collection("canvases").get();
-  const ids = snapshot.docs.map((doc) => doc.id);
-  return ids;
-}
-//動的にページ遷移
-export async function getStaticPaths() {
-  const ids = await getCanvasIds();
-  const paths = ids.map((id) => {
-    return "/Canvases/" + id;
-  });
-  return {
-    paths: paths,
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({ params }) {
-  return { props: params };
-}
-
-const Canvas = (props) => {
+const Canvas = () => {
   const classes = useStyles();
   const { joinedUsers, canvasData } = useContext(CanvasContext);
-  const id = props.id;
-
+  const router = useRouter();
+  const id = router.query.id;
   const users = joinedUsers.map((user) => (
     <Avatar
       className={classes.small}
@@ -56,9 +34,6 @@ const Canvas = (props) => {
       <div className={classes.middle}>
         <StickyNotesArea id={id} />
       </div>
-      {/* <div className={classes.bottom}>
-        <SendStickyNote id={id} />
-      </div> */}
     </Layout>
   );
 };
