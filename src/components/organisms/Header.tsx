@@ -44,7 +44,7 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  console.log(router.pathname);
+  // console.log(router.pathname);
   return (
     <AppBar>
       <Toolbar>

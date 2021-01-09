@@ -12,7 +12,7 @@ export async function getCanvasIds() {
   const ids = snapshot.docs.map((doc) => doc.id);
   return ids;
 }
-
+//動的にページ遷移
 export async function getStaticPaths() {
   const ids = await getCanvasIds();
   const paths = ids.map((id) => {
