@@ -1,6 +1,9 @@
 import React, { useState, createContext, useEffect } from "react";
-import firebase from "../firebase/firebase";
+import firebase, { storage } from "../firebase/firebase";
 import { useRouter } from "next/router";
+import { DvrTwoTone } from "@material-ui/icons";
+import html2canvas from "html2canvas";
+import loadImage from "blueimp-load-image";
 
 type Canvas = {
   //TODO:型直す
@@ -323,7 +326,7 @@ const CanvasProvider: React.FC = ({ children }) => {
             .update({ id: labelResult.id, zIndex: maxZindex + 1 });
           break;
       }
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -372,7 +375,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .collection(objName)
         .doc(objId)
         .delete();
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -396,7 +399,7 @@ const CanvasProvider: React.FC = ({ children }) => {
           positionX: x,
           positionY: y,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -418,7 +421,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           word: word,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -446,7 +449,7 @@ const CanvasProvider: React.FC = ({ children }) => {
           width,
           height,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -468,7 +471,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           isLocked,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -492,7 +495,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           color: color,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -513,6 +516,10 @@ const CanvasProvider: React.FC = ({ children }) => {
     }
   };
 
+  const updateCanvas = async (canvasId: string) => {
+    updateCanvasChangedTime(canvasId);
+    updateThumbnail(canvasId);
+  };
   /* --------------------------
   toBack/toFront
   -------------------------- */
@@ -534,7 +541,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: zIndex + 1,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -559,7 +566,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: maxZindex + 1,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -582,7 +589,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: zIndex - 1,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -602,7 +609,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           zIndex: maxZindex - 1,
         });
-      await updateCanvasChangedTime(canvasId);
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error.message);
     }
@@ -659,6 +666,26 @@ const CanvasProvider: React.FC = ({ children }) => {
     lines.map((line) =>
       ref.doc(result.id).collection(CanvasObject.Lines).add(line)
     );
+  };
+
+  const updateThumbnail = async (canvasId: string) => {
+    try {
+      console.log("update thumbnail");
+      const target = document.getElementById("area");
+      console.log(target);
+      html2canvas(target).then(async (canvas) => {
+        const dataUrl = canvas.toDataURL("image/png");
+        const result = await loadImage(dataUrl, {
+          maxWidth: 300,
+          canvas: true,
+        });
+        result.image.toBlob(async (blob) => {
+          firebase.storage().ref(`/images/thumbnails/${canvasId}`).put(blob);
+        });
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   useEffect(() => {
