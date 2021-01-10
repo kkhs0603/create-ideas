@@ -8,9 +8,9 @@ import { useRouter } from "next/router";
 
 const Canvas = () => {
   const classes = useStyles();
-  const { joinedUsers, canvasData } = useContext(CanvasContext);
+  const { joinedUsers, canvasData, enterCanvas } = useContext(CanvasContext);
   const router = useRouter();
-  const id = router.query.id;
+  const canvasId = router.query.id;
   const users = joinedUsers.map((user) => (
     <Avatar
       className={classes.small}
@@ -20,7 +20,9 @@ const Canvas = () => {
       src={user.imageUrl}
     />
   ));
-  useEffect(() => {}, []);
+  useEffect(() => {
+    enterCanvas(canvasId);
+  }, []);
   return (
     <Layout>
       <Grid container className={classes.top}>
@@ -28,11 +30,11 @@ const Canvas = () => {
           <div>canvas名：{canvasData?.name}</div>
         </Grid>
         <Grid item xs={6}>
-          <div className={classes.avatars}>参加者：{users}</div>
+          {/* <div className={classes.avatars}>参加者：{users}</div> */}
         </Grid>
       </Grid>
       <div className={classes.middle}>
-        <StickyNotesArea id={id} />
+        <StickyNotesArea id={canvasId} />
       </div>
     </Layout>
   );

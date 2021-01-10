@@ -1,84 +1,57 @@
 import React, { useContext } from "react";
-import { Button } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
+import {
+  Button,
+  Card,
+  CardActionArea,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Typography,
+} from "@material-ui/core";
+
+import { makeStyles } from "@material-ui/core/styles";
 import { useRouter } from "next/router";
 const SelectCanvas = (props) => {
+  const classes = useStyles();
   const canvases = props.canvases;
   const router = useRouter();
   if (!canvases) return <></>;
 
-  const columns = [
-    {
-      field: "canvasName",
-      headerName: "Canvas名",
-      flex: 1,
-      disableClickEventBubbling: true,
-    },
-    {
-      field: "author",
-      headerName: "作成者",
-      flex: 1,
-      disableClickEventBubbling: true,
-    },
-    {
-      field: "updatedTime",
-      headerName: "更新日時",
-      flex: 1,
-      disableClickEventBubbling: true,
-    },
-    {
-      field: "createdTime",
-      headerName: "作成日時",
-      flex: 1,
-      disableClickEventBubbling: true,
-    },
-    {
-      field: "enterCanvas",
-      headerName: " ",
-      flex: 1,
-      disableClickEventBubbling: true,
-      sortable: false,
-      renderCell: (params) => (
-        <Button
-          variant="contained"
-          color="primary"
-          fullwidth
+  const cards = canvases.map((canvas, index) => {
+    return (
+      <Card className={classes.card} key={index} variant="outlined">
+        <CardActionArea
           onClick={() =>
-            router.push("/Canvases/[id]", `/Canvases/${params.value}`)
+            router.push("/Canvases/[id]", `/Canvases/${canvas.id}`)
           }
         >
-          Enter Canvas
-        </Button>
-      ),
-    },
-  ];
-  const rows = canvases.map((canvas, index) => {
-    return {
-      id: canvas.id,
-      canvasName: canvas.name,
-      author: canvas.createdBy,
-      updatedTime: canvas.updatedAt,
-      createdTime: canvas.createdAt,
-      enterCanvas: canvas.id,
-    };
+          <CardMedia className={classes.media} image={canvas.thumbnailUrl} />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h2">
+              {canvas.name}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    );
   });
-  return (
-    <div style={{ height: "100%", width: "100%" }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        disableColumnFilter
-        pageSize={10}
-        rowsPerPageOptions={[10, 20]}
-        sortModel={[
-          {
-            field: "updatedTime",
-            sort: "desc",
-          },
-        ]}
-      />
-    </div>
-  );
+  return <div className={classes.container}>{cards}</div>;
 };
 
 export default SelectCanvas;
+
+///////
+//Style
+///////
+const useStyles = makeStyles({
+  container: {
+    display: "flex",
+  },
+  card: {
+    margin: 20,
+  },
+  media: {
+    height: 140,
+    width: 240,
+  },
+});

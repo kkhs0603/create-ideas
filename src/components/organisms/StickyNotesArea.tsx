@@ -12,7 +12,6 @@ import {
 } from "@material-ui/core";
 import Line from "../atoms/Line";
 import Label from "../atoms/Label";
-import Image from "next/image";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import html2canvas from "html2canvas";
 
@@ -52,7 +51,6 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     mouseY: number;
   }>(initialMouseState);
   const {
-    getAllCanvasDatas,
     stickyNotes,
     addCanvasObject,
     lines,
@@ -62,11 +60,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
   } = useContext(CanvasContext);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
-  const [scale, setScale] = useState<number>(1);
 
   const classes = useStyles(areaSize);
   useEffect(() => {
-    getAllCanvasDatas(props.id);
     setAreaSize({
       width: ref.current.scrollWidth,
       height: ref.current.scrollHeight,

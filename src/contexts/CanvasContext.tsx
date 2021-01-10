@@ -65,7 +65,7 @@ interface IContextProps {
   canvases: Array<Canvas>;
   enterCanvas: (canvasId: string) => void;
   joinedUsers;
-  getAllCanvasDatas: (canvasId: string) => void;
+  getAllCanvasObjects: (canvasId: string) => void;
   stickyNotes: Array<StickyNote>;
   changeStickyNoteColor: (
     canvasId: string,
@@ -137,6 +137,7 @@ const CanvasContext = createContext({} as IContextProps);
 const db = firebase.firestore();
 const CanvasProvider: React.FC = ({ children }) => {
   const [canvases, setCanvases] = useState<Array<Canvas>>([]);
+  const [canvasData, setCanvasData] = useState<Canvas>();
   const [joinedUsers, setJoinedUsers] = useState([]);
   const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
   const [lines, setLines] = useState<Array<Line>>([]);
@@ -159,6 +160,9 @@ const CanvasProvider: React.FC = ({ children }) => {
         updatedAt: new Date().toLocaleString("ja"),
       });
 
+      await db.collection("canvases").doc(result.id).update({
+        id: result.id,
+      });
       const stickyNotesRef = await db
         .collection("templates")
         .doc(templateId)
@@ -222,24 +226,27 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const getCanvases = async () => {
     try {
+      setCanvases([]);
       const canvasesRef = await db.collection("canvases");
       canvasesRef.onSnapshot((snapshot) => {
-        snapshot.docs.forEach(async (change) => {
-          const userRef = await db
-            .collection("users")
-            .doc(change.data().createdBy)
-            .get();
-          setCanvases((values) => [
-            ...values,
-            {
-              id: change.id,
-              name: change.data().name,
-              createdBy: userRef.data().name,
-              createdAt: change.data().createdAt,
-              updatedAt: change.data().updatedAt,
-            },
-          ]);
-        });
+        setCanvases([]);
+        setCanvases(snapshot.docs.map((canvas) => canvas.data()));
+        // snapshot.docs.forEach(async (change) => {
+        //   const userRef = await db
+        //     .collection("users")
+        //     .doc(change.data().createdBy)
+        //     .get();
+        //   setCanvases((values) => [
+        //     ...values,
+        //     {
+        //       id: change.data().id,
+        //       name: change.data().name,
+        //       createdBy: userRef.data().name,
+        //       createdAt: change.data().createdAt,
+        //       updatedAt: change.data().updatedAt,
+        //     },
+        //   ]);
+        // });
       });
     } catch (error) {
       console.log(error);
@@ -248,13 +255,23 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const enterCanvas = async (canvasId: string) => {
     try {
-      console.log("enter canvas");
+      const canvasRef = await db.collection("canvases").doc(canvasId);
+      const result = await canvasRef.get();
+      setCanvasData(result.data());
+      getAllCanvasObjects(canvasId);
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const getAllCanvasDatas = (canvasId: string) => {
+  const initializeDatas = () => {
+    setLabels([]);
+    setLines([]);
+    setStickyNotes([]);
+    setCanvasData();
+  };
+
+  const getAllCanvasObjects = (canvasId: string) => {
     try {
       getCanvasObject(canvasId, CanvasObject.StickyNotes);
       getCanvasObject(canvasId, CanvasObject.Lines);
@@ -670,18 +687,25 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const updateThumbnail = async (canvasId: string) => {
     try {
-      console.log("update thumbnail");
       const target = document.getElementById("area");
-      console.log(target);
-      html2canvas(target).then(async (canvas) => {
-        const dataUrl = canvas.toDataURL("image/png");
-        const result = await loadImage(dataUrl, {
-          maxWidth: 300,
-          canvas: true,
-        });
-        result.image.toBlob(async (blob) => {
-          firebase.storage().ref(`/images/thumbnails/${canvasId}`).put(blob);
-        });
+      const canvas = await html2canvas(target);
+      const dataUrl = canvas.toDataURL("image/png");
+      const result = await loadImage(dataUrl, {
+        maxWidth: 300,
+        canvas: true,
+      });
+      result.image.toBlob(async (blob: Blob) => {
+        const storageResult = await firebase
+          .storage()
+          .ref(`/images/thumbnails/${canvasId}`)
+          .put(blob);
+        //Canvasにサムネイル画像のURLがなければ入れる
+        const url = await storageResult.ref.getDownloadURL();
+        const canvasRef = await db.collection("canvases").doc(canvasId);
+        const result = await canvasRef.get();
+        if (!result.data().thumbnailUrl) {
+          canvasRef.update({ thumbnailUrl: url });
+        }
       });
     } catch (error) {
       console.log(error.message);
@@ -697,6 +721,10 @@ const CanvasProvider: React.FC = ({ children }) => {
     });
     return () => authState();
   }, []);
+
+  useEffect(() => {
+    initializeDatas();
+  }, [router.pathname]);
 
   return (
     <CanvasContext.Provider
@@ -722,11 +750,12 @@ const CanvasProvider: React.FC = ({ children }) => {
         sendToBack,
 
         isEdit,
-        getAllCanvasDatas,
+        getAllCanvasObjects,
         labels,
 
         uploadTemplate,
         templates,
+        canvasData,
       }}
     >
       {children}
