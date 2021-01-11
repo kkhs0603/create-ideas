@@ -1,30 +1,31 @@
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import React from 'react';
-import Slider from 'react-slick';
-import Style from './TopSlider.module.scss';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import React from "react";
+import Slider from "react-slick";
+import Style from "./TopSlider.module.scss";
+import Image from "next/image";
 
 const TopSlider = () => {
   const settings = {
-    // dots: true,
+    dots: true,
     infinite: true,
-    speed: 500,
+    speed: 1000,
     slidesToShow: 1,
     slidesToScroll: 1,
     fade: true,
     autoplay: true,
-    autoplaySpeed: 4000,
+    autoplaySpeed: 5000,
   };
   return (
     <Slider className={Style.slider} {...settings}>
       <div>
-        <h1 className={Style.img}>1</h1>
+        <Image src="/topPage/01.png" alt="01" className={Style.img} unsized />
       </div>
       <div>
-        <h1 className={Style.img}>2</h1>
+        <Image src="/topPage/02.gif" alt="02" className={Style.img} unsized />
       </div>
       <div>
-        <h1 className={Style.img}>3</h1>
+        <Image src="/topPage/03.gif" alt="03" className={Style.img} unsized />
       </div>
     </Slider>
   );

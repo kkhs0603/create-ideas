@@ -69,6 +69,10 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     });
   }, []);
 
+  // useEffect(() => {
+  //   console.log("sticky changed");
+  // }, [stickyNotes]);
+
   const handleClick = (e) => {
     e.preventDefault();
     if (e.target.id !== "area") return;
@@ -105,9 +109,9 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     });
   };
 
-  const stickyNotesComponent = stickyNotes?.map((stickyNote, index) => (
+  const stickyNotesComponent = stickyNotes?.map((stickyNote) => (
     <StickyNote
-      key={index}
+      key={stickyNote.id + stickyNote.updatedAt + stickyNote.updatedBy}
       parent={ref.current?.getBoundingClientRect()}
       canvasId={props.id}
       isAreaClicked={isAreaClicked}
@@ -121,14 +125,19 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     lines === null ? (
       <div>line</div>
     ) : (
-      lines?.map((line, index) => (
-        <Line key={index} canvasId={props.id} areaSize={areaSize} {...line} />
+      lines?.map((line) => (
+        <Line
+          key={line.id + line.updatedAt + line.updatedBy}
+          canvasId={props.id}
+          areaSize={areaSize}
+          {...line}
+        />
       ))
     );
 
-  const labelsComponent = labels?.map((label, index) => (
+  const labelsComponent = labels?.map((label) => (
     <Label
-      key={index}
+      key={label.id + label.updatedAt + label.updatedBy}
       canvasId={props.id}
       isEdit={(isEdit(label.createdBy) && label.word === "") || false}
       setIsAreaClicked={setIsAreaClicked}
@@ -289,14 +298,14 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
           >
             PNG出力
           </MenuItem>
-          <MenuItem
+          {/* <MenuItem
             onClick={() => {
               uploadTemplate();
               handleClose();
             }}
           >
             templateへ保存
-          </MenuItem>
+          </MenuItem> */}
         </div>
       </Menu>
     </div>

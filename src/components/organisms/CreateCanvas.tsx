@@ -116,7 +116,6 @@ const CreateCanvas = () => {
           helperText={
             isSubmitted && canvasName === "" ? "Canvas名を入力してください" : ""
           }
-          id="outlined-basic"
           variant="outlined"
           required
           fullWidth

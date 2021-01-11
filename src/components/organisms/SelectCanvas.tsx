@@ -25,7 +25,14 @@ const SelectCanvas = (props) => {
             router.push("/Canvases/[id]", `/Canvases/${canvas.id}`)
           }
         >
-          <CardMedia className={classes.media} image={canvas.thumbnailUrl} />
+          <CardMedia
+            className={classes.media}
+            image={
+              canvas.thumbnailUrl
+                ? canvas.thumbnailUrl
+                : "https://firebasestorage.googleapis.com/v0/b/create-ideas-cea7b.appspot.com/o/images%2Ftemplates%2FnoImage.png?alt=media&token=58161723-b8ea-42b1-815c-17f83f5314d9"
+            }
+          />
           <CardContent>
             <Typography gutterBottom variant="h5" component="h2">
               {canvas.name}
@@ -46,6 +53,7 @@ export default SelectCanvas;
 const useStyles = makeStyles({
   container: {
     display: "flex",
+    flexWrap: "wrap",
   },
   card: {
     margin: 20,

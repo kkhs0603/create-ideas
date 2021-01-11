@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
+import React, { useState, useContext, useRef, useEffect, useMemo } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { yellow, green, red, blue } from "@material-ui/core/colors";
 import { CanvasContext } from "../../contexts/CanvasContext";
@@ -104,7 +104,7 @@ const StickyNote: React.FC<Props> = (props) => {
   const [cursor, setCursor] = useState<string>("grab");
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
   const [selectedColor, setSelectedColor] = useState<string>(props.color);
-  const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [tempWord, setTempWord] = useState<string>(props.word);
   const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
 
@@ -223,7 +223,7 @@ const StickyNote: React.FC<Props> = (props) => {
         padding: 0,
         margin: 0,
       }}
-      autoFocus={true}
+      // autoFocus={true}
       onFocus={(e) => {
         e.currentTarget.select();
       }}
@@ -231,6 +231,9 @@ const StickyNote: React.FC<Props> = (props) => {
   ) : (
     <div id={props.id}>{tempWord}</div>
   );
+  // useEffect(() => {
+  //   console.log("test");
+  // }, [props]);
 
   useEffect(() => {
     //編集状態を解除する
@@ -247,9 +250,6 @@ const StickyNote: React.FC<Props> = (props) => {
     }
   }, [props.isAreaClicked]);
 
-  // useEffect(() => {
-  //   console.log("scale", props.scale);
-  // }, [[props.scale]]);
   return (
     <Rnd
       style={{

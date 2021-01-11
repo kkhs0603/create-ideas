@@ -8,18 +8,9 @@ import { useRouter } from "next/router";
 
 const Canvas = () => {
   const classes = useStyles();
-  const { joinedUsers, canvasData, enterCanvas } = useContext(CanvasContext);
+  const { canvasData, enterCanvas } = useContext(CanvasContext);
   const router = useRouter();
   const canvasId = router.query.id;
-  const users = joinedUsers.map((user) => (
-    <Avatar
-      className={classes.small}
-      user={user}
-      key={user.id}
-      alt="user"
-      src={user.imageUrl}
-    />
-  ));
   useEffect(() => {
     enterCanvas(canvasId);
   }, []);
