@@ -3,8 +3,9 @@ import { CanvasContext } from "../contexts/CanvasContext";
 import Layout from "../components/templates/Layout/Layout";
 import CreateCanvas from "../components/organisms/CreateCanvas";
 import SelectCanvas from "../components/organisms/SelectCanvas";
-import { Grid, Modal, Container, Button } from "@material-ui/core";
+import { Grid, Modal, Container, Button, IconButton } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -38,9 +39,9 @@ const CanvasListPage = () => {
           <CreateCanvas />
         </Modal>
         <Grid container direction="row" justify="flex-end" alignItems="center">
-          <Button variant="contained" onClick={handleOpen}>
-            Canvas追加
-          </Button>
+          <IconButton onClick={handleOpen}>
+            <AddCircleOutlineIcon fontSize="large" />
+          </IconButton>
         </Grid>
         <div style={{ height: "70vh" }}>
           <div>Canvas一覧</div>

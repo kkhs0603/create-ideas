@@ -20,7 +20,6 @@ const SignInPage: React.FC = () => {
   return (
     <Layout>
       <Container>
-        <Title />
         <TopSlider />
         {isSignIn ? <SignIn /> : <SignUp />}
         <Button

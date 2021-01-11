@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from "react";
+import React, { useState, createContext, useEffect, useReducer } from "react";
 import firebase, { storage } from "../firebase/firebase";
 import { useRouter } from "next/router";
 import { DvrTwoTone } from "@material-ui/icons";
@@ -138,10 +138,65 @@ const db = firebase.firestore();
 const CanvasProvider: React.FC = ({ children }) => {
   const [canvases, setCanvases] = useState<Array<Canvas>>([]);
   const [canvasData, setCanvasData] = useState<Canvas>();
-  const [joinedUsers, setJoinedUsers] = useState([]);
-  const [stickyNotes, setStickyNotes] = useState<Array<StickyNote>>([]);
-  const [lines, setLines] = useState<Array<Line>>([]);
-  const [labels, setLabels] = useState<Array<Label>>([]);
+
+  const ObjReducer = (
+    objArray: Array<StickyNote> | Array<Line> | Array<Label>,
+    action: {
+      type: "add" | "modify" | "remove" | "initialize";
+      obj: StickyNote | Line | Label;
+    }
+  ) => {
+    if (!objArray) return [];
+    switch (action.type) {
+      case "add":
+        console.log(objArray, action.obj);
+        if (objArray.length === 0) {
+          return [action.obj];
+        }
+        return [...objArray, action.obj];
+      case "modify":
+        if (!objArray) break;
+        const modifyArray = objArray;
+        const modifyIndex = modifyArray.findIndex(
+          (obj) => obj.id === action.obj.id
+        );
+        if (modifyIndex < 0) break;
+        modifyArray[modifyIndex] = action.obj;
+        return modifyArray;
+      case "remove":
+        if (!objArray) break;
+        const removeArray = objArray;
+        const removeIndex = removeArray.findIndex(
+          (obj) => obj.id === action.obj.id
+        );
+        if (removeIndex < 0) break;
+        return removeArray.filter((obj) => obj.id !== action.obj.id);
+      case "initialize":
+        return [];
+    }
+  };
+
+  const dispatchObject = (
+    objName: string,
+    type: string,
+    obj: StickyNote | Line | Label | null
+  ) => {
+    if (!obj) return;
+    switch (objName) {
+      case CanvasObject.StickyNotes:
+        dispatchStickyNotes({ type: type, obj: obj });
+        break;
+      case CanvasObject.Lines:
+        dispatchLines({ type: type, obj: obj });
+        break;
+      case CanvasObject.Labels:
+        dispatchLabels({ type: type, obj: obj });
+        break;
+    }
+  };
+  const [stickyNotes, dispatchStickyNotes] = useReducer(ObjReducer, []);
+  const [lines, dispatchLines] = useReducer(ObjReducer, []);
+  const [labels, dispatchLabels] = useReducer(ObjReducer, []);
   const [templates, setTemplates] = useState<Array<Template>>([]);
   const auth = firebase.auth();
   const router = useRouter();
@@ -151,13 +206,19 @@ const CanvasProvider: React.FC = ({ children }) => {
   const createCanvas = async (canvasName: string, templateId: string) => {
     try {
       //canvases
+      const templateRef = await db
+        .collection("templates")
+        .doc(templateId)
+        .get();
       const result = await db.collection("canvases").add({
         name: canvasName,
         ideas: [],
         joinedUsers: [],
-        createdAt: new Date().toLocaleString("ja"),
+        createdAt:
+          new Date().toLocaleString("ja") + ":" + new Date().getMilliseconds(),
         createdBy: auth.currentUser.uid,
-        updatedAt: new Date().toLocaleString("ja"),
+        updatedAt:
+          new Date().toLocaleString("ja") + ":" + new Date().getMilliseconds(),
       });
 
       await db.collection("canvases").doc(result.id).update({
@@ -194,7 +255,14 @@ const CanvasProvider: React.FC = ({ children }) => {
         result
           .collection(CanvasObject.StickyNotes)
           .doc(stickyResult.id)
-          .update({ id: stickyResult.id });
+          .update({
+            id: stickyResult.id,
+            updatedBy: auth.currentUser.uid,
+            updatedAt:
+              new Date().toLocaleString("ja") +
+              ":" +
+              new Date().getMilliseconds(),
+          });
       });
       console.log("labels writing");
       await labels.forEach(async (label) => {
@@ -204,7 +272,14 @@ const CanvasProvider: React.FC = ({ children }) => {
         result
           .collection(CanvasObject.Labels)
           .doc(labelResult.id)
-          .update({ id: labelResult.id });
+          .update({
+            id: labelResult.id,
+            updatedBy: auth.currentUser.uid,
+            updatedAt:
+              new Date().toLocaleString("ja") +
+              ":" +
+              new Date().getMilliseconds(),
+          });
       });
       console.log("lines writing");
       await lines.forEach(async (line) => {
@@ -214,7 +289,14 @@ const CanvasProvider: React.FC = ({ children }) => {
         result
           .collection(CanvasObject.Lines)
           .doc(lineResult.id)
-          .update({ id: lineResult.id });
+          .update({
+            id: lineResult.id,
+            updatedBy: auth.currentUser.uid,
+            updatedAt:
+              new Date().toLocaleString("ja") +
+              ":" +
+              new Date().getMilliseconds(),
+          });
       });
 
       console.log("new canvas created!");
@@ -231,22 +313,6 @@ const CanvasProvider: React.FC = ({ children }) => {
       canvasesRef.onSnapshot((snapshot) => {
         setCanvases([]);
         setCanvases(snapshot.docs.map((canvas) => canvas.data()));
-        // snapshot.docs.forEach(async (change) => {
-        //   const userRef = await db
-        //     .collection("users")
-        //     .doc(change.data().createdBy)
-        //     .get();
-        //   setCanvases((values) => [
-        //     ...values,
-        //     {
-        //       id: change.data().id,
-        //       name: change.data().name,
-        //       createdBy: userRef.data().name,
-        //       createdAt: change.data().createdAt,
-        //       updatedAt: change.data().updatedAt,
-        //     },
-        //   ]);
-        // });
       });
     } catch (error) {
       console.log(error);
@@ -255,6 +321,11 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const enterCanvas = async (canvasId: string) => {
     try {
+      console.log("enter");
+      dispatchObject(CanvasObject.StickyNotes, "initialize", []);
+      dispatchObject(CanvasObject.Lines, "initialize", []);
+      dispatchObject(CanvasObject.Labels, "initialize", []);
+      setCanvasData();
       const canvasRef = await db.collection("canvases").doc(canvasId);
       const result = await canvasRef.get();
       setCanvasData(result.data());
@@ -264,22 +335,16 @@ const CanvasProvider: React.FC = ({ children }) => {
     }
   };
 
-  const initializeDatas = () => {
-    setLabels([]);
-    setLines([]);
-    setStickyNotes([]);
-    setCanvasData();
-  };
-
-  const getAllCanvasObjects = (canvasId: string) => {
+  const getAllCanvasObjects = async (canvasId: string) => {
     try {
-      getCanvasObject(canvasId, CanvasObject.StickyNotes);
-      getCanvasObject(canvasId, CanvasObject.Lines);
-      getCanvasObject(canvasId, CanvasObject.Labels);
+      await getCanvasObject(canvasId, CanvasObject.StickyNotes);
+      await getCanvasObject(canvasId, CanvasObject.Lines);
+      await getCanvasObject(canvasId, CanvasObject.Labels);
     } catch (error) {
       console.log(error.message);
     }
   };
+
   /* --------------------------
   canvasObject
   -------------------------- */
@@ -298,11 +363,12 @@ const CanvasProvider: React.FC = ({ children }) => {
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName);
+        .collection(objName)
+        .doc();
 
       switch (objName) {
         case CanvasObject.StickyNotes:
-          const StickyResult = await ref.add({
+          await ref.set({
             word: "",
             positionX,
             positionY,
@@ -312,24 +378,33 @@ const CanvasProvider: React.FC = ({ children }) => {
             color: option,
             zIndex: maxZindex + 1,
             isLocked: false,
+            id: ref.id,
+            updatedBy: auth.currentUser.uid,
+            updatedAt:
+              new Date().toLocaleString("ja") +
+              ":" +
+              new Date().getMilliseconds(),
           });
-          ref.doc(StickyResult.id).update({ id: StickyResult.id });
           break;
 
         case CanvasObject.Lines:
-          const lineResult = await ref.add({
+          await ref.set({
             vh: option,
             positionX,
             positionY,
             isLocked: false,
+            id: ref.id,
+            zIndex: maxZindex + 1,
+            updatedBy: auth.currentUser.uid,
+            updatedAt:
+              new Date().toLocaleString("ja") +
+              ":" +
+              new Date().getMilliseconds(),
           });
-          ref
-            .doc(lineResult.id)
-            .update({ id: lineResult.id, zIndex: maxZindex + 1 });
           break;
 
         case CanvasObject.Labels:
-          const labelResult = await ref.add({
+          await ref.set({
             positionX,
             positionY,
             word: "",
@@ -337,10 +412,14 @@ const CanvasProvider: React.FC = ({ children }) => {
             height: 100,
             createdBy: auth.currentUser.uid,
             isLocked: false,
+            id: ref.id,
+            zIndex: maxZindex + 1,
+            updatedBy: auth.currentUser.uid,
+            updatedAt:
+              new Date().toLocaleString("ja") +
+              ":" +
+              new Date().getMilliseconds(),
           });
-          ref
-            .doc(labelResult.id)
-            .update({ id: labelResult.id, zIndex: maxZindex + 1 });
           break;
       }
       await updateCanvas(canvasId);
@@ -356,24 +435,20 @@ const CanvasProvider: React.FC = ({ children }) => {
         .collection("canvases")
         .doc(canvasId)
         .collection(objName);
-
-      //初回getで全部とる
-      //変更があった場合、変更があったものだけ配列の中身をかえる
-      ref.onSnapshot((snapshot) => {
-        switch (objName) {
-          case CanvasObject.StickyNotes:
-            setStickyNotes([]);
-            setStickyNotes(snapshot.docs.map((word) => word.data()));
-            break;
-          case CanvasObject.Lines:
-            setLines([]);
-            setLines(snapshot.docs.map((line) => line.data()));
-            break;
-          case CanvasObject.Labels:
-            setLabels([]);
-            setLabels(snapshot.docs.map((label) => label.data()));
-            break;
-        }
+      return ref.onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          switch (change.type) {
+            case "added":
+              dispatchObject(objName, "add", change.doc.data());
+              break;
+            case "modified":
+              dispatchObject(objName, "modify", change.doc.data());
+              break;
+            case "removed":
+              dispatchObject(objName, "remove", change.doc.data());
+              break;
+          }
+        });
       });
     } catch (error) {
       console.log(error.message);
@@ -386,6 +461,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     objId: string
   ): Promise<void> => {
     try {
+      console.log("delete ", objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -415,6 +491,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .update({
           positionX: x,
           positionY: y,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -437,6 +518,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(objId)
         .update({
           word: word,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -465,6 +551,11 @@ const CanvasProvider: React.FC = ({ children }) => {
           positionY,
           width,
           height,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -487,6 +578,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(objId)
         .update({
           isLocked,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -511,6 +607,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(stickyNoteId)
         .update({
           color: color,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -527,7 +628,12 @@ const CanvasProvider: React.FC = ({ children }) => {
       await db
         .collection("canvases")
         .doc(canvasId)
-        .update({ updatedAt: new Date().toLocaleString("ja") });
+        .update({
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
+        });
     } catch (error) {
       console.log(error.message);
     }
@@ -557,6 +663,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(id)
         .update({
           zIndex: zIndex + 1,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -582,6 +693,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(id)
         .update({
           zIndex: maxZindex + 1,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -605,6 +721,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(id)
         .update({
           zIndex: zIndex - 1,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -625,6 +746,11 @@ const CanvasProvider: React.FC = ({ children }) => {
         .doc(id)
         .update({
           zIndex: maxZindex - 1,
+          updatedBy: auth.currentUser.uid,
+          updatedAt:
+            new Date().toLocaleString("ja") +
+            ":" +
+            new Date().getMilliseconds(),
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -648,17 +774,8 @@ const CanvasProvider: React.FC = ({ children }) => {
     const lines = await (await linesRef.get()).docs;
     const linesZindices = lines.map((line) => line.data().zIndex);
     const result = zIndices.concat(linesZindices);
-    console.log("zindex", result);
     return result;
   };
-
-  /* --------------------------
-  Line
-  -------------------------- */
-
-  /* --------------------------
-  Label
-  -------------------------- */
 
   /* --------------------------
   Template
@@ -722,17 +839,12 @@ const CanvasProvider: React.FC = ({ children }) => {
     return () => authState();
   }, []);
 
-  useEffect(() => {
-    initializeDatas();
-  }, [router.pathname]);
-
   return (
     <CanvasContext.Provider
       value={{
         createCanvas,
         canvases,
         enterCanvas,
-        joinedUsers,
 
         addCanvasObject,
         deleteCanvasObject,

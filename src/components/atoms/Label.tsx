@@ -117,7 +117,7 @@ const Label = (props) => {
         }}
         //onKeyDown={(e) => finishWordEdit(e)}
 
-        autoFocus={true}
+        // autoFocus={true}
         onFocus={(e) => {
           e.currentTarget.select();
         }}
