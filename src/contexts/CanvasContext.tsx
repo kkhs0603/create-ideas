@@ -184,12 +184,15 @@ const CanvasProvider: React.FC = ({ children }) => {
     if (!obj) return;
     switch (objName) {
       case CanvasObject.StickyNotes:
+        // console.log("add stickynote");
         dispatchStickyNotes({ type: type, obj: obj });
         break;
       case CanvasObject.Lines:
+        // console.log("add line");
         dispatchLines({ type: type, obj: obj });
         break;
       case CanvasObject.Labels:
+        // console.log("add label");
         dispatchLabels({ type: type, obj: obj });
         break;
     }
@@ -438,7 +441,9 @@ const CanvasProvider: React.FC = ({ children }) => {
       return ref.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
           switch (change.type) {
+            //Switch3回いらん
             case "added":
+              console.log("add");
               dispatchObject(objName, "add", change.doc.data());
               break;
             case "modified":

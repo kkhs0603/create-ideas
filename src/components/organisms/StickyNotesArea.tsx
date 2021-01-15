@@ -111,7 +111,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
 
   const stickyNotesComponent = stickyNotes?.map((stickyNote) => (
     <StickyNote
-      key={stickyNote.id + stickyNote.updatedAt + stickyNote.updatedBy}
+      key={stickyNote.id}
       parent={ref.current?.getBoundingClientRect()}
       canvasId={props.id}
       isAreaClicked={isAreaClicked}
@@ -126,18 +126,13 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
       <div>line</div>
     ) : (
       lines?.map((line) => (
-        <Line
-          key={line.id + line.updatedAt + line.updatedBy}
-          canvasId={props.id}
-          areaSize={areaSize}
-          {...line}
-        />
+        <Line key={line.id} canvasId={props.id} areaSize={areaSize} {...line} />
       ))
     );
 
   const labelsComponent = labels?.map((label) => (
     <Label
-      key={label.id + label.updatedAt + label.updatedBy}
+      key={label.id}
       canvasId={props.id}
       isEdit={(isEdit(label.createdBy) && label.word === "") || false}
       setIsAreaClicked={setIsAreaClicked}

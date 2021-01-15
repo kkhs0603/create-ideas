@@ -34,6 +34,10 @@ export default (e, method) => {
       return "現在この認証方法はご利用頂けません";
     case "auth/requires-recent-login":
       return "認証の有効期限が切れています";
+    case "auth/email-verifying":
+      return "ユーザーを登録しました。登録に使用したメールアドレスの受信トレイをご確認ください"
+    case "auth/email-not-verified":
+      return "メールアドレスの認証ができていません。受信トレイをご確認ください"
     default:
       if (method.indexOf("signin") !== -1) {
         return "認証に失敗しました。しばらく時間をおいて再度お試しください";

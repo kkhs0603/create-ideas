@@ -30,8 +30,10 @@ export const useSignUp = () => {
   );
   const onSubmit = async (event) => {
     event.preventDefault();
-    const result = await signupWithEmailAndPassword(email, password, userName);
-    setErrorMessage(result);
+    await signupWithEmailAndPassword(email, password, userName);
+    setErrorMessage(
+      "ユーザーを登録しました。登録に使用したメールアドレスの受信トレイをご確認ください"
+    );
   };
   return [
     errorMessage,
