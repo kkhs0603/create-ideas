@@ -13,8 +13,13 @@ const AuthProvider = ({ children }) => {
   //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
     try {
+      if (!auth.currentUser?.emailVerified) {
+        console.log("error");
+        return ErrorMessage({ code: "auth/email-not-verified" }, "signin");
+      }
       await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
+      console.log(error);
       return ErrorMessage(error, "signin");
     }
   };
@@ -22,7 +27,10 @@ const AuthProvider = ({ children }) => {
   const signupWithEmailAndPassword = async (email, password, userName) => {
     try {
       const result = await auth.createUserWithEmailAndPassword(email, password);
-      await result.user.updateProfile({ displayName: userName });
+      if (!auth.currentUser?.emailVerified) {
+        auth.currentUser?.sendEmailVerification();
+      }
+
       return result;
     } catch (error) {
       return ErrorMessage(error, "signup");
@@ -72,9 +80,9 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
-      if (user == null) {
+      //loadingのModal表示
+      if (!user?.emailVerified || user == null) {
         setUser(null);
-        localStorage.clear();
         router.push("/");
         return;
       }
@@ -89,9 +97,10 @@ const AuthProvider = ({ children }) => {
           updatedAt: new Date().toLocaleString("ja"),
         });
       }
+
       router.push("/CanvasList");
     });
-  }, [auth]);
+  }, []);
 
   return (
     <AuthContext.Provider
