@@ -84,7 +84,6 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
-      console.log("user", user);
       if (!user?.emailVerified || user == null) {
         setUser(null);
         router.push({ pathname: "/" });

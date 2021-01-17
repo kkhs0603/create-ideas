@@ -142,19 +142,19 @@ const CanvasProvider: React.FC = ({ children }) => {
   const ObjReducer = (
     objArray: Array<StickyNote> | Array<Line> | Array<Label>,
     action: {
-      type: "add" | "modify" | "remove" | "initialize";
+      type: "added" | "modified" | "removed" | "initialize";
       obj: StickyNote | Line | Label;
     }
   ) => {
     if (!objArray) return [];
     switch (action.type) {
-      case "add":
-        console.log(objArray, action.obj);
+      case "added":
+        // console.log(objArray, action.obj);
         if (objArray.length === 0) {
           return [action.obj];
         }
         return [...objArray, action.obj];
-      case "modify":
+      case "modified":
         if (!objArray) break;
         const modifyArray = objArray;
         const modifyIndex = modifyArray.findIndex(
@@ -163,7 +163,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         if (modifyIndex < 0) break;
         modifyArray[modifyIndex] = action.obj;
         return modifyArray;
-      case "remove":
+      case "removed":
         if (!objArray) break;
         const removeArray = objArray;
         const removeIndex = removeArray.findIndex(
@@ -250,7 +250,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .get();
       const labels = labelsRef.docs.map((label) => label.data());
 
-      console.log("stickyNotes writing");
+      // console.log("stickyNotes writing");
       await stickyNotes.forEach(async (stickyNote) => {
         const stickyResult = await result
           .collection(CanvasObject.StickyNotes)
@@ -267,7 +267,7 @@ const CanvasProvider: React.FC = ({ children }) => {
               new Date().getMilliseconds(),
           });
       });
-      console.log("labels writing");
+      // console.log("labels writing");
       await labels.forEach(async (label) => {
         const labelResult = await result
           .collection(CanvasObject.Labels)
@@ -284,7 +284,7 @@ const CanvasProvider: React.FC = ({ children }) => {
               new Date().getMilliseconds(),
           });
       });
-      console.log("lines writing");
+      // console.log("lines writing");
       await lines.forEach(async (line) => {
         const lineResult = await result
           .collection(CanvasObject.Lines)
@@ -302,7 +302,7 @@ const CanvasProvider: React.FC = ({ children }) => {
           });
       });
 
-      console.log("new canvas created!");
+      // console.log("new canvas created!");
       router.push("/Canvases/" + result.id);
     } catch (error) {
       console.log(error);
@@ -324,7 +324,7 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const enterCanvas = async (canvasId: string) => {
     try {
-      console.log("enter");
+      // console.log("enter");
       dispatchObject(CanvasObject.StickyNotes, "initialize", []);
       dispatchObject(CanvasObject.Lines, "initialize", []);
       dispatchObject(CanvasObject.Labels, "initialize", []);
@@ -359,7 +359,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     option: string
   ) => {
     try {
-      console.log("add", objName);
+      // console.log("add", objName);
       const zIndeices = await getAllZindices(canvasId);
       const maxZindex =
         zIndeices.length !== 0 ? Math.max.apply(null, zIndeices) : 0;
@@ -433,26 +433,14 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const getCanvasObject = async (canvasId: string, objName: CanvasObject) => {
     try {
-      console.log("get " + objName);
+      // console.log("get " + objName);
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
         .collection(objName);
       return ref.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          switch (change.type) {
-            //Switch3回いらん
-            case "added":
-              console.log("add");
-              dispatchObject(objName, "add", change.doc.data());
-              break;
-            case "modified":
-              dispatchObject(objName, "modify", change.doc.data());
-              break;
-            case "removed":
-              dispatchObject(objName, "remove", change.doc.data());
-              break;
-          }
+          dispatchObject(objName, change.type, change.doc.data());
         });
       });
     } catch (error) {
@@ -466,7 +454,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     objId: string
   ): Promise<void> => {
     try {
-      console.log("delete ", objName);
+      // console.log("delete ", objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -487,7 +475,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     y: number
   ): Promise<void> => {
     try {
-      console.log("move ", objName);
+      // console.log("move ", objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -515,7 +503,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     word: string
   ) => {
     try {
-      console.log("edit " + objName + " word");
+      // console.log("edit " + objName + " word");
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -545,7 +533,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     height: number
   ) => {
     try {
-      console.log("resize", objName);
+      // console.log("resize", objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -575,7 +563,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     isLocked: boolean
   ) => {
     try {
-      console.log("lock " + objName);
+      // console.log("lock " + objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -604,7 +592,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     color: string
   ) => {
     try {
-      console.log("change stickyNote color : " + color);
+      // console.log("change stickyNote color : " + color);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -660,7 +648,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     zIndex: number
   ) => {
     try {
-      console.log("bringFoward : " + objName);
+      // console.log("bringFoward : " + objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -687,7 +675,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     id: string
   ) => {
     try {
-      console.log("bringToFront : " + objName);
+      // console.log("bringToFront : " + objName);
       const zIndeices = await getAllZindices(canvasId);
       console.log(zIndeices);
       const maxZindex = Math.max.apply(null, zIndeices);
@@ -718,7 +706,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     zIndex: number
   ) => {
     try {
-      console.log("sendBackward : " + objName);
+      // console.log("sendBackward : " + objName);
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -741,7 +729,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   //最背面へ
   const sendToBack = async (canvasId: string, objName: string, id: string) => {
     try {
-      console.log("sendToBack : " + objName);
+      // console.log("sendToBack : " + objName);
       const zIndeices = await getAllZindices(canvasId);
       const maxZindex = Math.min.apply(null, zIndeices);
       await db
