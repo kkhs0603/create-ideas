@@ -1,6 +1,6 @@
 import { useContext, useState, useCallback } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { storage } from "../firebase/firebase";
+import firebase from "../firebase/firebase";
 
 export const useUserSetting = () => {
   const { user, handleGoBack, updateUser } = useContext(AuthContext);
@@ -31,7 +31,7 @@ export const useUserSetting = () => {
   //画像をstorageにupload
   const uploadImage = (image) => {
     return new Promise((resolve, reject) => {
-      const uploadTask = storage.ref(`/images/${user.uid}`).put(image);
+      const uploadTask = firebase.storage.ref(`/images/${user.uid}`).put(image);
       uploadTask.on(
         "state_changed",
         // 進行中のsnapshotを得る
@@ -48,7 +48,7 @@ export const useUserSetting = () => {
         // 完了後の処理
         // 画像表示のため、アップロードした画像のURLを取得
         async () => {
-          const imageUrl = await storage
+          const imageUrl = await firebase.storage
             .ref("images")
             .child(user.uid)
             .getDownloadURL();

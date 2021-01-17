@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import firebase from "../firebase/firebase";
+import firebase, { User } from "../firebase/firebase";
 import ErrorMessage from "../firebase/ErrorMessage";
 import { useRouter } from "next/router";
 
@@ -7,16 +7,13 @@ const AuthContext = React.createContext({});
 
 const AuthProvider = ({ children }) => {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
   const auth = firebase.auth();
   const db = firebase.firestore();
   //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
     try {
-      if (!auth.currentUser?.emailVerified) {
-        console.log("error");
-        return ErrorMessage({ code: "auth/email-not-verified" }, "signin");
-      }
       await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
       console.log(error);
@@ -29,16 +26,19 @@ const AuthProvider = ({ children }) => {
       const result = await auth.createUserWithEmailAndPassword(email, password);
       if (!auth.currentUser?.emailVerified) {
         auth.currentUser?.sendEmailVerification();
+        return ErrorMessage({ code: "auth/email-verifying" }, "signup");
       }
 
       return result;
     } catch (error) {
+      console.log(error);
       return ErrorMessage(error, "signup");
     }
   };
 
   const signinWithGoogle = async () => {
     try {
+      setIsLoading(true);
       const googleProvider = new firebase.auth.GoogleAuthProvider();
       await auth.signInWithRedirect(googleProvider);
     } catch (e) {
@@ -70,8 +70,12 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleGoUserSetting = () => {
+  const toUserSettingPage = () => {
     router.push("/UserSetting");
+  };
+
+  const toCanvasPage = () => {
+    router.push("/CanvasList");
   };
 
   const handleGoBack = () => {
@@ -80,10 +84,10 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
-      //loadingのModal表示
+      console.log("user", user);
       if (!user?.emailVerified || user == null) {
         setUser(null);
-        router.push("/");
+        router.push({ pathname: "/" });
         return;
       }
       setUser(user);
@@ -97,7 +101,6 @@ const AuthProvider = ({ children }) => {
           updatedAt: new Date().toLocaleString("ja"),
         });
       }
-
       router.push("/CanvasList");
     });
   }, []);
@@ -110,10 +113,12 @@ const AuthProvider = ({ children }) => {
         signupWithEmailAndPassword,
         signinWithEmailAndPassword,
         user,
-        handleGoUserSetting,
+        toCanvasPage,
+        toUserSettingPage,
         handleGoBack,
         updateUser,
         router,
+        isLoading,
       }}
     >
       {children}
