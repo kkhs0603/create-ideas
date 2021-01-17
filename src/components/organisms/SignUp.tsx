@@ -1,20 +1,33 @@
-import React from "react";
-import { useSignUp } from "../../hooks/useSignUp";
+import React, { useState, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { TextField, Button } from "@material-ui/core";
+import { AuthContext } from "../../contexts/AuthContext";
 
 ///////////
 //Component
 ///////////
 export const SignUp = () => {
   const classes = useStyles();
-  const [
-    errorMessage,
-    onSubmit,
-    handleUserNameOnChanged,
-    handleEmailOnChanged,
-    handlePasswordOnChanged,
-  ] = useSignUp();
+  const { signupWithEmailAndPassword } = useContext(AuthContext);
+  const [errorMessage, setErrorMessage] = useState("");
+  const useInput = (initialValue) => {
+    const [value, set] = useState(initialValue);
+    return { value, onChange: (e) => set(e.target.value) };
+  };
+
+  const email = useInput("");
+  const password = useInput("");
+  const userName = useInput("");
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    const result = await signupWithEmailAndPassword(
+      email.value,
+      password.value,
+      userName.value
+    );
+    setErrorMessage(result);
+  };
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -28,7 +41,7 @@ export const SignUp = () => {
           helperText={""}
           fullWidth
           variant="outlined"
-          onChange={handleUserNameOnChanged}
+          {...userName}
         />
         <TextField
           className={classes.textField}
@@ -38,9 +51,8 @@ export const SignUp = () => {
           autoComplete="email"
           required
           helperText={""}
-          fullWidth
           variant="outlined"
-          onChange={handleEmailOnChanged}
+          {...email}
         />
         <TextField
           className={classes.textField}
@@ -50,12 +62,17 @@ export const SignUp = () => {
           autoComplete="current-password"
           required
           helperText={""}
-          fullWidth
           variant="outlined"
-          onChange={handlePasswordOnChanged}
+          {...password}
         />
-        {errorMessage ? errorMessage : ""}
-        <Button type="submit" fullWidth variant="contained" color="primary">
+        <div>{errorMessage ? errorMessage : ""}</div>
+        <Button
+          className={classes.button}
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+        >
           登録
         </Button>
       </form>
@@ -68,6 +85,10 @@ export const SignUp = () => {
 ///////
 const useStyles = makeStyles({
   textField: {
+    width: "80%",
     margin: "10px 0",
+  },
+  button: {
+    width: "80%",
   },
 });

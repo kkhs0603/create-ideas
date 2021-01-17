@@ -32,7 +32,8 @@ const Header = () => {
   const {
     user,
     signout,
-    handleGoUserSetting,
+    toCanvasPage,
+    toUserSettingPage,
     handleGoBack,
     router,
   } = useContext(AuthContext);
@@ -86,7 +87,8 @@ const Header = () => {
                 open={open}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleGoUserSetting}>設定</MenuItem>
+                <MenuItem onClick={toCanvasPage}>Canvas一覧へ</MenuItem>
+                <MenuItem onClick={toUserSettingPage}>設定</MenuItem>
                 <MenuItem onClick={signout}>サインアウト</MenuItem>
               </Menu>
             </div>

@@ -13,7 +13,4 @@ const config = {
 if (!firebase.apps.length) {
   firebase.initializeApp(config);
 }
-//firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-
-export const storage = firebase.storage();
 export default firebase;

@@ -1,64 +1,66 @@
-import React from "react";
-import { useSignIn } from "../../hooks/useSignIn";
+import React, { useContext, useState } from "react";
 import { Separator } from "../atoms/Separator/Separator";
-import { TextField, Button } from "@material-ui/core";
+import { TextField, Button, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Image from "next/image";
+import { AuthContext } from "../../contexts/AuthContext";
 
 ///////////
 //Component
 ///////////
 export const SignIn = () => {
   const classes = useStyles();
-  const [
-    errorMessage,
-    signinWithGoogle,
-    handleSubmit,
-    handleEmailOnChanged,
-    handlePasswordOnChanged,
-  ] = useSignIn();
+  const { signinWithEmailAndPassword } = useContext(AuthContext);
+  const [errorMessage, setErrorMessage] = useState("");
+  const useInput = (initialValue) => {
+    const [value, set] = useState(initialValue);
+    return { value, onChange: (e) => set(e.target.value) };
+  };
+
+  const email = useInput("");
+  const password = useInput("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const result = await signinWithEmailAndPassword(email, password);
+    setErrorMessage(result);
+  };
 
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
+      {/* <Separator /> */}
+      <TextField
+        className={classes.textField}
+        id="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
+        required
+        helperText={""}
+        variant="outlined"
+        {...email}
+      />
+      <TextField
+        className={classes.textField}
+        id="password"
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        required
+        helperText={""}
+        variant="outlined"
+        {...password}
+      />
+      <div>{errorMessage ? errorMessage : ""}</div>
       <Button
-        fullWidth
+        className={classes.button}
+        type="submit"
         variant="contained"
         color="primary"
-        onClick={signinWithGoogle}
       >
-        Googleアカウントでサインイン
+        サインイン
       </Button>
-      <Separator />
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <TextField
-          className={classes.textField}
-          id="email"
-          label="Email"
-          type="email"
-          autoComplete="email"
-          required
-          helperText={""}
-          fullWidth
-          variant="outlined"
-          onChange={handleEmailOnChanged}
-        />
-        <TextField
-          className={classes.textField}
-          id="password"
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          required
-          helperText={""}
-          fullWidth
-          variant="outlined"
-          onChange={handlePasswordOnChanged}
-        />
-        {errorMessage ? errorMessage : ""}
-        <Button type="submit" fullWidth variant="contained" color="primary">
-          サインイン
-        </Button>
-      </form>
-    </div>
+    </form>
   );
 };
 
@@ -66,7 +68,11 @@ export const SignIn = () => {
 //Style
 ///////
 const useStyles = makeStyles({
+  button: {
+    width: "80%",
+  },
   textField: {
+    width: "80%",
     margin: "10px 0",
   },
 });

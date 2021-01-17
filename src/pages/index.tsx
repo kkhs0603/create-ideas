@@ -1,35 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Layout from "../components/templates/Layout/Layout";
-import Title from "../components/atoms/Title";
-import TopSlider from "../components/molecules/TopSlider/TopSlider";
-import { SignIn } from "../components/organisms/SignIn";
-import { SignUp } from "../components/organisms/SignUp";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Container } from "@material-ui/core";
+import { useRouter } from "next/router";
+import { Button, Grid, Typography } from "@material-ui/core";
+import Image from "next/image";
 
-const useStyles = makeStyles({
-  button: {
-    color: "BLUE",
+const useStyles = makeStyles((theme) => ({
+  container: {
+    textAlign: "center",
   },
-});
+  button: {
+    textTransform: "none",
+    margin: 10,
+  },
+  img: {
+    width: "80%",
+    margin: "10px",
+    height: "auto",
+    color: "#fff",
+    outline: "none",
+  },
+  col: {
+    textAlign: "center",
+  },
+}));
 
 const SignInPage: React.FC = () => {
   const classes = useStyles();
-  const [isSignIn, setIsSignIn] = useState<Boolean>(true);
-  const caption: string = isSignIn ? "登録しますか？" : "サインインしますか？";
+  const router = useRouter();
   return (
     <Layout>
-      <Container>
-        <TopSlider />
-        {isSignIn ? <SignIn /> : <SignUp />}
-        <Button
-          className={classes.button}
-          onClick={() => setIsSignIn(!isSignIn)}
-          disableRipple
-        >
-          {caption}
-        </Button>
-      </Container>
+      <Grid
+        container
+        alignItems="center"
+        direction="row"
+        style={{
+          height: "92vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Grid item xs={6} className={classes.col}>
+          <Typography variant="h1">Create Ideas</Typography>
+          <Typography variant="h5">アイデア出しをより手軽に</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            size="large"
+            onClick={() => router.push("Auth")}
+          >
+            SignIn
+          </Button>
+          <Button
+            variant="contained"
+            className={classes.button}
+            size="large"
+            onClick={() => router.push("About")}
+          >
+            About
+          </Button>
+        </Grid>
+        <Grid item xs={6}>
+          <Image
+            src="/topPage/topIllust.svg"
+            alt="topIllust"
+            className={classes.img}
+            unsized
+          />
+        </Grid>
+      </Grid>
     </Layout>
   );
 };
