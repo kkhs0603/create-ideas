@@ -11,7 +11,6 @@ const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState<Boolean>(false);
   const auth = firebase.auth();
   const db = firebase.firestore();
-  //TODO:reducerを通してstateを変更するように
   const signinWithEmailAndPassword = async (email, password) => {
     try {
       await auth.signInWithEmailAndPassword(email, password);
@@ -84,7 +83,6 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
-      console.log("user", user);
       if (!user?.emailVerified || user == null) {
         setUser(null);
         router.push({ pathname: "/" });
