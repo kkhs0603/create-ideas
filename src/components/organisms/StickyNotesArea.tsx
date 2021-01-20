@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useEffect, useMemo, useState, useContext } from "react";
 import StickyNote from "./StickyNote";
 import { makeStyles } from "@material-ui/core/styles";

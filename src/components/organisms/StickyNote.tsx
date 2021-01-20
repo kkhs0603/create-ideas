@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useContext, useRef, useEffect, useMemo } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { yellow, green, red, blue } from "@material-ui/core/colors";
@@ -7,7 +8,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import LockButton from "../atoms/LockButton";
-
 type Props = {
   canvasId: string;
   setIsAreaClicked: (isAreaClicked: boolean) => void;
@@ -76,7 +76,7 @@ const BlueRadio = withStyles({
   checked: {},
 })((props) => <Radio color="default" {...props} />);
 
-const StickyNote: React.FC<Props> = (props) => {
+const StickyNote: React.FC<any> = (props) => {
   const classes = useStyles(props);
   const {
     moveCanvasObject,
@@ -249,7 +249,6 @@ const StickyNote: React.FC<Props> = (props) => {
       }
     }
   }, [props.isAreaClicked]);
-
   return (
     <Rnd
       style={{

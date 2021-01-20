@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, createContext, useEffect, useReducer } from "react";
 import firebase, { storage } from "../firebase/firebase";
 import { useRouter } from "next/router";
@@ -57,6 +58,9 @@ type Template = {
   labels: Array<Label>;
   lines: Array<Line>;
   stickyNotes: Array<StickyNote>;
+  id: string;
+  imageUrl: string;
+  description: string;
 };
 
 //interface
@@ -131,6 +135,8 @@ interface IContextProps {
     objId: string,
     isLocked: boolean
   ) => void;
+  templates: Array<Template>;
+  user: any;
 }
 
 const CanvasContext = createContext({} as IContextProps);

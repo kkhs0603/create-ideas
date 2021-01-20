@@ -67,7 +67,8 @@ const SignInPage: React.FC = () => {
             src="/topPage/topIllust.svg"
             alt="topIllust"
             className={classes.img}
-            unsized
+            width={600}
+            height={400}
           />
         </Grid>
       </Grid>

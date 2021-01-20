@@ -6,7 +6,6 @@ import {
   CardActionArea,
   CardMedia,
   CardContent,
-  CardActions,
   Typography,
   Backdrop,
   CircularProgress,

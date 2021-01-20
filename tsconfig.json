@@ -21,14 +21,16 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": "./",
+    "paths": {"react-textfit": ["/src/types/react-textfit/react-textfit.d.ts"]},
+    "typeRoots": ["/src/types","node_modules/@types"],
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "/src/components/atoms/atoms/Label.tsx"
   ]
 }
