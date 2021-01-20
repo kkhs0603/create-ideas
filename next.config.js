@@ -10,7 +10,16 @@ module.exports = {
     FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
   },
   trailingSlash: true,
-  exportPathMap: function () {
-    return { "/": { page: "/" } };
+  // exportPathMap: function () {
+  //   return { "/": { page: "/" } };
+  // },
+  // distDir: "public",
+  async rewrites() {
+    return [
+      {
+        source: "/:any*",
+        destination: "/",
+      },
+    ];
   },
 };

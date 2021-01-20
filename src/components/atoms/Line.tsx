@@ -2,14 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { CanvasContext } from "../../contexts/CanvasContext";
-import {
-  Button,
-  TextField,
-  Menu,
-  MenuItem,
-  Radio,
-  Divider,
-} from "@material-ui/core";
+import { Menu, MenuItem } from "@material-ui/core";
 import { Rnd } from "react-rnd";
 import LockButton from "./LockButton";
 
@@ -20,6 +13,10 @@ type Props = {
   y: number;
   vh: string;
   zIndex: number;
+  positionX: number;
+  positionY: number;
+  isLocked: boolean;
+  areaSize: { height: number; width: number };
 };
 
 const CanvasObject = {
@@ -225,11 +222,11 @@ const useStyles = makeStyles({
   },
   vertical: {
     width: 5,
-    height: (props) => (props.areaSize ? props.areaSize.height : "100%"),
+    height: (props: Props) => (props.areaSize ? props.areaSize.height : "100%"),
     margin: "0px 5px",
   },
   horizontal: {
-    width: (props) => (props.areaSize ? props.areaSize.width : "100%"),
+    width: (props: Props) => (props.areaSize ? props.areaSize.width : "100%"),
     height: 5,
     margin: "5px 0px",
   },

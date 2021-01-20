@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import Layout from "../components/templates/Layout/Layout";
+import Layout from "../src/components/templates/Layout/Layout";
 import { Button, Grid, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Image from "next/image";

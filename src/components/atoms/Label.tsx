@@ -1,17 +1,7 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
-import { withStyles } from "@material-ui/core/styles";
-import { yellow, green, red, blue } from "@material-ui/core/colors";
+import React, { useState, useContext, useEffect } from "react";
 import { CanvasContext } from "../../contexts/CanvasContext";
-import {
-  TextField,
-  Menu,
-  MenuItem,
-  Radio,
-  Divider,
-  FormControlLabel,
-} from "@material-ui/core";
+import { TextField, Menu, MenuItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import { Textfit } from "react-textfit";
 import LockButton from "./LockButton";
@@ -24,12 +14,45 @@ const CanvasObject = {
 
 type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
 
-const initiaMouselState = {
+interface mouseState {
+  mouseX: null | number;
+  mouseY: null | number;
+}
+
+const initiaMouselState: mouseState = {
   mouseX: null,
   mouseY: null,
 };
 
-const Label = (props) => {
+type LabelProps = {
+  id: string;
+  vh: string;
+  positionX: number;
+  positionY: number;
+  zIndex: number;
+  isEdit: boolean;
+  word: string;
+  width: number;
+  height: number;
+  isLocked: boolean;
+  canvasId: string;
+  isAreaClicked: boolean;
+  setIsAreaClicked: (boolean) => void;
+};
+
+type DraggableData = {
+  node: HTMLElement;
+  x: number;
+  y: number;
+  deltaX: number;
+  deltaY: number;
+  lastX: number;
+  lastY: number;
+};
+
+type DraggableEventHandler = (e: any, data: DraggableData) => void | false;
+
+const Label: React.FC<LabelProps> = (props) => {
   const classes = useStyles(props);
   const {
     moveCanvasObject,
@@ -48,18 +71,14 @@ const Label = (props) => {
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
   const [tempWord, setTempWord] = useState<string>(props.word);
-  const [mouseState, setMouseState] = useState<{
-    mouseX: number;
-    mouseY: number;
-  }>(initiaMouselState);
-  const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
-  const [size, setSize] = useState({
+  const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
+  const [size, setSize] = useState<{ width: number; height: number }>({
     width: props.width,
     height: props.height,
   });
-  const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
+  const isLocked = props.isLocked;
 
-  const handleStop = (e, d) => {
+  const handleStop: DraggableEventHandler = (e, d) => {
     const positionX = d.x;
     const positionY = d.y;
     if (position.x !== positionX || position.y !== positionY) {
@@ -95,7 +114,6 @@ const Label = (props) => {
   };
 
   const handleClick = (e) => {
-    setIsOpendMenu(true);
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -103,7 +121,6 @@ const Label = (props) => {
   };
 
   const handleClose = () => {
-    setIsOpendMenu(false);
     setMouseState(initiaMouselState);
   };
 
@@ -171,7 +188,7 @@ const Label = (props) => {
     >
       <div
         onDoubleClick={(e) => {
-          console.log(e.target.id === props.id);
+          //console.log(e.target.id === props.id);
           setIsEdit(true);
           props.setIsAreaClicked(false);
         }}
@@ -272,7 +289,7 @@ const useStyles = makeStyles({
     height: "100%",
     width: "100%",
     padding: 5,
-    zIndex: (props: Props) => props.zIndex,
+    zIndex: (props: LabelProps) => props.zIndex,
   },
   onHoverContainer: {
     position: "absolute",
@@ -281,7 +298,7 @@ const useStyles = makeStyles({
     height: "100%",
     width: "100%",
     padding: 5,
-    zIndex: (props: Props) => props.zIndex,
+    zIndex: (props: LabelProps) => props.zIndex,
   },
 });
 

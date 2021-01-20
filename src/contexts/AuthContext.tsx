@@ -1,9 +1,10 @@
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import firebase, { User } from "../firebase/firebase";
 import ErrorMessage from "../firebase/ErrorMessage";
 import { useRouter } from "next/router";
 
-const AuthContext = React.createContext({});
+const AuthContext = React.createContext({} as any);
 
 const AuthProvider = ({ children }) => {
   const router = useRouter();
