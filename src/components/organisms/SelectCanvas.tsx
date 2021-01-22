@@ -22,7 +22,7 @@ const SelectCanvas = (props) => {
       <Card className={classes.card} key={index} variant="outlined">
         <CardActionArea
           onClick={() =>
-            router.push("/Canvases/[id]", `/Canvases/${canvas.id}`)
+            router.push("/canvases/[id]", `/canvases/${canvas.id}`)
           }
         >
           <CardMedia

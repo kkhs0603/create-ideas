@@ -49,7 +49,7 @@ const SignInPage: React.FC = () => {
             color="primary"
             className={classes.button}
             size="large"
-            onClick={() => router.push("Auth")}
+            onClick={() => router.push("auth")}
           >
             SignIn
           </Button>
@@ -57,7 +57,7 @@ const SignInPage: React.FC = () => {
             variant="contained"
             className={classes.button}
             size="large"
-            onClick={() => router.push("About")}
+            onClick={() => router.push("about")}
           >
             About
           </Button>

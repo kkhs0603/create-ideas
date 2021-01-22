@@ -14,6 +14,7 @@
     "blueimp-load-image": "^5.14.0",
     "classnames": "^2.2.6",
     "css-loader": "^5.0.1",
+    "dotenv-webpack": "^6.0.0",
     "firebase": "^7.19.1",
     "firebase-admin": "^9.2.0",
     "firebase-functions": "^3.13.1",
@@ -27,6 +28,7 @@
     "react-rnd": "^10.2.4",
     "react-scripts": "3.4.3",
     "react-textfit": "^1.1.1",
+    "request-promise": "^4.2.6",
     "sass": "^1.30.0",
     "string-width": "^4.2.0",
     "style-loader": "^2.0.0",
@@ -34,11 +36,15 @@
     "ts-loader": "^8.0.14",
     "use-fit-text": "^2.4.0"
   },
+  "main": "firebaseFunctions.js",
   "scripts": {
-    "dev": "next",
-    "build": "next build",
-    "start": "next start",
-    "export": "next export"
+    "dev": "next src/",
+    "build": "next build src/",
+    "start": "next start src/",
+    "serve": "npm run build && firebase emulators:start --only functions,hosting",
+    "shell": "npm run build && firebase functions:shell",
+    "deploy": "firebase deploy --only functions,hosting",
+    "logs": "firebase functions:log"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -60,6 +66,8 @@
     "@types/react-dom": "^17.0.0",
     "babel-plugin-styled-components": "^1.12.0",
     "typescript": "^4.1.2",
-    "url-loader": "^4.1.1"
+    "url-loader": "^4.1.1",
+    "firebase-functions-test": "^0.1.6",
+    "firebase-tools": "^8.6.0"
   }
 }
