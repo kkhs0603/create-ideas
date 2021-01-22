@@ -1,36 +1,20 @@
 {
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+  "hosting": {
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "nextjsFunc"
+      }
+    ]
   },
   "functions": {
     "source": ".",
     "predeploy": [
-      "npm run typecheck-app",
-      "npm run build-app"
+      "npm --prefix \"$PROJECT_DIR\" install",
+      "npm --prefix \"$PROJECT_DIR\" run build"
     ],
     "runtime": "nodejs10"
-  },
-  "hosting": {
-    "public": "public",
-    "predeploy": "npm run build-public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/v1/**/*",    // APIを受け付けるURL
-        "function": "api"    // Cloud Functionsのapiという関数を実行する
-      },
-      {
-        "source": "**/**",    // API以外のURLをすべて受け付けるURL
-        "function": "nextApp"    // Cloud FunctionsのnextAppという関数を実行する
-      }
-    ]
-  },
-  "storage": {
-    "rules": "storage.rules"
   }
 }

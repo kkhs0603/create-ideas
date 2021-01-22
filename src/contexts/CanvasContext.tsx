@@ -309,7 +309,7 @@ const CanvasProvider: React.FC = ({ children }) => {
       });
 
       // console.log("new canvas created!");
-      router.push("/Canvases/" + result.id);
+      router.push("/canvases/" + result.id);
     } catch (error) {
       console.log(error);
     }

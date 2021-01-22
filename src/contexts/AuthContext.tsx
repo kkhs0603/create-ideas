@@ -71,11 +71,11 @@ const AuthProvider = ({ children }) => {
   };
 
   const toUserSettingPage = () => {
-    router.push("/UserSetting");
+    router.push("/userSetting");
   };
 
   const toCanvasPage = () => {
-    router.push("/CanvasList");
+    router.push("/canvasList");
   };
 
   const handleGoBack = () => {
@@ -100,7 +100,7 @@ const AuthProvider = ({ children }) => {
           updatedAt: new Date().toLocaleString("ja"),
         });
       }
-      router.push("/CanvasList");
+      router.push("/canvasList");
     });
   }, []);
 

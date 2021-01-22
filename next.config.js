@@ -1,3 +1,5 @@
+const path = require("path");
+const dotenv = require("dotenv-webpack");
 module.exports = {
   env: {
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
@@ -9,17 +11,20 @@ module.exports = {
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
     FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
   },
-  trailingSlash: true,
-  // exportPathMap: function () {
-  //   return { "/": { page: "/" } };
-  // },
-  // distDir: "public",
-  async rewrites() {
-    return [
-      {
-        source: "/:any*",
-        destination: "/",
-      },
+  distDir: "/.next",
+  webpack: (config) => {
+    config.plugins = config.plugins || [];
+
+    config.plugins = [
+      ...config.plugins,
+
+      // Read the .env file
+      new dotenv({
+        path: path.join(__dirname, ".env"),
+        systemvars: true,
+      }),
     ];
+
+    return config;
   },
 };
