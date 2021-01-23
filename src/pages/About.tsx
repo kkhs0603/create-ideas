@@ -63,7 +63,8 @@ const About = () => {
           <Image
             src="/aboutPage/step1.gif"
             alt="step1"
-            unsized
+            height="600"
+            width="1020"
             className={classes.img}
           />
         </div>
@@ -71,18 +72,21 @@ const About = () => {
           <Image
             src="/aboutPage/step2.gif"
             alt="step2"
-            unsized
+            height="600"
+            width="1020"
             className={classes.img}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            size="large"
-            onClick={() => router.push("auth")}
-          >
-            Create Ideasを使ってみる
-          </Button>
+          <div>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              size="large"
+              onClick={() => router.push("/auth")}
+            >
+              Create Ideasを使ってみる
+            </Button>
+          </div>
         </div>
       </Grid>
     </Layout>

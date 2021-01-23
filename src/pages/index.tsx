@@ -49,7 +49,7 @@ const SignInPage: React.FC = () => {
             color="primary"
             className={classes.button}
             size="large"
-            onClick={() => router.push("auth")}
+            onClick={() => router.push("/auth")}
           >
             SignIn
           </Button>
@@ -57,7 +57,7 @@ const SignInPage: React.FC = () => {
             variant="contained"
             className={classes.button}
             size="large"
-            onClick={() => router.push("about")}
+            onClick={() => router.push("/about")}
           >
             About
           </Button>
@@ -66,7 +66,7 @@ const SignInPage: React.FC = () => {
           <Image
             src="/topPage/topIllust.svg"
             alt="topIllust"
-            className={classes.img}
+            // className={classes.img}
             width={600}
             height={400}
           />
