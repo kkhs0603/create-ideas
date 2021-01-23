@@ -13,6 +13,7 @@ import {
 import { CanvasContext } from "../../contexts/CanvasContext";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import { orange } from "@material-ui/core/colors";
+import Image from "next/image";
 
 const ColorButton = withStyles((theme) => ({
   root: {
@@ -83,7 +84,13 @@ const CreateCanvas = () => {
       variant="outlined"
     >
       <CardActionArea onClick={() => setSelectedIndex(index)}>
-        <CardMedia className={classes.media} image={template.imageUrl} />
+        <Image
+          className={classes.media}
+          src={template.imageUrl}
+          width={600}
+          height={400}
+          quality={50}
+        />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
             {template.name}

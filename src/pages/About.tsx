@@ -47,6 +47,7 @@ const About = () => {
             alt="whatis"
             height="300"
             width="920"
+            quality={50}
           />
           <Typography className={classes.explain}>
             個人開発、チーム開発などで新しくプロダクトを作る際に、最も必要で難航するアイデア出し。
@@ -66,6 +67,7 @@ const About = () => {
             height="600"
             width="1020"
             className={classes.img}
+            quality={50}
           />
         </div>
         <div className={classes.section}>
@@ -75,6 +77,7 @@ const About = () => {
             height="600"
             width="1020"
             className={classes.img}
+            quality={50}
           />
           <div>
             <Button
