@@ -51,6 +51,7 @@ const Auth = () => {
               alt="signInWithGoogle"
               width="320"
               height="80"
+              quality={50}
             />
           </Button>
         </Grid>

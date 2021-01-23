@@ -69,6 +69,7 @@ const SignInPage: React.FC = () => {
             // className={classes.img}
             width={600}
             height={400}
+            quality={50}
           />
         </Grid>
       </Grid>
