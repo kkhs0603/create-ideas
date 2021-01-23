@@ -1,68 +1,55 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Create Ideas
 
-## Available Scripts
+## コンセプト
 
-In the project directory, you can run:
+みんなでアイデア出しをしよう
 
-### `yarn start`
+## ターゲット
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+新しくプロジェクトを立ち上げる方
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## 解決したい課題
 
-### `yarn test`
+チーム開発を始めるときに必要なアイデア出し。  
+みんなで「何を作ろうか？」と相談を始めるも、時間だけが過ぎていく。  
+その時間を少しでも短くしたいという思いで開発しました。
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 用語
 
-### `yarn build`
+- Canvas：アイデア出しをするための場所
+- Object：Canvas の中に配置するモノ。
+  - 付箋：背景色のある、文字を入力できるモノ。
+  - ラベル：背景色はないが、文字入力ができるモノ。
+  - 線：縦または横に線が引けるモノ。
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 機能
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+- ユーザー登録  
+  メールアドレスもしくは、Google アカウント
+- ユーザー情報編集  
+  ユーザー名、プロフィール画像の変更
+- ログイン/ログアウト
+- Canvas 作成  
+  作成時にテンプレートを適用できる。
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  - ToDo
+  - PDCA
+  - SWOT
 
-### `yarn eject`
+- Canvas
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+  - Object
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    - **Object 共通機能**：新規作成、削除、移動、前面背面へ移動、ロック機能
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+    - 付箋：新規作成(色を選べる)、付箋のサイズの変更、付箋の色の変更、付箋の文字入力/変更
+    - ラベル：ラベルのサイズ変更、ラベルの文字入力/変更
+    - 線：新規作成(横/縦を選べる)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+  - 画像出力：png 出力
 
-## Learn More
+## 実装予定
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- スマホ対応(※今は PC のみ)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- ランダムな言葉を生成できる
