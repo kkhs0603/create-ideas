@@ -818,10 +818,8 @@ const CanvasProvider: React.FC = ({ children }) => {
         //Canvasにサムネイル画像のURLがなければ入れる
         const url = await storageResult.ref.getDownloadURL();
         const canvasRef = await db.collection("canvases").doc(canvasId);
-        const result = await canvasRef.get();
-        if (!result.data().thumbnailUrl) {
-          canvasRef.update({ thumbnailUrl: url });
-        }
+        await canvasRef.get();
+        canvasRef.update({ thumbnailUrl: url });
       });
     } catch (error) {
       console.log(error.message);
