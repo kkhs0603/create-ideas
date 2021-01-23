@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 
 const Canvas = () => {
   const classes = useStyles();
-  const { canvasData, enterCanvas } = useContext(CanvasContext);
+  const { enterCanvas } = useContext(CanvasContext);
   const router = useRouter();
   const canvasId = router.query.id;
   useEffect(() => {
@@ -17,17 +17,7 @@ const Canvas = () => {
   }, []);
   return (
     <Layout>
-      <Grid container className={classes.top}>
-        <Grid item xs={6}>
-          <div>canvas名：{canvasData?.name}</div>
-        </Grid>
-        <Grid item xs={6}>
-          {/* <div className={classes.avatars}>参加者：{users}</div> */}
-        </Grid>
-      </Grid>
-      <div className={classes.middle}>
-        <StickyNotesArea id={canvasId} />
-      </div>
+      <StickyNotesArea id={canvasId} />
     </Layout>
   );
 };
@@ -40,21 +30,5 @@ export default Canvas;
 const useStyles = makeStyles((theme) => ({
   avatars: {
     display: "flex",
-  },
-  small: {
-    width: theme.spacing(3),
-    height: theme.spacing(3),
-  },
-  top: {
-    position: "fixed",
-    height: "4vh",
-  },
-  middle: {
-    paddingTop: "4vh",
-  },
-  bottom: {
-    position: "fixed",
-    bottom: "1%",
-    left: "40%",
   },
 }));

@@ -12,6 +12,8 @@ import {
   Icon,
 } from "@material-ui/core";
 import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
+import { CanvasContext } from "../../contexts/CanvasContext";
+import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,6 +39,8 @@ const Header = () => {
     handleGoBack,
     router,
   } = useContext(AuthContext);
+
+  const { canvasData } = useContext(CanvasContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event) => {
@@ -45,7 +49,12 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  // console.log(router.pathname);
+  const headerCaption =
+    router.pathname !== "/canvases/[id]"
+      ? "Create Ideas"
+      : canvasData
+      ? "Create Ideas/" + canvasData.name
+      : "Create Ideas";
   return (
     <AppBar>
       <Toolbar>
@@ -57,7 +66,7 @@ const Header = () => {
               <KeyboardBackspaceIcon style={{ color: "white" }} />
             </IconButton>
           )}
-          <div className={classes.title}>Create Ideas</div>
+          <div className={classes.title}>{headerCaption}</div>
           {user == null ? (
             <></>
           ) : (
