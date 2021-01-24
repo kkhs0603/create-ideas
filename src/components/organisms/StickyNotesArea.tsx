@@ -70,10 +70,6 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     });
   }, []);
 
-  // useEffect(() => {
-  //   console.log("sticky changed");
-  // }, [stickyNotes]);
-
   const handleClick = (e) => {
     e.preventDefault();
     if (e.target.id !== "area") return;
