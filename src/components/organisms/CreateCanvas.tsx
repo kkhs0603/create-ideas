@@ -84,13 +84,7 @@ const CreateCanvas = () => {
       variant="outlined"
     >
       <CardActionArea onClick={() => setSelectedIndex(index)}>
-        <Image
-          className={classes.media}
-          src={template.imageUrl}
-          width={600}
-          height={400}
-          quality={50}
-        />
+        <CardMedia className={classes.media} image={template.imageUrl} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
             {template.name}
