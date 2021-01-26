@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useContext, useRef, useEffect, useMemo } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { yellow, green, red, blue } from "@material-ui/core/colors";
@@ -24,6 +23,19 @@ type Props = {
     positionX: number;
     positionY: number;
   };
+};
+
+type StickyNoteProps = {
+  color: string;
+  createdBy: string;
+  height: number;
+  width: number;
+  id: string;
+  isEdit: boolean;
+  word: string;
+  zIndex: number;
+  positionX: number;
+  positionY: number;
 };
 
 const CanvasObject = {
@@ -93,20 +105,19 @@ const StickyNote: React.FC<any> = (props) => {
     mouseX: number;
     mouseY: number;
   }>(initiaMouselState);
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: props.positionX,
-    y: props.positionY,
-  });
-  const [size, setSize] = useState<{ width: number; height: number }>({
-    width: props.width,
-    height: props.height,
-  });
   const [cursor, setCursor] = useState<string>("grab");
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
-  const [selectedColor, setSelectedColor] = useState<string>(props.color);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [tempWord, setTempWord] = useState<string>(props.word);
-  const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
+
+  const [stickyNoteProps, setStickyNoteProps] = useState<StickyNoteProps>({
+    positionX: props.positionX,
+    positionY: props.positionY,
+    width: props.width,
+    height: props.height,
+    selectedColor: props.color,
+    word: props.word,
+    isLocked: props.isLocked,
+  });
 
   const handleClick = (e) => {
     setIsOpendMenu(true);
@@ -136,8 +147,16 @@ const StickyNote: React.FC<any> = (props) => {
   const handleStop = (e, d) => {
     const positionX = d.x;
     const positionY = d.y;
-    if (position.x !== positionX || position.y !== positionY) {
-      setPosition({ x: positionX, y: positionY });
+    if (isNaN(positionX) || isNaN(positionY)) return;
+    if (
+      stickyNoteProps.positionX !== positionX ||
+      stickyNoteProps.positionY !== positionY
+    ) {
+      setStickyNoteProps({
+        ...stickyNoteProps,
+        positionX: positionX,
+        positionY: positionY,
+      });
       moveCanvasObject(
         props.canvasId,
         CanvasObject.StickyNotes,
@@ -173,13 +192,22 @@ const StickyNote: React.FC<any> = (props) => {
   }
 
   const handleResizeStop = (e, direction, ref, delta, position) => {
-    const changedWidth = size.width + delta.width;
-    const changedHeight = size.height + delta.height;
+    const changedWidth = stickyNoteProps.width + delta.width;
+    const changedHeight = stickyNoteProps.height + delta.height;
     const positionX = position.x;
     const positionY = position.y;
-    if (size.width !== changedWidth || size.height !== changedHeight) {
-      setSize({ width: changedWidth, height: changedHeight });
-      setPosition({ x: positionX, y: positionY });
+    if (isNaN(positionX) || isNaN(positionY)) return;
+    if (
+      stickyNoteProps.width !== changedWidth ||
+      stickyNoteProps.height !== changedHeight
+    ) {
+      setStickyNoteProps({
+        ...stickyNoteProps,
+        width: changedWidth,
+        height: changedHeight,
+        positionX,
+        positionY,
+      });
       resizeCanvasObject(
         props.canvasId,
         CanvasObject.StickyNotes,
@@ -197,7 +225,7 @@ const StickyNote: React.FC<any> = (props) => {
       ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
       e.key === "Enter"
     ) {
-      if (tempWord === "" || props.word !== tempWord) {
+      if (stickyNoteProps.word === "" || props.word !== stickyNoteProps.word) {
         editCanvasObjectWord(
           props.canvasId,
           CanvasObject.StickyNotes,
@@ -210,41 +238,45 @@ const StickyNote: React.FC<any> = (props) => {
   };
 
   const word = isEdit ? (
-    <TextField
-      multiline={true}
-      value={tempWord}
+    <textarea
+      style={{
+        width: stickyNoteProps.width,
+        height: stickyNoteProps.height,
+        backgroundColor: "transparent",
+        resize: "none",
+      }}
+      value={stickyNoteProps.word}
       onChange={(e) => {
-        setTempWord(e.target.value);
+        setStickyNoteProps({ ...stickyNoteProps, word: e.target.value });
       }}
       onKeyDown={(e) => finishWordEdit(e)}
-      style={{
-        width: "100%",
-        height: "100%",
-        padding: 0,
-        margin: 0,
-      }}
-      // autoFocus={true}
-      onFocus={(e) => {
-        e.currentTarget.select();
-      }}
+      autoFocus
+      onFocus={(e) =>
+        e.currentTarget.setSelectionRange(
+          e.currentTarget.value.length,
+          e.currentTarget.value.length
+        )
+      }
     />
   ) : (
-    <div id={props.id}>{tempWord}</div>
+    <div id={props.id}>{stickyNoteProps.word}</div>
   );
-  // useEffect(() => {
-  //   console.log("test");
-  // }, [props]);
+  useEffect(() => {
+    // console.log(props);
+    setStickyNoteProps(props);
+  }, [props]);
 
   useEffect(() => {
     //編集状態を解除する
     if (props.isAreaClicked) {
       setIsEdit(false);
-      if (props.word !== tempWord) {
+      if (props.word !== stickyNoteProps.word) {
+        setStickyNoteProps({ ...stickyNoteProps, word: stickyNoteProps.word });
         editCanvasObjectWord(
           props.canvasId,
           CanvasObject.StickyNotes,
           props.id,
-          tempWord
+          stickyNoteProps.word
         );
       }
     }
@@ -255,20 +287,18 @@ const StickyNote: React.FC<any> = (props) => {
         zIndex: props.zIndex,
       }}
       size={{
-        width: size.width,
-        height: size.height,
+        width: stickyNoteProps.width,
+        height: stickyNoteProps.height,
       }}
-      position={{ x: position.x, y: position.y }}
+      position={{ x: stickyNoteProps.positionX, y: stickyNoteProps.positionY }}
       onDragStart={handleStart}
       onDrag={handleDrag}
       onDragStop={handleStop}
       onResizeStop={handleResizeStop}
       minHeight="50"
       minWidth="50"
-      disableDragging={isLocked}
-      enableResizing={!isLocked}
-      // onMouseEnter={() => props.setDisabledPanZoom(true)}
-      // onMouseLeave={() => props.setDisabledPanZoom(false)}
+      disableDragging={stickyNoteProps.isLocked}
+      enableResizing={!stickyNoteProps.isLocked}
     >
       <div
         id={props.id}
@@ -279,7 +309,6 @@ const StickyNote: React.FC<any> = (props) => {
           props.setIsAreaClicked(false);
         }}
         onDoubleClick={(e) => {
-          console.log(e.target.id === props.id);
           setIsEdit(e.target.id === props.id);
           props.setIsAreaClicked(false);
         }}
@@ -296,13 +325,13 @@ const StickyNote: React.FC<any> = (props) => {
           }
         >
           <LockButton
-            isLocked={props.isLocked}
+            isLocked={stickyNoteProps.isLocked}
             canvasId={props.canvasId}
             objName={CanvasObject.StickyNotes}
             id={props.id}
           />
           <MenuItem
-            disabled={isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={(e) => {
               setIsEdit(true);
               handleClose();
@@ -311,7 +340,7 @@ const StickyNote: React.FC<any> = (props) => {
             編集
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={() => {
               bringForward(
                 props.canvasId,
@@ -324,7 +353,7 @@ const StickyNote: React.FC<any> = (props) => {
             前面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={() => {
               bringToFront(props.canvasId, CanvasObject.StickyNotes, props.id);
             }}
@@ -332,7 +361,7 @@ const StickyNote: React.FC<any> = (props) => {
             最前面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={() => {
               sendBackward(
                 props.canvasId,
@@ -345,7 +374,7 @@ const StickyNote: React.FC<any> = (props) => {
             背面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={() => {
               sendToBack(props.canvasId, CanvasObject.StickyNotes, props.id);
             }}
@@ -355,32 +384,32 @@ const StickyNote: React.FC<any> = (props) => {
           <Divider />
           <MenuItem disabled>付箋の色</MenuItem>
           <YellowRadio
-            checked={selectedColor === "yellow"}
-            disabled={isLocked}
+            checked={stickyNoteProps.color === "yellow"}
+            disabled={stickyNoteProps.isLocked}
             onChange={handleChangeColor}
             value="yellow"
           />
           <GreenRadio
-            disabled={isLocked}
-            checked={selectedColor === "green"}
+            disabled={stickyNoteProps.isLocked}
+            checked={stickyNoteProps.color === "green"}
             onChange={handleChangeColor}
             value="green"
           />
           <RedRadio
-            disabled={isLocked}
-            checked={selectedColor === "red"}
+            disabled={stickyNoteProps.isLocked}
+            checked={stickyNoteProps.color === "red"}
             onChange={handleChangeColor}
             value="red"
           />
           <BlueRadio
-            disabled={isLocked}
-            checked={selectedColor === "blue"}
+            disabled={stickyNoteProps.isLocked}
+            checked={stickyNoteProps.color === "blue"}
             onChange={handleChangeColor}
             value="blue"
           />
           <Divider />
           <MenuItem
-            disabled={isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={() => {
               deleteCanvasObject(
                 props.canvasId,

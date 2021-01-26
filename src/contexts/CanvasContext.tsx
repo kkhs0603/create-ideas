@@ -2,7 +2,6 @@
 import React, { useState, createContext, useEffect, useReducer } from "react";
 import firebase, { storage } from "../firebase/firebase";
 import { useRouter } from "next/router";
-import { DvrTwoTone } from "@material-ui/icons";
 import html2canvas from "html2canvas";
 import loadImage from "blueimp-load-image";
 
@@ -155,12 +154,13 @@ const CanvasProvider: React.FC = ({ children }) => {
     if (!objArray) return [];
     switch (action.type) {
       case "added":
-        // console.log(objArray, action.obj);
+        console.log("add");
         if (objArray.length === 0) {
           return [action.obj];
         }
         return [...objArray, action.obj];
       case "modified":
+        console.log("modified");
         if (!objArray) break;
         const modifyArray = objArray;
         const modifyIndex = modifyArray.findIndex(
@@ -168,6 +168,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         );
         if (modifyIndex < 0) break;
         modifyArray[modifyIndex] = action.obj;
+        console.log(modifyArray);
         return modifyArray;
       case "removed":
         if (!objArray) break;
@@ -187,11 +188,13 @@ const CanvasProvider: React.FC = ({ children }) => {
     type: string,
     obj: StickyNote | Line | Label | null
   ) => {
+    // console.log("dispatchObject");
     if (!obj) return;
     switch (objName) {
       case CanvasObject.StickyNotes:
         // console.log("add stickynote");
         dispatchStickyNotes({ type: type, obj: obj });
+        // console.log(stickyNotes);
         break;
       case CanvasObject.Lines:
         // console.log("add line");
@@ -311,20 +314,20 @@ const CanvasProvider: React.FC = ({ children }) => {
       // console.log("new canvas created!");
       router.push("/canvases/" + result.id);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
   const getCanvases = async () => {
     try {
-      setCanvases([]);
       const canvasesRef = await db.collection("canvases");
       canvasesRef.onSnapshot((snapshot) => {
         setCanvases([]);
         setCanvases(snapshot.docs.map((canvas) => canvas.data()));
       });
+      // unsubscribe();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -340,7 +343,7 @@ const CanvasProvider: React.FC = ({ children }) => {
       setCanvasData(result.data());
       getAllCanvasObjects(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -350,7 +353,7 @@ const CanvasProvider: React.FC = ({ children }) => {
       await getCanvasObject(canvasId, CanvasObject.Lines);
       await getCanvasObject(canvasId, CanvasObject.Labels);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -433,22 +436,23 @@ const CanvasProvider: React.FC = ({ children }) => {
       }
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
   const getCanvasObject = async (canvasId: string, objName: CanvasObject) => {
     try {
-      // console.log("get " + objName);
+      console.log("get " + objName);
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
         .collection(objName);
-      return ref.onSnapshot((snapshot) => {
+      ref.onSnapshot({ includeMetadataChanges: false }, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           dispatchObject(objName, change.type, change.doc.data());
         });
       });
+      unsubscribe();
     } catch (error) {
       console.log(error.message);
     }
@@ -469,7 +473,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .delete();
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -498,7 +502,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -525,7 +529,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -558,7 +562,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -585,7 +589,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -614,7 +618,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -634,7 +638,7 @@ const CanvasProvider: React.FC = ({ children }) => {
             new Date().getMilliseconds(),
         });
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -670,7 +674,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -683,7 +687,7 @@ const CanvasProvider: React.FC = ({ children }) => {
     try {
       // console.log("bringToFront : " + objName);
       const zIndeices = await getAllZindices(canvasId);
-      console.log(zIndeices);
+      // console.log(zIndeices);
       const maxZindex = Math.max.apply(null, zIndeices);
       await db
         .collection("canvases")
@@ -700,7 +704,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -728,7 +732,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -753,7 +757,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         });
       await updateCanvas(canvasId);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -822,18 +826,18 @@ const CanvasProvider: React.FC = ({ children }) => {
         canvasRef.update({ thumbnailUrl: url });
       });
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
   useEffect(() => {
-    const authState = auth.onAuthStateChanged((user) => {
-      if (user) {
-        getCanvases();
-        getTemplates();
-      }
-    });
-    return () => authState();
+    // const authState = auth.onAuthStateChanged((user) => {
+    //   if (user) {
+    //     getCanvases();
+    //     getTemplates();
+    //   }
+    // });
+    // return () => authState();
   }, []);
 
   return (
@@ -865,6 +869,9 @@ const CanvasProvider: React.FC = ({ children }) => {
         uploadTemplate,
         templates,
         canvasData,
+
+        getCanvases,
+        getTemplates,
       }}
     >
       {children}
