@@ -16,7 +16,7 @@ const AuthProvider = ({ children }) => {
     try {
       await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return ErrorMessage(error, "signin");
     }
   };
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
 
       return result;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return ErrorMessage(error, "signup");
     }
   };
@@ -49,7 +49,7 @@ const AuthProvider = ({ children }) => {
   const signout = async () => {
     try {
       await auth.signOut();
-      console.log("sign out");
+      // console.log("sign out");
     } catch (e) {
       return ErrorMessage(e, "signout");
     }
@@ -66,7 +66,7 @@ const AuthProvider = ({ children }) => {
           updatedAt: new Date().toLocaleString("ja"),
         });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

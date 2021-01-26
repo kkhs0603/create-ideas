@@ -106,17 +106,24 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     });
   };
 
-  const stickyNotesComponent = stickyNotes?.map((stickyNote) => (
-    <StickyNote
-      key={stickyNote.id}
-      parent={ref.current?.getBoundingClientRect()}
-      canvasId={props.id}
-      isAreaClicked={isAreaClicked}
-      setIsAreaClicked={setIsAreaClicked}
-      isEdit={(isEdit(stickyNote.createdBy) && stickyNote.word === "") || false}
-      {...stickyNote}
-    />
-  ));
+  // useEffect(() => {
+  //   console.log("stickyNotes", stickyNotes);
+  // }, [stickyNotes]);
+  const stickyNotesComponent = stickyNotes?.map((stickyNote) => {
+    return (
+      <StickyNote
+        key={stickyNote.id}
+        parent={ref.current?.getBoundingClientRect()}
+        canvasId={props.id}
+        isAreaClicked={isAreaClicked}
+        setIsAreaClicked={setIsAreaClicked}
+        isEdit={
+          (isEdit(stickyNote.createdBy) && stickyNote.word === "") || false
+        }
+        {...stickyNote}
+      />
+    );
+  });
 
   const linesComponent =
     lines === null ? (

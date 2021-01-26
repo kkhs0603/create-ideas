@@ -64,25 +64,28 @@ const Label: React.FC<LabelProps> = (props) => {
     bringToFront,
     sendToBack,
   } = useContext(CanvasContext);
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: props.positionX,
-    y: props.positionY,
-  });
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
-  const [tempWord, setTempWord] = useState<string>(props.word);
   const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
-  const [size, setSize] = useState<{ width: number; height: number }>({
+  const [fontSize, setFontSize] = useState<number>(0);
+  const [labelProps, setLabelProps] = useState<LabelProps>({
+    positionX: props.positionX,
+    positionY: props.positionY,
     width: props.width,
     height: props.height,
+    selectedColor: props.color,
+    word: props.word,
+    isLocked: props.isLocked,
   });
-  const isLocked = props.isLocked;
 
   const handleStop: DraggableEventHandler = (e, d) => {
     const positionX = d.x;
     const positionY = d.y;
-    if (position.x !== positionX || position.y !== positionY) {
-      setPosition({ x: positionX, y: positionY });
+    if (
+      labelProps.positionX !== positionX ||
+      labelProps.positionY !== positionY
+    ) {
+      setLabelProps({ ...labelProps, positionX, positionY });
       moveCanvasObject(
         props.canvasId,
         CanvasObject.Labels,
@@ -94,13 +97,21 @@ const Label: React.FC<LabelProps> = (props) => {
   };
 
   const handleResizeStop = (e, direction, ref, delta, position) => {
-    const changedWidth = size.width + delta.width;
-    const changedHeight = size.height + delta.height;
+    const changedWidth = labelProps.width + delta.width;
+    const changedHeight = labelProps.height + delta.height;
     const positionX = position.x;
     const positionY = position.y;
-    if (size.width !== changedWidth || size.height !== changedHeight) {
-      setSize({ width: changedWidth, height: changedHeight });
-      setPosition({ x: positionX, y: positionY });
+    if (
+      labelProps.width !== changedWidth ||
+      labelProps.height !== changedHeight
+    ) {
+      setLabelProps({
+        ...labelProps,
+        width: changedWidth,
+        height: changedHeight,
+        positionX,
+        positionY,
+      });
       resizeCanvasObject(
         props.canvasId,
         CanvasObject.Labels,
@@ -125,77 +136,94 @@ const Label: React.FC<LabelProps> = (props) => {
   };
 
   const word =
-    !isLocked && isEdit ? (
-      <TextField
-        multiline={true}
-        value={tempWord}
+    !labelProps.isLocked && isEdit ? (
+      <textarea
+        style={{
+          fontSize: fontSize,
+          width: labelProps.width,
+          height: labelProps.height,
+          resize: "none",
+        }}
+        value={labelProps.word}
         onChange={(e) => {
-          setTempWord(e.target.value);
+          console.log(e.target.value);
+          setLabelProps({ ...labelProps, word: e.target.value });
         }}
-        //onKeyDown={(e) => finishWordEdit(e)}
-
-        // autoFocus={true}
-        onFocus={(e) => {
-          e.currentTarget.select();
-        }}
+        autoFocus
+        onFocus={(e) =>
+          e.currentTarget.setSelectionRange(
+            e.currentTarget.value.length,
+            e.currentTarget.value.length
+          )
+        }
       />
     ) : (
-      <div id={props.id}>{tempWord}</div>
+      <div id={props.id}>
+        <Textfit
+          className={style}
+          max={300}
+          onReady={(e) => {
+            setFontSize(e);
+          }}
+        >
+          {labelProps.word}
+        </Textfit>
+      </div>
     );
   useEffect(() => {
     //編集状態を解除する
     if (props.isAreaClicked) {
       setIsEdit(false);
-      if (props.word !== tempWord) {
+      if (props.word !== labelProps.word) {
+        setLabelProps({ ...labelProps, word: labelProps.word });
         editCanvasObjectWord(
           props.canvasId,
           CanvasObject.Labels,
           props.id,
-          tempWord
+          labelProps.word
         );
       }
     }
   }, [props.isAreaClicked]);
+
+  useEffect(() => {
+    // console.log(props);
+    setLabelProps(props);
+  }, [props]);
   return (
     <Rnd
       style={{ zIndex: props.zIndex }}
       size={{
-        width: size.width,
-        height: size.height,
+        width: labelProps.width,
+        height: labelProps.height,
       }}
-      position={{ x: position.x, y: position.y }}
-      // onDragStart={handleStart}
-      // onDrag={handleDrag}
+      position={{ x: labelProps.positionX, y: labelProps.positionY }}
       onDragStop={handleStop}
       onResizeStop={handleResizeStop}
       minHeight="50"
       minWidth="50"
       onMouseOver={() => {
-        if (!isLocked && style !== classes.onHoverContainer) {
+        if (!labelProps.isLocked && style !== classes.onHoverContainer) {
           setStyle(classes.onHoverContainer);
         }
       }}
       onMouseLeave={() => {
-        if (!isLocked && style !== classes.container) {
+        if (!labelProps.isLocked && style !== classes.container) {
           setStyle(classes.container);
         }
       }}
       id={props.id}
-      // onMouseEnter={() => props.setDisabledPanZoom(true)}
-      // onMouseLeave={() => props.setDisabledPanZoom(false)}
-      disableDragging={isLocked}
-      enableResizing={!isLocked}
+      disableDragging={labelProps.isLocked}
+      enableResizing={!labelProps.isLocked}
     >
       <div
         onDoubleClick={(e) => {
-          //console.log(e.target.id === props.id);
           setIsEdit(true);
           props.setIsAreaClicked(false);
         }}
         onContextMenu={handleClick}
       >
-        <Textfit className={style}>{word}</Textfit>
-
+        {word}
         <Menu
           open={mouseState.mouseY !== null}
           onClose={handleClose}
@@ -211,9 +239,10 @@ const Label: React.FC<LabelProps> = (props) => {
             canvasId={props.canvasId}
             objName={CanvasObject.Labels}
             id={props.id}
+            setProps={setLabelProps}
           />
           <MenuItem
-            disabled={isLocked}
+            disabled={labelProps.isLocked}
             onClick={(e) => {
               setIsEdit(true);
               handleClose();
@@ -222,7 +251,7 @@ const Label: React.FC<LabelProps> = (props) => {
             編集
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={labelProps.isLocked}
             onClick={() => {
               bringForward(
                 props.canvasId,
@@ -235,7 +264,7 @@ const Label: React.FC<LabelProps> = (props) => {
             前面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={labelProps.isLocked}
             onClick={() => {
               bringToFront(props.canvasId, CanvasObject.Labels, props.id);
             }}
@@ -243,7 +272,7 @@ const Label: React.FC<LabelProps> = (props) => {
             最前面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={labelProps.isLocked}
             onClick={() => {
               sendBackward(
                 props.canvasId,
@@ -256,7 +285,7 @@ const Label: React.FC<LabelProps> = (props) => {
             背面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={labelProps.isLocked}
             onClick={() => {
               sendToBack(props.canvasId, CanvasObject.Labels, props.id);
             }}
@@ -264,7 +293,7 @@ const Label: React.FC<LabelProps> = (props) => {
             最背面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={labelProps.isLocked}
             onClick={() => {
               deleteCanvasObject(props.canvasId, CanvasObject.Labels, props.id);
               handleClose();
@@ -288,8 +317,9 @@ const useStyles = makeStyles({
     border: "1px solid transparent",
     height: "100%",
     width: "100%",
-    padding: 5,
+    padding: 0,
     zIndex: (props: LabelProps) => props.zIndex,
+    whiteSpace: "pre-wrap",
   },
   onHoverContainer: {
     position: "absolute",
@@ -297,8 +327,9 @@ const useStyles = makeStyles({
     border: "1px solid gray",
     height: "100%",
     width: "100%",
-    padding: 5,
+    padding: 0,
     zIndex: (props: LabelProps) => props.zIndex,
+    whiteSpace: "pre-wrap",
   },
 });
 

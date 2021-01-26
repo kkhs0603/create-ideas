@@ -24,7 +24,7 @@ export const useUserSetting = () => {
       await updateUser(user.uid, username, url);
       handleGoBack();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -40,7 +40,7 @@ export const useUserSetting = () => {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
+          // console.log("Upload is " + progress + "% done");
         },
         (error) => {
           reject(error);
@@ -70,9 +70,9 @@ export const useUserSetting = () => {
       reader.onload = () => {
         setImageUrl(reader.result);
       };
-      console.log("stored profile image");
+      // console.log("stored profile image");
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 

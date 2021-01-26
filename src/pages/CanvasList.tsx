@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { CanvasContext } from "../contexts/CanvasContext";
 import Layout from "../components/templates/Layout/Layout";
 import CreateCanvas from "../components/organisms/CreateCanvas";
@@ -19,13 +19,17 @@ const CanvasListPage = () => {
   const classes = useStyles();
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
-  const { canvases } = useContext(CanvasContext);
+  const { canvases, getCanvases, getTemplates } = useContext(CanvasContext);
   const handleOpen = () => {
     setIsOpenedModal(true);
   };
   const handleClose = () => {
     setIsOpenedModal(false);
   };
+  useEffect(() => {
+    getCanvases();
+    getTemplates();
+  }, []);
   return (
     <Layout>
       <Container>

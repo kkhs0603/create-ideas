@@ -6,7 +6,7 @@ import { Menu, MenuItem } from "@material-ui/core";
 import { Rnd } from "react-rnd";
 import LockButton from "./LockButton";
 
-type Props = {
+type LineProps = {
   canvasId: string;
   id: string;
   x: number;
@@ -32,18 +32,22 @@ const initiaMouselState = {
   mouseY: null,
 };
 
-const Line: React.FC<Props> = (props) => {
+const Line: React.FC<LineProps> = (props) => {
   const [cursor, setCursor] = useState<string>("grab");
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: props.positionX,
-    y: props.positionY,
+  const [lineProps, setLineProps] = useState<LineProps>({
+    canvasId: props.canvasId,
+    id: props.id,
+    positionX: props.positionX,
+    positionY: props.positionY,
+    vh: props.vh,
+    zIndex: props.zIndex,
+    isLocked: props.isLocked,
   });
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
     mouseY: number;
   }>(initiaMouselState);
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
-  const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
   const classes = useStyles(props);
   const {
     moveCanvasObject,
@@ -88,11 +92,15 @@ const Line: React.FC<Props> = (props) => {
     setCursor("grab");
     const positionX = d.x;
     const positionY = d.y;
-    if (position.x !== positionX || position.y !== positionY) {
+    if (isNaN(positionX) || isNaN(positionY)) return;
+    if (
+      lineProps.positionX !== positionX ||
+      lineProps.positionY !== positionY
+    ) {
       if (props.vh === "vertical") {
-        setPosition({ x: positionX, y: 0 });
+        setLineProps({ ...lineProps, positionX, positionY: 0 });
       } else if (props.vh === "horizontal") {
-        setPosition({ x: 0, y: positionY });
+        setLineProps({ ...lineProps, positionX: 0, positionY });
       }
       moveCanvasObject(
         props.canvasId,
@@ -109,14 +117,15 @@ const Line: React.FC<Props> = (props) => {
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
     });
-    setIsOpendMenu(true);
   };
 
   const handleClose = () => {
     setMouseState(initiaMouselState);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setLineProps(props);
+  }, [props]);
 
   return (
     <Rnd
@@ -124,13 +133,13 @@ const Line: React.FC<Props> = (props) => {
       onDragStart={handleStart}
       onDrag={handleDrag}
       onDragStop={handleStop}
-      position={{ x: position.x, y: position.y }}
+      position={{ x: lineProps.positionX, y: lineProps.positionY }}
       bounds="parent"
       style={{ zIndex: props.zIndex }}
       size={{ width: width, height: height }}
       enableResizing={false}
       id="line"
-      disableDragging={isLocked}
+      disableDragging={lineProps.isLocked}
     >
       <div
         className={lineClasses}
@@ -149,13 +158,13 @@ const Line: React.FC<Props> = (props) => {
           }
         >
           <LockButton
-            isLocked={props.isLocked}
+            isLocked={lineProps.isLocked}
             canvasId={props.canvasId}
             objName={CanvasObject.Lines}
             id={props.id}
           />
           <MenuItem
-            disabled={isLocked}
+            disabled={lineProps.isLocked}
             onClick={() => {
               bringForward(
                 props.canvasId,
@@ -168,7 +177,7 @@ const Line: React.FC<Props> = (props) => {
             前面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={lineProps.isLocked}
             onClick={() => {
               bringToFront(props.canvasId, CanvasObject.Lines, props.id);
             }}
@@ -176,7 +185,7 @@ const Line: React.FC<Props> = (props) => {
             最前面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={lineProps.isLocked}
             onClick={() => {
               sendBackward(
                 props.canvasId,
@@ -189,7 +198,7 @@ const Line: React.FC<Props> = (props) => {
             背面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={lineProps.isLocked}
             onClick={() => {
               sendToBack(props.canvasId, CanvasObject.Lines, props.id);
             }}
@@ -197,7 +206,7 @@ const Line: React.FC<Props> = (props) => {
             最後面へ
           </MenuItem>
           <MenuItem
-            disabled={isLocked}
+            disabled={lineProps.isLocked}
             onClick={() => {
               deleteCanvasObject(props.canvasId, CanvasObject.Lines, props.id);
               handleClose();
@@ -218,15 +227,17 @@ const useStyles = makeStyles({
   container: {
     position: "absolute",
     backgroundColor: "black",
-    zIndex: (props: Props) => props.zIndex,
+    zIndex: (props: LineProps) => props.zIndex,
   },
   vertical: {
     width: 5,
-    height: (props: Props) => (props.areaSize ? props.areaSize.height : "100%"),
+    height: (props: LineProps) =>
+      props.areaSize ? props.areaSize.height : "100%",
     margin: "0px 5px",
   },
   horizontal: {
-    width: (props: Props) => (props.areaSize ? props.areaSize.width : "100%"),
+    width: (props: LineProps) =>
+      props.areaSize ? props.areaSize.width : "100%",
     height: 5,
     margin: "5px 0px",
   },
