@@ -2,7 +2,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
+import { MaterialsContext } from "../../contexts/MaterialsContext";
 import { Menu, MenuItem } from "@material-ui/core";
 import { Rnd } from "react-rnd";
 import LockButton from "./LockButton";
@@ -20,13 +20,13 @@ type LineProps = {
   areaSize: { height: number; width: number };
 };
 
-const CanvasObject = {
+const Material = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+type Material = typeof Material[keyof typeof Material];
 
 const initiaMouselState = {
   mouseX: null,
@@ -51,13 +51,13 @@ const Line: React.FC<LineProps> = (props) => {
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
   const classes = useStyles(props);
   const {
-    moveCanvasObject,
-    deleteCanvasObject,
+    moveMaterial,
+    deleteMaterial,
     bringForward,
     sendBackward,
     bringToFront,
     sendToBack,
-  } = useContext(CanvasMaterialsContext);
+  } = useContext(MaterialsContext);
 
   let lineClasses = classes.container;
   let axis = null;
@@ -103,9 +103,9 @@ const Line: React.FC<LineProps> = (props) => {
       } else if (props.vh === "horizontal") {
         setLineProps({ ...lineProps, positionX: 0, positionY });
       }
-      moveCanvasObject(
+      moveMaterial(
         props.canvasId,
-        CanvasObject.Lines,
+        Material.Lines,
         props.id,
         positionX,
         positionY
@@ -161,7 +161,7 @@ const Line: React.FC<LineProps> = (props) => {
           <LockButton
             isLocked={lineProps.isLocked}
             canvasId={props.canvasId}
-            objName={CanvasObject.Lines}
+            objName={Material.Lines}
             id={props.id}
           />
           <MenuItem
@@ -169,7 +169,7 @@ const Line: React.FC<LineProps> = (props) => {
             onClick={() => {
               bringForward(
                 props.canvasId,
-                CanvasObject.Lines,
+                Material.Lines,
                 props.id,
                 props.zIndex
               );
@@ -180,7 +180,7 @@ const Line: React.FC<LineProps> = (props) => {
           <MenuItem
             disabled={lineProps.isLocked}
             onClick={() => {
-              bringToFront(props.canvasId, CanvasObject.Lines, props.id);
+              bringToFront(props.canvasId, Material.Lines, props.id);
             }}
           >
             最前面へ
@@ -190,7 +190,7 @@ const Line: React.FC<LineProps> = (props) => {
             onClick={() => {
               sendBackward(
                 props.canvasId,
-                CanvasObject.Lines,
+                Material.Lines,
                 props.id,
                 props.zIndex
               );
@@ -201,7 +201,7 @@ const Line: React.FC<LineProps> = (props) => {
           <MenuItem
             disabled={lineProps.isLocked}
             onClick={() => {
-              sendToBack(props.canvasId, CanvasObject.Lines, props.id);
+              sendToBack(props.canvasId, Material.Lines, props.id);
             }}
           >
             最後面へ
@@ -209,7 +209,7 @@ const Line: React.FC<LineProps> = (props) => {
           <MenuItem
             disabled={lineProps.isLocked}
             onClick={() => {
-              deleteCanvasObject(props.canvasId, CanvasObject.Lines, props.id);
+              deleteMaterial(props.canvasId, Material.Lines, props.id);
               handleClose();
             }}
           >

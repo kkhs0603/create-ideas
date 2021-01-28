@@ -1,19 +1,19 @@
 // @ts-nocheck
 import React, { useState, useContext, useEffect } from "react";
-import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
+import { MaterialsContext } from "../../contexts/MaterialsContext";
 import { TextField, Menu, MenuItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Rnd } from "react-rnd";
 import { Textfit } from "react-textfit";
 import LockButton from "./LockButton";
 
-const CanvasObject = {
+const Material = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+type Material = typeof Material[keyof typeof Material];
 
 interface mouseState {
   mouseX: null | number;
@@ -56,15 +56,15 @@ type DraggableEventHandler = (e: any, data: DraggableData) => void | false;
 const Label: React.FC<LabelProps> = (props) => {
   const classes = useStyles(props);
   const {
-    moveCanvasObject,
-    resizeCanvasObject,
-    editCanvasObjectWord,
-    deleteCanvasObject,
+    moveMaterial,
+    resizeMaterial,
+    editMaterialWord,
+    deleteMaterial,
     bringForward,
     sendBackward,
     bringToFront,
     sendToBack,
-  } = useContext(CanvasMaterialsContext);
+  } = useContext(MaterialsContext);
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
   const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
@@ -87,9 +87,9 @@ const Label: React.FC<LabelProps> = (props) => {
       labelProps.positionY !== positionY
     ) {
       setLabelProps({ ...labelProps, positionX, positionY });
-      moveCanvasObject(
+      moveMaterial(
         props.canvasId,
-        CanvasObject.Labels,
+        Material.Labels,
         props.id,
         positionX,
         positionY
@@ -113,9 +113,9 @@ const Label: React.FC<LabelProps> = (props) => {
         positionX,
         positionY,
       });
-      resizeCanvasObject(
+      resizeMaterial(
         props.canvasId,
-        CanvasObject.Labels,
+        Material.Labels,
         props.id,
         positionX,
         positionY,
@@ -177,9 +177,9 @@ const Label: React.FC<LabelProps> = (props) => {
       setIsEdit(false);
       if (props.word !== labelProps.word) {
         setLabelProps({ ...labelProps, word: labelProps.word });
-        editCanvasObjectWord(
+        editMaterialWord(
           props.canvasId,
-          CanvasObject.Labels,
+          Material.Labels,
           props.id,
           labelProps.word
         );
@@ -239,7 +239,7 @@ const Label: React.FC<LabelProps> = (props) => {
           <LockButton
             isLocked={props.isLocked}
             canvasId={props.canvasId}
-            objName={CanvasObject.Labels}
+            objName={Material.Labels}
             id={props.id}
             setProps={setLabelProps}
           />
@@ -257,7 +257,7 @@ const Label: React.FC<LabelProps> = (props) => {
             onClick={() => {
               bringForward(
                 props.canvasId,
-                CanvasObject.Labels,
+                Material.Labels,
                 props.id,
                 props.zIndex
               );
@@ -268,7 +268,7 @@ const Label: React.FC<LabelProps> = (props) => {
           <MenuItem
             disabled={labelProps.isLocked}
             onClick={() => {
-              bringToFront(props.canvasId, CanvasObject.Labels, props.id);
+              bringToFront(props.canvasId, Material.Labels, props.id);
             }}
           >
             最前面へ
@@ -278,7 +278,7 @@ const Label: React.FC<LabelProps> = (props) => {
             onClick={() => {
               sendBackward(
                 props.canvasId,
-                CanvasObject.Labels,
+                Material.Labels,
                 props.id,
                 props.zIndex
               );
@@ -289,7 +289,7 @@ const Label: React.FC<LabelProps> = (props) => {
           <MenuItem
             disabled={labelProps.isLocked}
             onClick={() => {
-              sendToBack(props.canvasId, CanvasObject.Labels, props.id);
+              sendToBack(props.canvasId, Material.Labels, props.id);
             }}
           >
             最背面へ
@@ -297,7 +297,7 @@ const Label: React.FC<LabelProps> = (props) => {
           <MenuItem
             disabled={labelProps.isLocked}
             onClick={() => {
-              deleteCanvasObject(props.canvasId, CanvasObject.Labels, props.id);
+              deleteMaterial(props.canvasId, Material.Labels, props.id);
               handleClose();
             }}
           >
