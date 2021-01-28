@@ -6,6 +6,7 @@ import { CanvasProvider } from "../contexts/CanvasContext";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "../../theme";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { RecoilRoot } from "recoil";
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
@@ -30,9 +31,12 @@ export default function App(props: AppProps) {
       <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
+        //TODO:providerからrecoilに置き換える
         <AuthProvider>
           <CanvasProvider>
-            <Component {...pageProps} />
+            <RecoilRoot>
+              <Component {...pageProps} />
+            </RecoilRoot>
           </CanvasProvider>
         </AuthProvider>
       </ThemeProvider>

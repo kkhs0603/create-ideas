@@ -1,7 +1,8 @@
+// @ts-nocheck
 import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { CanvasContext } from "../../contexts/CanvasContext";
+import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
 import { Menu, MenuItem } from "@material-ui/core";
 import { Rnd } from "react-rnd";
 import LockButton from "./LockButton";
@@ -56,7 +57,7 @@ const Line: React.FC<LineProps> = (props) => {
     sendBackward,
     bringToFront,
     sendToBack,
-  } = useContext(CanvasContext);
+  } = useContext(CanvasMaterialsContext);
 
   let lineClasses = classes.container;
   let axis = null;

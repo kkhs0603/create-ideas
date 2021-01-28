@@ -27,6 +27,7 @@
     "react-rnd": "^10.2.4",
     "react-scripts": "3.4.3",
     "react-textfit": "^1.1.1",
+    "recoil": "^0.1.2",
     "request-promise": "^4.2.6",
     "sass": "^1.30.0",
     "string-width": "^4.2.0",

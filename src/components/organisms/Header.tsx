@@ -54,7 +54,7 @@ const Header = () => {
     router.pathname !== "/canvases/[id]"
       ? "Create Ideas"
       : canvasData
-      ? "Create Ideas/" + canvasData.name
+      ? canvasData.name
       : "Create Ideas";
   return (
     <AppBar>

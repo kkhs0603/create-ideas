@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useMemo, useState, useContext } from "react";
 import StickyNote from "./StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
-import { CanvasContext } from "../../contexts/CanvasContext";
+import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
 import {
   Button,
   TextField,
@@ -43,27 +43,27 @@ const initialMouseState = {
   mouseY: null,
 };
 
-const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
-  props: StickyNoteAreaProps
-) => {
-  const ref = useRef();
-  const [mouseState, setMouseState] = useState<{
-    mouseX: number;
-    mouseY: number;
-  }>(initialMouseState);
+const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
   const {
+    enterCanvas,
     stickyNotes,
     addCanvasObject,
     lines,
     isEdit,
     labels,
-    uploadTemplate,
-  } = useContext(CanvasContext);
+    // uploadTemplate,
+  } = useContext(CanvasMaterialsContext);
+  const ref = useRef();
+  const [mouseState, setMouseState] = useState<{
+    mouseX: number;
+    mouseY: number;
+  }>(initialMouseState);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
 
   const classes = useStyles(areaSize);
   useEffect(() => {
+    enterCanvas(props.id);
     setAreaSize({
       width: ref.current.scrollWidth,
       height: ref.current.scrollHeight,
@@ -145,6 +145,7 @@ const StickyNotesArea: React.FC<StickyNoteAreaProps> = (
     />
   ));
 
+  //TODO:退出した時、初期化
   return (
     <div
       id="area"
@@ -365,4 +366,4 @@ const useStyles = makeStyles({
   },
 });
 
-export default StickyNotesArea;
+export default Canvas;
