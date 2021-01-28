@@ -1,5 +1,6 @@
+// @ts-nocheck
 import React, { useState, useContext, useEffect } from "react";
-import { CanvasContext } from "../../contexts/CanvasContext";
+import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
 import { TextField, Menu, MenuItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Rnd } from "react-rnd";
@@ -63,7 +64,7 @@ const Label: React.FC<LabelProps> = (props) => {
     sendBackward,
     bringToFront,
     sendToBack,
-  } = useContext(CanvasContext);
+  } = useContext(CanvasMaterialsContext);
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
   const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
@@ -146,7 +147,7 @@ const Label: React.FC<LabelProps> = (props) => {
         }}
         value={labelProps.word}
         onChange={(e) => {
-          console.log(e.target.value);
+          // console.log(e.target.value);
           setLabelProps({ ...labelProps, word: e.target.value });
         }}
         autoFocus
@@ -190,6 +191,7 @@ const Label: React.FC<LabelProps> = (props) => {
     // console.log(props);
     setLabelProps(props);
   }, [props]);
+
   return (
     <Rnd
       style={{ zIndex: props.zIndex }}

@@ -4,25 +4,25 @@ import { CanvasContext } from "../../contexts/CanvasContext";
 import Layout from "../../components/templates/Layout/Layout";
 import { TextField, Button, Avatar, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import StickyNotesArea from "../../components/organisms/StickyNotesArea";
+import Canvas from "../../components/organisms/Canvas";
 import { useRouter } from "next/router";
 
-const Canvas = () => {
+import { CanvasMaterialsProvider } from "../../contexts/CanvasMaterialsContext";
+const Canvases = () => {
   const classes = useStyles();
-  const { enterCanvas } = useContext(CanvasContext);
   const router = useRouter();
   const canvasId = router.query.id;
-  useEffect(() => {
-    enterCanvas(canvasId);
-  }, []);
+
   return (
     <Layout>
-      <StickyNotesArea id={canvasId} />
+      <CanvasMaterialsProvider>
+        <Canvas id={canvasId} />
+      </CanvasMaterialsProvider>
     </Layout>
   );
 };
 
-export default Canvas;
+export default Canvases;
 
 ///////
 //Style

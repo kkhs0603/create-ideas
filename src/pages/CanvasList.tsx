@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useContext, useState, useEffect } from "react";
 import { CanvasContext } from "../contexts/CanvasContext";
 import Layout from "../components/templates/Layout/Layout";
