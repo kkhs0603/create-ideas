@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { Checkbox, FormControlLabel } from "@material-ui/core";
 import { Lock, LockOpen } from "@material-ui/icons";
 
-import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
+import { MaterialsContext } from "../../contexts/MaterialsContext";
 
 const LockButton = (props) => {
-  const { lockCanvasObject } = useContext(CanvasMaterialsContext);
+  const { lockMaterial } = useContext(MaterialsContext);
   //const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
   return (
     <div style={{ paddingLeft: 15 }}>
@@ -19,7 +19,7 @@ const LockButton = (props) => {
             onChange={(e) => {
               //setIsLocked(e.target.checked);
               // props.setProps({ ...props.state, isLocked: e.target.checked });
-              lockCanvasObject(
+              lockMaterial(
                 props.canvasId,
                 props.objName,
                 props.id,

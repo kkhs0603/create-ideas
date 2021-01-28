@@ -1,13 +1,12 @@
 // @ts-nocheck
 import React, { useContext, useEffect, useState } from "react";
-import { CanvasContext } from "../../contexts/CanvasContext";
 import Layout from "../../components/templates/Layout/Layout";
 import { TextField, Button, Avatar, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Canvas from "../../components/organisms/Canvas";
 import { useRouter } from "next/router";
 
-import { CanvasMaterialsProvider } from "../../contexts/CanvasMaterialsContext";
+import { MaterialsProvider } from "../../contexts/MaterialsContext";
 const Canvases = () => {
   const classes = useStyles();
   const router = useRouter();
@@ -15,9 +14,9 @@ const Canvases = () => {
 
   return (
     <Layout>
-      <CanvasMaterialsProvider>
+      <MaterialsProvider>
         <Canvas id={canvasId} />
-      </CanvasMaterialsProvider>
+      </MaterialsProvider>
     </Layout>
   );
 };

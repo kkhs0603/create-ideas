@@ -2,7 +2,7 @@
 import React, { useState, useContext, useRef, useEffect, useMemo } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { yellow, green, red, blue } from "@material-ui/core/colors";
-import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
+import { MaterialsContext } from "../../contexts/MaterialsContext";
 import { TextField, Menu, MenuItem, Radio, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
@@ -56,13 +56,13 @@ type StickyNoteProps = {
   positionY: number;
 };
 
-const CanvasObject = {
+const Material = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+type Material = typeof Material[keyof typeof Material];
 
 const initiaMouselState = {
   mouseX: null,
@@ -109,16 +109,16 @@ const BlueRadio = withStyles({
 const StickyNote: React.FC<any> = (props) => {
   const classes = useStyles(props);
   const {
-    moveCanvasObject,
-    deleteCanvasObject,
-    editCanvasObjectWord,
-    resizeCanvasObject,
+    moveMaterial,
+    deleteMaterial,
+    editMaterialWord,
+    resizeMaterial,
     changeStickyNoteColor,
     bringForward,
     sendBackward,
     bringToFront,
     sendToBack,
-  } = useContext(CanvasMaterialsContext);
+  } = useContext(MaterialsContext);
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
     mouseY: number;
@@ -175,9 +175,9 @@ const StickyNote: React.FC<any> = (props) => {
         positionX: positionX,
         positionY: positionY,
       });
-      moveCanvasObject(
+      moveMaterial(
         props.canvasId,
-        CanvasObject.StickyNotes,
+        Material.StickyNotes,
         props.id,
         positionX,
         positionY
@@ -226,9 +226,9 @@ const StickyNote: React.FC<any> = (props) => {
         positionX,
         positionY,
       });
-      resizeCanvasObject(
+      resizeMaterial(
         props.canvasId,
-        CanvasObject.StickyNotes,
+        Material.StickyNotes,
         props.id,
         positionX,
         positionY,
@@ -244,9 +244,9 @@ const StickyNote: React.FC<any> = (props) => {
       e.key === "Enter"
     ) {
       if (stickyNoteProps.word === "" || props.word !== stickyNoteProps.word) {
-        editCanvasObjectWord(
+        editMaterialWord(
           props.canvasId,
-          CanvasObject.StickyNotes,
+          Material.StickyNotes,
           props.id,
           e.target.value
         );
@@ -290,9 +290,9 @@ const StickyNote: React.FC<any> = (props) => {
       setIsEdit(false);
       if (props.word !== stickyNoteProps.word) {
         setStickyNoteProps({ ...stickyNoteProps, word: stickyNoteProps.word });
-        editCanvasObjectWord(
+        editMaterialWord(
           props.canvasId,
-          CanvasObject.StickyNotes,
+          Material.StickyNotes,
           props.id,
           stickyNoteProps.word
         );
@@ -345,7 +345,7 @@ const StickyNote: React.FC<any> = (props) => {
           <LockButton
             isLocked={stickyNoteProps.isLocked}
             canvasId={props.canvasId}
-            objName={CanvasObject.StickyNotes}
+            objName={Material.StickyNotes}
             id={props.id}
           />
           <MenuItem
@@ -362,7 +362,7 @@ const StickyNote: React.FC<any> = (props) => {
             onClick={() => {
               bringForward(
                 props.canvasId,
-                CanvasObject.StickyNotes,
+                Material.StickyNotes,
                 props.id,
                 props.zIndex
               );
@@ -373,7 +373,7 @@ const StickyNote: React.FC<any> = (props) => {
           <MenuItem
             disabled={stickyNoteProps.isLocked}
             onClick={() => {
-              bringToFront(props.canvasId, CanvasObject.StickyNotes, props.id);
+              bringToFront(props.canvasId, Material.StickyNotes, props.id);
             }}
           >
             最前面へ
@@ -383,7 +383,7 @@ const StickyNote: React.FC<any> = (props) => {
             onClick={() => {
               sendBackward(
                 props.canvasId,
-                CanvasObject.StickyNotes,
+                Material.StickyNotes,
                 props.id,
                 props.zIndex
               );
@@ -394,7 +394,7 @@ const StickyNote: React.FC<any> = (props) => {
           <MenuItem
             disabled={stickyNoteProps.isLocked}
             onClick={() => {
-              sendToBack(props.canvasId, CanvasObject.StickyNotes, props.id);
+              sendToBack(props.canvasId, Material.StickyNotes, props.id);
             }}
           >
             最背面へ
@@ -429,11 +429,7 @@ const StickyNote: React.FC<any> = (props) => {
           <MenuItem
             disabled={stickyNoteProps.isLocked}
             onClick={() => {
-              deleteCanvasObject(
-                props.canvasId,
-                CanvasObject.StickyNotes,
-                props.id
-              );
+              deleteMaterial(props.canvasId, Material.StickyNotes, props.id);
               handleClose();
             }}
           >

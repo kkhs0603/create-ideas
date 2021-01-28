@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useMemo, useState, useContext } from "react";
 import StickyNote from "./StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
-import { CanvasMaterialsContext } from "../../contexts/CanvasMaterialsContext";
+import { MaterialsContext } from "../../contexts/MaterialsContext";
 import {
   Button,
   TextField,
@@ -30,13 +30,13 @@ type StickyNote = {
   zIndex: number;
 };
 
-const CanvasObject = {
+const Material = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+type Material = typeof Material[keyof typeof Material];
 
 const initialMouseState = {
   mouseX: null,
@@ -47,12 +47,12 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
   const {
     enterCanvas,
     stickyNotes,
-    addCanvasObject,
+    addMaterial,
     lines,
     isEdit,
     labels,
     // uploadTemplate,
-  } = useContext(CanvasMaterialsContext);
+  } = useContext(MaterialsContext);
   const ref = useRef();
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
@@ -176,9 +176,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
           <NestedMenuItem label="新規付箋" parentMenuOpen={!!mouseState}>
             <MenuItem
               onClick={() => {
-                addCanvasObject(
+                addMaterial(
                   props.id,
-                  CanvasObject.StickyNotes,
+                  Material.StickyNotes,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
                   mouseState.mouseY - ref.current.getBoundingClientRect().y,
                   "yellow"
@@ -191,9 +191,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                addCanvasObject(
+                addMaterial(
                   props.id,
-                  CanvasObject.StickyNotes,
+                  Material.StickyNotes,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
                   mouseState.mouseY - ref.current.getBoundingClientRect().y,
                   "red"
@@ -206,9 +206,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                addCanvasObject(
+                addMaterial(
                   props.id,
-                  CanvasObject.StickyNotes,
+                  Material.StickyNotes,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
                   mouseState.mouseY - ref.current.getBoundingClientRect().y,
                   "blue"
@@ -221,9 +221,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                addCanvasObject(
+                addMaterial(
                   props.id,
-                  CanvasObject.StickyNotes,
+                  Material.StickyNotes,
                   mouseState.mouseX - ref.current.getBoundingClientRect().x,
                   mouseState.mouseY - ref.current.getBoundingClientRect().y,
                   "green"
@@ -238,9 +238,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
           <Divider />
           <MenuItem
             onClick={() => {
-              addCanvasObject(
+              addMaterial(
                 props.id,
-                CanvasObject.Lines,
+                Material.Lines,
                 mouseState.mouseX - ref.current.getBoundingClientRect().x,
                 0,
                 "vertical"
@@ -255,9 +255,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              addCanvasObject(
+              addMaterial(
                 props.id,
-                CanvasObject.Lines,
+                Material.Lines,
                 0,
                 mouseState.mouseY - ref.current.getBoundingClientRect().y,
                 "horizontal"
@@ -272,9 +272,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              addCanvasObject(
+              addMaterial(
                 props.id,
-                CanvasObject.Labels,
+                Material.Labels,
                 mouseState.mouseX - ref.current.getBoundingClientRect().x,
                 mouseState.mouseY - ref.current.getBoundingClientRect().y,
                 ""

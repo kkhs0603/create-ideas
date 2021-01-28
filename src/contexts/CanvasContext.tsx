@@ -27,7 +27,7 @@ interface IContextProps {
   canvases: Array<Canvas>;
   enterCanvas: (canvasId: string) => void;
   joinedUsers;
-  getAllCanvasObjects: (canvasId: string) => void;
+  getAllMaterials: (canvasId: string) => void;
   stickyNotes: Array<StickyNote>;
   changeStickyNoteColor: (
     canvasId: string,
@@ -53,43 +53,39 @@ interface IContextProps {
   isEdit: (createdBy: string) => boolean;
   labels: Array<Label>;
 
-  addCanvasObject: (
+  addMaterial: (
     id: string,
-    objName: CanvasObject,
+    objName: Material,
     positionX: number,
     positionY: number,
     option: string
   ) => void;
-  deleteCanvasObject: (
+  deleteMaterial: (canvasId: string, objName: Material, objId: string) => void;
+  moveMaterial: (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string
-  ) => void;
-  moveCanvasObject: (
-    canvasId: string,
-    objName: CanvasObject,
+    objName: Material,
     objId: string,
     x: number,
     y: number
   ) => void;
-  editCanvasObjectWord: (
+  editMaterialWord: (
     canvasId: string,
-    objName: CanvasObject,
+    objName: Material,
     objId: string,
     word: string
   ) => void;
-  resizeCanvasObject: (
+  resizeMaterial: (
     canvasId: string,
-    objName: CanvasObject,
+    objName: Material,
     objId: string,
     positionX: number,
     positionY: number,
     width: number,
     height: number
   ) => void;
-  lockCanvasObject: (
+  lockMaterial: (
     canvasId: string,
-    objName: CanvasObject,
+    objName: Material,
     objId: string,
     isLocked: boolean
   ) => void;
@@ -132,7 +128,7 @@ const CanvasProvider: React.FC = ({ children }) => {
       const stickyNotesRef = await db
         .collection("templates")
         .doc(templateId)
-        .collection(CanvasObject.StickyNotes)
+        .collection(Material.StickyNotes)
         .get();
       const stickyNotes = stickyNotesRef.docs.map((stickyNote) =>
         stickyNote.data()
@@ -141,24 +137,24 @@ const CanvasProvider: React.FC = ({ children }) => {
       const linesRef = await db
         .collection("templates")
         .doc(templateId)
-        .collection(CanvasObject.Lines)
+        .collection(Material.Lines)
         .get();
       const lines = linesRef.docs.map((line) => line.data());
 
       const labelsRef = await db
         .collection("templates")
         .doc(templateId)
-        .collection(CanvasObject.Labels)
+        .collection(Material.Labels)
         .get();
       const labels = labelsRef.docs.map((label) => label.data());
 
       // console.log("stickyNotes writing");
       await stickyNotes.forEach(async (stickyNote) => {
         const stickyResult = await result
-          .collection(CanvasObject.StickyNotes)
+          .collection(Material.StickyNotes)
           .add(stickyNote);
         result
-          .collection(CanvasObject.StickyNotes)
+          .collection(Material.StickyNotes)
           .doc(stickyResult.id)
           .update({
             id: stickyResult.id,
@@ -171,11 +167,9 @@ const CanvasProvider: React.FC = ({ children }) => {
       });
       // console.log("labels writing");
       await labels.forEach(async (label) => {
-        const labelResult = await result
-          .collection(CanvasObject.Labels)
-          .add(label);
+        const labelResult = await result.collection(Material.Labels).add(label);
         result
-          .collection(CanvasObject.Labels)
+          .collection(Material.Labels)
           .doc(labelResult.id)
           .update({
             id: labelResult.id,
@@ -188,11 +182,9 @@ const CanvasProvider: React.FC = ({ children }) => {
       });
       // console.log("lines writing");
       await lines.forEach(async (line) => {
-        const lineResult = await result
-          .collection(CanvasObject.Lines)
-          .add(line);
+        const lineResult = await result.collection(Material.Lines).add(line);
         result
-          .collection(CanvasObject.Lines)
+          .collection(Material.Lines)
           .doc(lineResult.id)
           .update({
             id: lineResult.id,
@@ -239,13 +231,13 @@ const CanvasProvider: React.FC = ({ children }) => {
     const result = await ref.add({ name: "PDCA" });
 
     stickyNotes.map((stickyNote) =>
-      ref.doc(result.id).collection(CanvasObject.StickyNotes).add(stickyNote)
+      ref.doc(result.id).collection(Material.StickyNotes).add(stickyNote)
     );
     labels.map((label) =>
-      ref.doc(result.id).collection(CanvasObject.Labels).add(label)
+      ref.doc(result.id).collection(Material.Labels).add(label)
     );
     lines.map((line) =>
-      ref.doc(result.id).collection(CanvasObject.Lines).add(line)
+      ref.doc(result.id).collection(Material.Lines).add(line)
     );
   };
 

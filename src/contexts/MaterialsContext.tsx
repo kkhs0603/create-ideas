@@ -1,56 +1,42 @@
-// @ts-nocheck
-import React, { useState, createContext, useEffect, useReducer } from "react";
-import firebase, { storage } from "../firebase/firebase";
+import React, { createContext, useEffect, useReducer } from "react";
+import firebase from "../firebase/firebase";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import loadImage from "blueimp-load-image";
 
-type Canvas = {
-  //TODO:型直す
-  createdAt: Date;
-  createdBy: string;
-  name: string;
-  updatedAt: Date;
-};
+interface Material {
+  id: string;
+  positionX: number;
+  positionY: number;
+  zIndex: number;
+}
 
-type StickyNote = {
+interface StickyNote extends Material {
   color: string;
   createdBy: string;
-  id: string;
-  positionX: number;
-  positionY: number;
   word: string;
-  zIndex: number;
   width: number;
   height: number;
-};
+}
 
-type Line = {
-  id: string;
-  vh: string;
-  positionX: number;
-  positionY: number;
-  zIndex: number;
-};
+interface Line extends Material {
+  vh: "vertical" | "horizontal";
+}
 
-type Label = {
-  id: string;
+interface Label extends Material {
   word: string;
-  positionX: number;
-  positionY: number;
-  zIndex: number;
   width: number;
   height: number;
   createdBy: string;
-};
+}
 
-const CanvasObject = {
+const MaterialType = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type CanvasObject = typeof CanvasObject[keyof typeof CanvasObject];
+type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 type Template = {
   name: string;
@@ -62,13 +48,9 @@ type Template = {
   description: string;
 };
 
-//interface
 interface IContextProps {
-  createCanvas: (canvasName: string, templateId: string) => void;
-  canvases: Array<Canvas>;
   enterCanvas: (canvasId: string) => void;
-  joinedUsers;
-  getAllCanvasObjects: (canvasId: string) => void;
+  getAllMaterials: (canvasId: string) => void;
   stickyNotes: Array<StickyNote>;
   changeStickyNoteColor: (
     canvasId: string,
@@ -79,169 +61,174 @@ interface IContextProps {
 
   bringForward: (
     canvasId: string,
-    objName: string,
+    materialName: string,
     id: string,
     zIndex: number
   ) => void;
-  bringToFront: (canvasId: string, objName: string, id: string) => void;
+  bringToFront: (canvasId: string, materialName: string, id: string) => void;
   sendBackward: (
     canvasId: string,
-    objName: string,
+    materialName: string,
     id: string,
     zIndex: number
   ) => void;
-  sendToBack: (canvasId: string, objName: string, id: string) => void;
+  sendToBack: (canvasId: string, materialName: string, id: string) => void;
   isEdit: (createdBy: string) => boolean;
   labels: Array<Label>;
-
-  addCanvasObject: (
+  addMaterial: (
     id: string,
-    objName: CanvasObject,
+    materialName: MaterialType,
     positionX: number,
     positionY: number,
     option: string
   ) => void;
-  deleteCanvasObject: (
+  deleteMaterial: (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string
+    materialName: MaterialType,
+    materialId: string
   ) => void;
-  moveCanvasObject: (
+  moveMaterial: (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     x: number,
     y: number
   ) => void;
-  editCanvasObjectWord: (
+  editMaterialWord: (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     word: string
   ) => void;
-  resizeCanvasObject: (
+  resizeMaterial: (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     positionX: number,
     positionY: number,
     width: number,
     height: number
   ) => void;
-  lockCanvasObject: (
+  lockMaterial: (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     isLocked: boolean
   ) => void;
   templates: Array<Template>;
   user: any;
 }
 
-const CanvasMaterialsContext = createContext({} as IContextProps);
+const MaterialsContext = createContext({} as IContextProps);
 const db = firebase.firestore();
-const CanvasMaterialsProvider: React.FC = ({ children }) => {
-  const ObjReducer = (
-    objArray: Array<StickyNote> | Array<Line> | Array<Label>,
+const MaterialsProvider: React.FC = ({ children }) => {
+  const MaterialReducer = (
+    materialsArray: Array<StickyNote> | Array<Line> | Array<Label>,
     action: {
       type: "added" | "modified" | "removed" | "initialize";
-      obj: StickyNote | Line | Label;
+      material: StickyNote | Line | Label;
     }
   ) => {
-    if (!objArray) return [];
+    if (!materialsArray) return [];
     switch (action.type) {
       case "added":
         // console.log("add");
-        if (objArray.length === 0) {
-          return [action.obj];
+        if (materialsArray.length === 0) {
+          return [action.material];
         }
         //既に入っている場合は、追加しない
-        if (objArray.map((obj) => obj.id).includes(action.obj.id)) {
-          return objArray;
+        if (
+          materialsArray
+            .map((material) => material.id)
+            .includes(action.material.id)
+        ) {
+          return materialsArray;
         }
-        return [...objArray, action.obj];
+        return [...materialsArray, action.material];
       case "modified":
-        // console.log("modified", action.obj.id);
-        if (!objArray) break;
-        const modifyArray = objArray;
+        // console.log("modified", action.material.id);
+        if (!materialsArray) break;
+        const modifyArray = materialsArray;
         const modifyIndex = modifyArray.findIndex(
-          (obj) => obj.id === action.obj.id
+          (material) => material.id === action.material.id
         );
-        if (modifyIndex < 0) return objArray;
-        modifyArray[modifyIndex] = action.obj;
+        if (modifyIndex < 0) return materialsArray;
+        modifyArray[modifyIndex] = action.material;
         // console.log(modifyArray);
         return modifyArray;
       case "removed":
-        if (!objArray) break;
-        const removeArray = objArray;
+        if (!materialsArray) break;
+        const removeArray = materialsArray;
         const removeIndex = removeArray.findIndex(
-          (obj) => obj.id === action.obj.id
+          (material) => material.id === action.material.id
         );
-        if (removeIndex < 0) return objArray;
-        return removeArray.filter((obj) => obj.id !== action.obj.id);
+        if (removeIndex < 0) return materialsArray;
+        return removeArray.filter(
+          (material) => material.id !== action.material.id
+        );
       case "initialize":
         return [];
     }
   };
 
-  const dispatchObject = (
-    objName: string,
-    type: string,
-    obj: StickyNote | Line | Label | null
+  const dispatchMaterial = (
+    materialName: string,
+    type: "added" | "modified" | "removed" | "initialize",
+    material: StickyNote | Line | Label | {}
   ) => {
-    // console.log("dispatchObject");
-    if (!obj) return;
-    switch (objName) {
-      case CanvasObject.StickyNotes:
+    // console.log("dispatchMaterial");
+    if (!material) return;
+    switch (materialName) {
+      case MaterialType.StickyNotes:
         // console.log("add stickynote");
-        dispatchStickyNotes({ type: type, obj: obj });
+        dispatchStickyNotes({ type: type, material: material });
         // console.log(stickyNotes);
         break;
-      case CanvasObject.Lines:
+      case MaterialType.Lines:
         // console.log("add line");
-        dispatchLines({ type: type, obj: obj });
+        dispatchLines({ type: type, material: material });
         break;
-      case CanvasObject.Labels:
+      case MaterialType.Labels:
         // console.log("add label");
-        dispatchLabels({ type: type, obj: obj });
+        dispatchLabels({ type: type, material: material });
         break;
     }
   };
-  const [stickyNotes, dispatchStickyNotes] = useReducer(ObjReducer, []);
-  const [lines, dispatchLines] = useReducer(ObjReducer, []);
-  const [labels, dispatchLabels] = useReducer(ObjReducer, []);
+  const [stickyNotes, dispatchStickyNotes] = useReducer(MaterialReducer, []);
+  const [lines, dispatchLines] = useReducer(MaterialReducer, []);
+  const [labels, dispatchLabels] = useReducer(MaterialReducer, []);
   const auth = firebase.auth();
   const router = useRouter();
 
   const enterCanvas = async (canvasId: string) => {
     try {
       // console.log("enter");
-      dispatchObject(CanvasObject.StickyNotes, "initialize", []);
-      dispatchObject(CanvasObject.Lines, "initialize", []);
-      dispatchObject(CanvasObject.Labels, "initialize", []);
+      dispatchMaterial(MaterialType.StickyNotes, "initialize", []);
+      dispatchMaterial(MaterialType.Lines, "initialize", []);
+      dispatchMaterial(MaterialType.Labels, "initialize", []);
       await db.collection("canvases").doc(canvasId);
-      getAllCanvasObjects(canvasId);
+      getAllMaterials(canvasId);
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const getAllCanvasObjects = async (canvasId: string) => {
+  const getAllMaterials = async (canvasId: string) => {
     try {
-      await getCanvasObject(canvasId, CanvasObject.StickyNotes);
-      await getCanvasObject(canvasId, CanvasObject.Lines);
-      await getCanvasObject(canvasId, CanvasObject.Labels);
+      await getMaterial(canvasId, MaterialType.StickyNotes);
+      await getMaterial(canvasId, MaterialType.Lines);
+      await getMaterial(canvasId, MaterialType.Labels);
     } catch (error) {
       // console.log(error.message);
     }
   };
 
   /* --------------------------
-  canvasObject
+  Material
   -------------------------- */
-  const addCanvasObject = async (
+  const addMaterial = async (
     canvasId: string,
-    objName: CanvasObject,
+    materialName: MaterialType,
     positionX: number,
     positionY: number,
     option: string
@@ -264,17 +251,17 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
       // const ref = await db
       //   .collection("canvases")
       //   .doc(canvasId)
-      //   .collection(objName)
+      //   .collection(materialName)
       //   .doc(id);
       // while (!(await ref.get()).exists) {
       //   id = Array.from(Array(idLength)).map(() => chars[Math.floor(Math.random() * chars.length)]).join('')
       // }
 
-      //ローカルのCanvasObjectsの配列に追加
-      let newObj = {};
-      switch (objName) {
-        case CanvasObject.Labels:
-          newObj = {
+      //ローカルのMaterialsの配列に追加
+      let newMaterial = {};
+      switch (materialName) {
+        case MaterialType.Labels:
+          newMaterial = {
             positionX,
             positionY,
             word: "",
@@ -291,8 +278,8 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
               new Date().getMilliseconds(),
           };
           break;
-        case CanvasObject.Lines:
-          newObj = {
+        case MaterialType.Lines:
+          newMaterial = {
             vh: option,
             positionX,
             positionY,
@@ -306,8 +293,8 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
               new Date().getMilliseconds(),
           };
           break;
-        case CanvasObject.StickyNotes:
-          newObj = {
+        case MaterialType.StickyNotes:
+          newMaterial = {
             word: "",
             positionX,
             positionY,
@@ -326,25 +313,25 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
           };
           break;
       }
-      dispatchObject(objName, "added", newObj);
+      dispatchMaterial(materialName, "added", newMaterial);
 
       //DB書き込み
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
+        .collection(materialName)
         .doc(id);
-      switch (objName) {
-        case CanvasObject.StickyNotes:
-          await ref.set(newObj);
+      switch (materialName) {
+        case MaterialType.StickyNotes:
+          await ref.set(newMaterial);
           break;
 
-        case CanvasObject.Lines:
-          await ref.set(newObj);
+        case MaterialType.Lines:
+          await ref.set(newMaterial);
           break;
 
-        case CanvasObject.Labels:
-          await ref.set(newObj);
+        case MaterialType.Labels:
+          await ref.set(newMaterial);
           break;
       }
       await updateCanvas(canvasId);
@@ -353,16 +340,16 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
-  const getCanvasObject = async (canvasId: string, objName: CanvasObject) => {
+  const getMaterial = async (canvasId: string, materialName: MaterialType) => {
     try {
-      console.log("get " + objName);
+      console.log("get " + materialName);
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName);
+        .collection(materialName);
       ref.onSnapshot({ includeMetadataChanges: false }, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          dispatchObject(objName, change.type, change.doc.data());
+          dispatchMaterial(materialName, change.type, change.doc.data());
         });
       });
     } catch (error) {
@@ -370,20 +357,20 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
-  const deleteCanvasObject = async (
+  const deleteMaterial = async (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string
+    materialName: MaterialType,
+    materialId: string
   ): Promise<void> => {
     try {
-      // console.log("delete ", objName);
-      const newObj = { id: objId };
-      dispatchObject(objName, "removed", newObj);
+      // console.log("delete ", materialName);
+      const newMaterial = { id: materialId };
+      dispatchMaterial(materialName, "removed", newMaterial);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
-        .doc(objId)
+        .collection(materialName)
+        .doc(materialId)
         .delete();
       await updateCanvas(canvasId);
     } catch (error) {
@@ -391,20 +378,20 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
-  const moveCanvasObject = async (
+  const moveMaterial = async (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     x: number,
     y: number
   ): Promise<void> => {
     try {
-      // console.log("move ", objName);
+      // console.log("move ", materialName);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
-        .doc(objId)
+        .collection(materialName)
+        .doc(materialId)
         .update({
           positionX: x,
           positionY: y,
@@ -420,19 +407,19 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
-  const editCanvasObjectWord = async (
+  const editMaterialWord = async (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     word: string
   ) => {
     try {
-      // console.log("edit " + objName + " word");
+      // console.log("edit " + materialName + " word");
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
-        .doc(objId)
+        .collection(materialName)
+        .doc(materialId)
         .update({
           word: word,
           updatedBy: auth.currentUser.uid,
@@ -447,22 +434,22 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
-  const resizeCanvasObject = async (
+  const resizeMaterial = async (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     positionX: number,
     positionY: number,
     width: number,
     height: number
   ) => {
     try {
-      // console.log("resize", objName);
+      // console.log("resize", materialName);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
-        .doc(objId)
+        .collection(materialName)
+        .doc(materialId)
         .update({
           positionX,
           positionY,
@@ -480,19 +467,19 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
-  const lockCanvasObject = async (
+  const lockMaterial = async (
     canvasId: string,
-    objName: CanvasObject,
-    objId: string,
+    materialName: MaterialType,
+    materialId: string,
     isLocked: boolean
   ) => {
     try {
-      // console.log("lock " + objName);
+      // console.log("lock " + materialName);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
-        .doc(objId)
+        .collection(materialName)
+        .doc(materialId)
         .update({
           isLocked,
           updatedBy: auth.currentUser.uid,
@@ -567,16 +554,16 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
   //前面へ
   const bringForward = async (
     canvasId: string,
-    objName: string,
+    materialName: string,
     id: string,
     zIndex: number
   ) => {
     try {
-      // console.log("bringFoward : " + objName);
+      // console.log("bringFoward : " + materialName);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
+        .collection(materialName)
         .doc(id)
         .update({
           zIndex: zIndex + 1,
@@ -595,18 +582,18 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
   //最前面へ
   const bringToFront = async (
     canvasId: string,
-    objName: string,
+    materialName: string,
     id: string
   ) => {
     try {
-      // console.log("bringToFront : " + objName);
+      // console.log("bringToFront : " + materialName);
       const zIndeices = await getAllZindices(canvasId);
       // console.log(zIndeices);
       const maxZindex = Math.max.apply(null, zIndeices);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
+        .collection(materialName)
         .doc(id)
         .update({
           zIndex: maxZindex + 1,
@@ -625,16 +612,16 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
   //背面へ
   const sendBackward = async (
     canvasId: string,
-    objName: string,
+    materialName: string,
     id: string,
     zIndex: number
   ) => {
     try {
-      // console.log("sendBackward : " + objName);
+      // console.log("sendBackward : " + materialName);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
+        .collection(materialName)
         .doc(id)
         .update({
           zIndex: zIndex - 1,
@@ -651,15 +638,19 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
   };
 
   //最背面へ
-  const sendToBack = async (canvasId: string, objName: string, id: string) => {
+  const sendToBack = async (
+    canvasId: string,
+    materialName: string,
+    id: string
+  ) => {
     try {
-      // console.log("sendToBack : " + objName);
+      // console.log("sendToBack : " + materialName);
       const zIndeices = await getAllZindices(canvasId);
       const maxZindex = Math.min.apply(null, zIndeices);
       await db
         .collection("canvases")
         .doc(canvasId)
-        .collection(objName)
+        .collection(materialName)
         .doc(id)
         .update({
           zIndex: maxZindex - 1,
@@ -722,16 +713,16 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
   useEffect(() => {}, []);
 
   return (
-    <CanvasMaterialsContext.Provider
+    <MaterialsContext.Provider
       value={{
         enterCanvas,
 
-        addCanvasObject,
-        deleteCanvasObject,
-        moveCanvasObject,
-        editCanvasObjectWord,
-        resizeCanvasObject,
-        lockCanvasObject,
+        addMaterial,
+        deleteMaterial,
+        moveMaterial,
+        editMaterialWord,
+        resizeMaterial,
+        lockMaterial,
 
         changeStickyNoteColor,
         bringForward,
@@ -740,7 +731,7 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
         sendToBack,
 
         isEdit,
-        getAllCanvasObjects,
+        getAllMaterials,
 
         lines,
         stickyNotes,
@@ -748,8 +739,8 @@ const CanvasMaterialsProvider: React.FC = ({ children }) => {
       }}
     >
       {children}
-    </CanvasMaterialsContext.Provider>
+    </MaterialsContext.Provider>
   );
 };
 
-export { CanvasMaterialsContext, CanvasMaterialsProvider };
+export { MaterialsContext, MaterialsProvider };
