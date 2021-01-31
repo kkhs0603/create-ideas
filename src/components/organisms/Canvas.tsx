@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useRef, useEffect, useMemo, useState, useContext } from "react";
-import StickyNote from "./StickyNote";
+import StickyNote from "../molecules/StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
 import { MaterialsContext } from "../../contexts/MaterialsContext";
 import {
@@ -11,8 +11,8 @@ import {
   Radio,
   Divider,
 } from "@material-ui/core";
-import Line from "../atoms/Line";
-import Label from "../atoms/Label";
+import Line from "../molecules/Line";
+import Label from "../molecules/Label";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import html2canvas from "html2canvas";
 
@@ -130,7 +130,13 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
       <div>line</div>
     ) : (
       lines?.map((line) => (
-        <Line key={line.id} canvasId={props.id} areaSize={areaSize} {...line} />
+        <Line
+          key={line.id}
+          canvasId={props.id}
+          areaSize={areaSize}
+          setIsAreaClicked={setIsAreaClicked}
+          {...line}
+        />
       ))
     );
 

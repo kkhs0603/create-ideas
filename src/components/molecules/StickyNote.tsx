@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import LockButton from "../atoms/LockButton";
 import { atom } from "recoil";
+import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
 
 export const stickyNoteState = atom({
   key: "stickyNoteState",
@@ -56,13 +57,13 @@ type StickyNoteProps = {
   positionY: number;
 };
 
-const Material = {
+const MaterialType = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type Material = typeof Material[keyof typeof Material];
+type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 const initiaMouselState = {
   mouseX: null,
@@ -177,7 +178,7 @@ const StickyNote: React.FC<any> = (props) => {
       });
       moveMaterial(
         props.canvasId,
-        Material.StickyNotes,
+        MaterialType.StickyNotes,
         props.id,
         positionX,
         positionY
@@ -228,7 +229,7 @@ const StickyNote: React.FC<any> = (props) => {
       });
       resizeMaterial(
         props.canvasId,
-        Material.StickyNotes,
+        MaterialType.StickyNotes,
         props.id,
         positionX,
         positionY,
@@ -246,7 +247,7 @@ const StickyNote: React.FC<any> = (props) => {
       if (stickyNoteProps.word === "" || props.word !== stickyNoteProps.word) {
         editMaterialWord(
           props.canvasId,
-          Material.StickyNotes,
+          MaterialType.StickyNotes,
           props.id,
           e.target.value
         );
@@ -292,7 +293,7 @@ const StickyNote: React.FC<any> = (props) => {
         setStickyNoteProps({ ...stickyNoteProps, word: stickyNoteProps.word });
         editMaterialWord(
           props.canvasId,
-          Material.StickyNotes,
+          MaterialType.StickyNotes,
           props.id,
           stickyNoteProps.word
         );
@@ -345,7 +346,7 @@ const StickyNote: React.FC<any> = (props) => {
           <LockButton
             isLocked={stickyNoteProps.isLocked}
             canvasId={props.canvasId}
-            objName={Material.StickyNotes}
+            objName={MaterialType.StickyNotes}
             id={props.id}
           />
           <MenuItem
@@ -356,48 +357,6 @@ const StickyNote: React.FC<any> = (props) => {
             }}
           >
             編集
-          </MenuItem>
-          <MenuItem
-            disabled={stickyNoteProps.isLocked}
-            onClick={() => {
-              bringForward(
-                props.canvasId,
-                Material.StickyNotes,
-                props.id,
-                props.zIndex
-              );
-            }}
-          >
-            前面へ
-          </MenuItem>
-          <MenuItem
-            disabled={stickyNoteProps.isLocked}
-            onClick={() => {
-              bringToFront(props.canvasId, Material.StickyNotes, props.id);
-            }}
-          >
-            最前面へ
-          </MenuItem>
-          <MenuItem
-            disabled={stickyNoteProps.isLocked}
-            onClick={() => {
-              sendBackward(
-                props.canvasId,
-                Material.StickyNotes,
-                props.id,
-                props.zIndex
-              );
-            }}
-          >
-            背面へ
-          </MenuItem>
-          <MenuItem
-            disabled={stickyNoteProps.isLocked}
-            onClick={() => {
-              sendToBack(props.canvasId, Material.StickyNotes, props.id);
-            }}
-          >
-            最背面へ
           </MenuItem>
           <Divider />
           <MenuItem disabled>付箋の色</MenuItem>
@@ -426,10 +385,19 @@ const StickyNote: React.FC<any> = (props) => {
             value="blue"
           />
           <Divider />
+          <FrontBackContextMenuItems
+            materialType={MaterialType.StickyNotes}
+            canvasId={props.canvasId}
+            {...stickyNoteProps}
+          />
           <MenuItem
             disabled={stickyNoteProps.isLocked}
             onClick={() => {
-              deleteMaterial(props.canvasId, Material.StickyNotes, props.id);
+              deleteMaterial(
+                props.canvasId,
+                MaterialType.StickyNotes,
+                props.id
+              );
               handleClose();
             }}
           >

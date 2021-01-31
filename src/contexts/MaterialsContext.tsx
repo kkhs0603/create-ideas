@@ -146,7 +146,6 @@ const MaterialsProvider: React.FC = ({ children }) => {
         }
         return [...materialsArray, action.material];
       case "modified":
-        // console.log("modified", action.material.id);
         if (!materialsArray) break;
         const modifyArray = materialsArray;
         const modifyIndex = modifyArray.findIndex(
@@ -154,8 +153,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
         );
         if (modifyIndex < 0) return materialsArray;
         modifyArray[modifyIndex] = action.material;
-        // console.log(modifyArray);
-        return modifyArray;
+        return [...modifyArray];
       case "removed":
         if (!materialsArray) break;
         const removeArray = materialsArray;
@@ -176,20 +174,15 @@ const MaterialsProvider: React.FC = ({ children }) => {
     type: "added" | "modified" | "removed" | "initialize",
     material: StickyNote | Line | Label | {}
   ) => {
-    // console.log("dispatchMaterial");
     if (!material) return;
     switch (materialName) {
       case MaterialType.StickyNotes:
-        // console.log("add stickynote");
         dispatchStickyNotes({ type: type, material: material });
-        // console.log(stickyNotes);
         break;
       case MaterialType.Lines:
-        // console.log("add line");
         dispatchLines({ type: type, material: material });
         break;
       case MaterialType.Labels:
-        // console.log("add label");
         dispatchLabels({ type: type, material: material });
         break;
     }
@@ -202,15 +195,12 @@ const MaterialsProvider: React.FC = ({ children }) => {
 
   const enterCanvas = async (canvasId: string) => {
     try {
-      // console.log("enter");
       dispatchMaterial(MaterialType.StickyNotes, "initialize", []);
       dispatchMaterial(MaterialType.Lines, "initialize", []);
       dispatchMaterial(MaterialType.Labels, "initialize", []);
       await db.collection("canvases").doc(canvasId);
-      getAllMaterials(canvasId);
-    } catch (error) {
-      console.log(error.message);
-    }
+      await getAllMaterials(canvasId);
+    } catch (error) {}
   };
 
   const getAllMaterials = async (canvasId: string) => {
@@ -342,18 +332,22 @@ const MaterialsProvider: React.FC = ({ children }) => {
 
   const getMaterial = async (canvasId: string, materialName: MaterialType) => {
     try {
-      console.log("get " + materialName);
+      // console.log("get " + materialName);
       const ref = await db
         .collection("canvases")
         .doc(canvasId)
         .collection(materialName);
-      ref.onSnapshot({ includeMetadataChanges: false }, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          dispatchMaterial(materialName, change.type, change.doc.data());
-        });
-      });
+      const result = ref.onSnapshot(
+        { includeMetadataChanges: false },
+        (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            dispatchMaterial(materialName, change.type, change.doc.data());
+          });
+        }
+      );
+      return result;
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -387,6 +381,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
   ): Promise<void> => {
     try {
       // console.log("move ", materialName);
+
       await db
         .collection("canvases")
         .doc(canvasId)
@@ -709,8 +704,6 @@ const MaterialsProvider: React.FC = ({ children }) => {
       // console.log(error.message);
     }
   };
-
-  useEffect(() => {}, []);
 
   return (
     <MaterialsContext.Provider
