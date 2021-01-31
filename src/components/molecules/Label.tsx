@@ -5,15 +5,16 @@ import { TextField, Menu, MenuItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Rnd } from "react-rnd";
 import { Textfit } from "react-textfit";
-import LockButton from "./LockButton";
+import LockButton from "../atoms/LockButton";
+import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
 
-const Material = {
+const MaterialType = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type Material = typeof Material[keyof typeof Material];
+type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 interface mouseState {
   mouseX: null | number;
@@ -60,10 +61,6 @@ const Label: React.FC<LabelProps> = (props) => {
     resizeMaterial,
     editMaterialWord,
     deleteMaterial,
-    bringForward,
-    sendBackward,
-    bringToFront,
-    sendToBack,
   } = useContext(MaterialsContext);
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
@@ -89,7 +86,7 @@ const Label: React.FC<LabelProps> = (props) => {
       setLabelProps({ ...labelProps, positionX, positionY });
       moveMaterial(
         props.canvasId,
-        Material.Labels,
+        MaterialType.Labels,
         props.id,
         positionX,
         positionY
@@ -115,7 +112,7 @@ const Label: React.FC<LabelProps> = (props) => {
       });
       resizeMaterial(
         props.canvasId,
-        Material.Labels,
+        MaterialType.Labels,
         props.id,
         positionX,
         positionY,
@@ -179,7 +176,7 @@ const Label: React.FC<LabelProps> = (props) => {
         setLabelProps({ ...labelProps, word: labelProps.word });
         editMaterialWord(
           props.canvasId,
-          Material.Labels,
+          MaterialType.Labels,
           props.id,
           labelProps.word
         );
@@ -239,7 +236,7 @@ const Label: React.FC<LabelProps> = (props) => {
           <LockButton
             isLocked={props.isLocked}
             canvasId={props.canvasId}
-            objName={Material.Labels}
+            objName={MaterialType.Labels}
             id={props.id}
             setProps={setLabelProps}
           />
@@ -252,52 +249,15 @@ const Label: React.FC<LabelProps> = (props) => {
           >
             編集
           </MenuItem>
+          <FrontBackContextMenuItems
+            materialType={MaterialType.Labels}
+            canvasId={props.canvasId}
+            {...labelProps}
+          />
           <MenuItem
             disabled={labelProps.isLocked}
             onClick={() => {
-              bringForward(
-                props.canvasId,
-                Material.Labels,
-                props.id,
-                props.zIndex
-              );
-            }}
-          >
-            前面へ
-          </MenuItem>
-          <MenuItem
-            disabled={labelProps.isLocked}
-            onClick={() => {
-              bringToFront(props.canvasId, Material.Labels, props.id);
-            }}
-          >
-            最前面へ
-          </MenuItem>
-          <MenuItem
-            disabled={labelProps.isLocked}
-            onClick={() => {
-              sendBackward(
-                props.canvasId,
-                Material.Labels,
-                props.id,
-                props.zIndex
-              );
-            }}
-          >
-            背面へ
-          </MenuItem>
-          <MenuItem
-            disabled={labelProps.isLocked}
-            onClick={() => {
-              sendToBack(props.canvasId, Material.Labels, props.id);
-            }}
-          >
-            最背面へ
-          </MenuItem>
-          <MenuItem
-            disabled={labelProps.isLocked}
-            onClick={() => {
-              deleteMaterial(props.canvasId, Material.Labels, props.id);
+              deleteMaterial(props.canvasId, MaterialType.Labels, props.id);
               handleClose();
             }}
           >

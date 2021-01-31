@@ -5,7 +5,8 @@ import classNames from "classnames";
 import { MaterialsContext } from "../../contexts/MaterialsContext";
 import { Menu, MenuItem } from "@material-ui/core";
 import { Rnd } from "react-rnd";
-import LockButton from "./LockButton";
+import LockButton from "../atoms/LockButton";
+import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
 
 type LineProps = {
   canvasId: string;
@@ -20,13 +21,13 @@ type LineProps = {
   areaSize: { height: number; width: number };
 };
 
-const Material = {
+const MaterialType = {
   StickyNotes: "stickyNotes",
   Lines: "lines",
   Labels: "labels",
 } as const;
 
-type Material = typeof Material[keyof typeof Material];
+type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 const initiaMouselState = {
   mouseX: null,
@@ -50,14 +51,7 @@ const Line: React.FC<LineProps> = (props) => {
   }>(initiaMouselState);
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
   const classes = useStyles(props);
-  const {
-    moveMaterial,
-    deleteMaterial,
-    bringForward,
-    sendBackward,
-    bringToFront,
-    sendToBack,
-  } = useContext(MaterialsContext);
+  const { moveMaterial, deleteMaterial } = useContext(MaterialsContext);
 
   let lineClasses = classes.container;
   let axis = null;
@@ -105,7 +99,7 @@ const Line: React.FC<LineProps> = (props) => {
       }
       moveMaterial(
         props.canvasId,
-        Material.Lines,
+        MaterialType.Lines,
         props.id,
         positionX,
         positionY
@@ -161,55 +155,18 @@ const Line: React.FC<LineProps> = (props) => {
           <LockButton
             isLocked={lineProps.isLocked}
             canvasId={props.canvasId}
-            objName={Material.Lines}
+            objName={MaterialType.Lines}
             id={props.id}
+          />
+          <FrontBackContextMenuItems
+            materialType={MaterialType.Lines}
+            canvasId={props.canvasId}
+            {...lineProps}
           />
           <MenuItem
             disabled={lineProps.isLocked}
             onClick={() => {
-              bringForward(
-                props.canvasId,
-                Material.Lines,
-                props.id,
-                props.zIndex
-              );
-            }}
-          >
-            前面へ
-          </MenuItem>
-          <MenuItem
-            disabled={lineProps.isLocked}
-            onClick={() => {
-              bringToFront(props.canvasId, Material.Lines, props.id);
-            }}
-          >
-            最前面へ
-          </MenuItem>
-          <MenuItem
-            disabled={lineProps.isLocked}
-            onClick={() => {
-              sendBackward(
-                props.canvasId,
-                Material.Lines,
-                props.id,
-                props.zIndex
-              );
-            }}
-          >
-            背面へ
-          </MenuItem>
-          <MenuItem
-            disabled={lineProps.isLocked}
-            onClick={() => {
-              sendToBack(props.canvasId, Material.Lines, props.id);
-            }}
-          >
-            最後面へ
-          </MenuItem>
-          <MenuItem
-            disabled={lineProps.isLocked}
-            onClick={() => {
-              deleteMaterial(props.canvasId, Material.Lines, props.id);
+              deleteMaterial(props.canvasId, MaterialType.Lines, props.id);
               handleClose();
             }}
           >
