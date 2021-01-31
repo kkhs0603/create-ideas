@@ -14,6 +14,7 @@ import { CanvasContext } from "../../contexts/CanvasContext";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import { orange } from "@material-ui/core/colors";
 import Image from "next/image";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const ColorButton = withStyles((theme) => ({
   root: {
@@ -59,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CreateCanvas = () => {
   const { createCanvas, templates } = useContext(CanvasContext);
+  const { user } = useContext(AuthContext);
   const [canvasName, setCanvasName] = useState("");
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
@@ -123,7 +125,16 @@ const CreateCanvas = () => {
         />
       </div>
       <div className={classes.section}>
-        <ColorButton fullWidth onClick={handleSubmit}>
+        <div>
+          {user?.uid === process.env.TEST_USER_ID
+            ? "テストユーザーはCanvasを作成できません"
+            : ""}
+        </div>
+        <ColorButton
+          fullWidth
+          onClick={handleSubmit}
+          disabled={user?.uid === process.env.TEST_USER_ID}
+        >
           Canvas作成
         </ColorButton>
       </div>

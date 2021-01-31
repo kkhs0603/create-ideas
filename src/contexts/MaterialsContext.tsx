@@ -192,13 +192,17 @@ const MaterialsProvider: React.FC = ({ children }) => {
   const [labels, dispatchLabels] = useReducer(MaterialReducer, []);
   const auth = firebase.auth();
   const router = useRouter();
+  const collectionId =
+    auth.currentUser.uid === process.env.TEST_USER_ID
+      ? "testCanvases"
+      : "canvases";
 
   const enterCanvas = async (canvasId: string) => {
     try {
       dispatchMaterial(MaterialType.StickyNotes, "initialize", []);
       dispatchMaterial(MaterialType.Lines, "initialize", []);
       dispatchMaterial(MaterialType.Labels, "initialize", []);
-      await db.collection("canvases").doc(canvasId);
+      await db.collection(collectionId).doc(canvasId);
       await getAllMaterials(canvasId);
     } catch (error) {}
   };
@@ -307,7 +311,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
 
       //DB書き込み
       const ref = await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(id);
@@ -334,7 +338,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("get " + materialName);
       const ref = await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName);
       const result = ref.onSnapshot(
@@ -361,7 +365,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       const newMaterial = { id: materialId };
       dispatchMaterial(materialName, "removed", newMaterial);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(materialId)
@@ -383,7 +387,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       // console.log("move ", materialName);
 
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(materialId)
@@ -411,7 +415,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("edit " + materialName + " word");
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(materialId)
@@ -441,7 +445,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("resize", materialName);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(materialId)
@@ -471,7 +475,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("lock " + materialName);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(materialId)
@@ -500,7 +504,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("change stickyNote color : " + color);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection("stickyNotes")
         .doc(stickyNoteId)
@@ -525,7 +529,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
   const updateCanvasChangedTime = async (canvasId: string) => {
     try {
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .update({
           updatedAt:
@@ -556,7 +560,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("bringFoward : " + materialName);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(id)
@@ -586,7 +590,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       // console.log(zIndeices);
       const maxZindex = Math.max.apply(null, zIndeices);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(id)
@@ -614,7 +618,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
     try {
       // console.log("sendBackward : " + materialName);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(id)
@@ -643,7 +647,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       const zIndeices = await getAllZindices(canvasId);
       const maxZindex = Math.min.apply(null, zIndeices);
       await db
-        .collection("canvases")
+        .collection(collectionId)
         .doc(canvasId)
         .collection(materialName)
         .doc(id)
@@ -664,14 +668,14 @@ const MaterialsProvider: React.FC = ({ children }) => {
   //全オブジェクトのzIndex取得
   const getAllZindices = async (canvasId: string) => {
     const wordsRef = await db
-      .collection("canvases")
+      .collection(collectionId)
       .doc(canvasId)
       .collection("stickyNotes");
     const words = await (await wordsRef.get()).docs;
     const zIndices = words.map((word) => word.data().zIndex);
 
     const linesRef = await db
-      .collection("canvases")
+      .collection(collectionId)
       .doc(canvasId)
       .collection("lines");
     const lines = await (await linesRef.get()).docs;
@@ -696,7 +700,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
           .put(blob);
         //Canvasにサムネイル画像のURLがなければ入れる
         const url = await storageResult.ref.getDownloadURL();
-        const canvasRef = await db.collection("canvases").doc(canvasId);
+        const canvasRef = await db.collection(collectionId).doc(canvasId);
         await canvasRef.get();
         canvasRef.update({ thumbnailUrl: url });
       });

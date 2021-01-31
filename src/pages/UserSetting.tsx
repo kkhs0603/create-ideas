@@ -25,6 +25,7 @@ const UserSettingsPage = () => {
     handleGoBack,
     imageUrl,
     handleSaveTempImage,
+    user,
   ] = useUserSetting();
   const classes = useStyles();
   return (
@@ -33,7 +34,11 @@ const UserSettingsPage = () => {
         <Avatar alt="user" src={imageUrl} className={classes.avatar} />
         <div className={classes.section}>
           <div>プロフィール画像</div>
-          <input type="file" onChange={handleSaveTempImage} />
+          <input
+            type="file"
+            onChange={handleSaveTempImage}
+            disabled={user?.uid === process.env.TEST_USER_ID}
+          />
         </div>
 
         <div className={classes.section}>
@@ -48,6 +53,7 @@ const UserSettingsPage = () => {
             defaultValue={username}
             onChange={handleUserNameOnChanged}
             fullWidth
+            disabled={user?.uid === process.env.TEST_USER_ID}
           />
         </div>
         <div className={classes.section}>
@@ -56,6 +62,7 @@ const UserSettingsPage = () => {
             variant="contained"
             color="primary"
             onClick={updateUserSetting}
+            disabled={user?.uid === process.env.TEST_USER_ID}
           >
             更新
           </Button>

@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useRouter } from "next/router";
 import { Button, Grid, Typography } from "@material-ui/core";
 import Image from "next/image";
+import { AuthContext } from "../contexts/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 const SignInPage: React.FC = () => {
   const classes = useStyles();
   const router = useRouter();
+  const { signInTestUser } = useContext(AuthContext);
   return (
     <Layout>
       <Grid
@@ -61,6 +63,15 @@ const SignInPage: React.FC = () => {
           >
             About
           </Button>
+          <div>
+            <Button
+              variant="outlined"
+              className={classes.button}
+              onClick={() => signInTestUser()}
+            >
+              テストユーザーでサインイン
+            </Button>
+          </div>
         </Grid>
         <Grid item xs={6}>
           <Image
