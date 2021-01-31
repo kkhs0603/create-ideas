@@ -101,17 +101,21 @@ const CanvasProvider: React.FC = ({ children }) => {
   const [templates, setTemplates] = useState<Array<Template>>([]);
   const auth = firebase.auth();
   const router = useRouter();
+  //テストユーザーの場合、別データを読む
+  const collectionId =
+    auth.currentUser.uid === process.env.TEST_USER_ID
+      ? "testCanvases"
+      : "canvases";
   /* --------------------------
   Canvas
   -------------------------- */
   const createCanvas = async (canvasName: string, templateId: string) => {
     try {
-      //canvases
       const templateRef = await db
         .collection("templates")
         .doc(templateId)
         .get();
-      const result = await db.collection("canvases").add({
+      const result = await db.collection(collectionId).add({
         name: canvasName,
         ideas: [],
         joinedUsers: [],
@@ -122,7 +126,7 @@ const CanvasProvider: React.FC = ({ children }) => {
           new Date().toLocaleString("ja") + ":" + new Date().getMilliseconds(),
       });
 
-      await db.collection("canvases").doc(result.id).update({
+      await db.collection(collectionId).doc(result.id).update({
         id: result.id,
       });
       const stickyNotesRef = await db
@@ -205,11 +209,12 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const getCanvases = async () => {
     try {
-      const canvasesRef = await db.collection("canvases");
+      const canvasesRef = await db.collection(collectionId);
       canvasesRef.onSnapshot((snapshot) => {
         setCanvases([]);
         setCanvases(snapshot.docs.map((canvas) => canvas.data()));
       });
+
       // unsubscribe();
     } catch (error) {
       // console.log(error);

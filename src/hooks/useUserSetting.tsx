@@ -83,5 +83,6 @@ export const useUserSetting = () => {
     handleGoBack,
     imageUrl,
     handleSaveTempImage,
+    user,
   ];
 };

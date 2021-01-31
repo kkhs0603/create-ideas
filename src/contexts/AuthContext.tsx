@@ -82,25 +82,42 @@ const AuthProvider = ({ children }) => {
     router.back();
   };
 
+  const signInTestUser = () => {
+    try {
+      auth.signInWithEmailAndPassword("testuser@test.com", "testpassword");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
+    if (auth == null) {
+      return;
+    }
     auth.onAuthStateChanged(async (user) => {
-      if (!user?.emailVerified || user == null) {
+      if (
+        (user == null) |
+        user?.emailVerified |
+        (user?.uid !== process.env.TEST_USER_ID)
+      ) {
         setUser(null);
         router.push({ pathname: "/" });
         return;
+      } else {
+        if (user == null) return;
+        setUser(user);
+        const userRef = await db.collection("users").doc(user?.uid);
+        if (!userRef.get().exists) {
+          await userRef.set({
+            id: user?.uid,
+            name: user?.displayName,
+            imageUrl: user?.photoURL,
+            createdAt: new Date().toLocaleString("ja"),
+            updatedAt: new Date().toLocaleString("ja"),
+          });
+        }
+        router.push("/canvasList");
       }
-      setUser(user);
-      const userRef = await db.collection("users").doc(user.uid);
-      if (!userRef.get().exists) {
-        await userRef.set({
-          id: user.uid,
-          name: user.displayName,
-          imageUrl: user.photoURL,
-          createdAt: new Date().toLocaleString("ja"),
-          updatedAt: new Date().toLocaleString("ja"),
-        });
-      }
-      router.push("/canvasList");
     });
   }, []);
 
@@ -118,6 +135,8 @@ const AuthProvider = ({ children }) => {
         updateUser,
         router,
         isLoading,
+
+        signInTestUser,
       }}
     >
       {children}
