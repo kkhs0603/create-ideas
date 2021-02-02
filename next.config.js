@@ -1,5 +1,6 @@
 const path = require("path");
 const dotenv = require("dotenv-webpack");
+require("dotenv").config();
 module.exports = {
   distDir: "/.next",
   images: {

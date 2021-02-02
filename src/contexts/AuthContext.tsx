@@ -92,19 +92,16 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (auth == null) {
-      return;
+      setUser(null);
+      router.push({ pathname: "/" });
     }
     auth.onAuthStateChanged(async (user) => {
-      if (
-        (user == null) |
-        user?.emailVerified |
-        (user?.uid !== process.env.TEST_USER_ID)
-      ) {
+      if (user == null) {
         setUser(null);
         router.push({ pathname: "/" });
         return;
-      } else {
-        if (user == null) return;
+      }
+      if (user.emailVerified | (user?.uid === process.env.TEST_USER_ID)) {
         setUser(user);
         const userRef = await db.collection("users").doc(user?.uid);
         if (!userRef.get().exists) {
@@ -117,9 +114,13 @@ const AuthProvider = ({ children }) => {
           });
         }
         router.push("/canvasList");
+      } else {
+        setUser(null);
+        router.push({ pathname: "/" });
+        return;
       }
     });
-  }, []);
+  }, [auth]);
 
   return (
     <AuthContext.Provider

@@ -101,11 +101,7 @@ const CanvasProvider: React.FC = ({ children }) => {
   const [templates, setTemplates] = useState<Array<Template>>([]);
   const auth = firebase.auth();
   const router = useRouter();
-  //テストユーザーの場合、別データを読む
-  const collectionId =
-    auth.currentUser.uid === process.env.TEST_USER_ID
-      ? "testCanvases"
-      : "canvases";
+
   /* --------------------------
   Canvas
   -------------------------- */
@@ -115,6 +111,10 @@ const CanvasProvider: React.FC = ({ children }) => {
         .collection("templates")
         .doc(templateId)
         .get();
+      const collectionId =
+        auth.currentUser.uid === process.env.TEST_USER_ID
+          ? "testCanvases"
+          : "canvases";
       const result = await db.collection(collectionId).add({
         name: canvasName,
         ideas: [],
@@ -209,6 +209,10 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const getCanvases = async () => {
     try {
+      const collectionId =
+        auth.currentUser.uid === process.env.TEST_USER_ID
+          ? "testCanvases"
+          : "canvases";
       const canvasesRef = await db.collection(collectionId);
       canvasesRef.onSnapshot((snapshot) => {
         setCanvases([]);

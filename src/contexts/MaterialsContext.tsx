@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useEffect, useReducer } from "react";
 import firebase from "../firebase/firebase";
 import { useRouter } from "next/router";
@@ -192,10 +193,13 @@ const MaterialsProvider: React.FC = ({ children }) => {
   const [labels, dispatchLabels] = useReducer(MaterialReducer, []);
   const auth = firebase.auth();
   const router = useRouter();
-  const collectionId =
+  let collectionId = "canvases";
+  if (
+    auth.currentUser != null &&
     auth.currentUser.uid === process.env.TEST_USER_ID
-      ? "testCanvases"
-      : "canvases";
+  ) {
+    collectionId = "testCanvases";
+  }
 
   const enterCanvas = async (canvasId: string) => {
     try {
