@@ -42,13 +42,13 @@ const About = () => {
           <Typography variant="h2" className={classes.explain}>
             What is Create Ideas?
           </Typography>
-          <Image
+          {/* <Image
             src="/aboutPage/whatis.svg"
             alt="whatis"
             height="300"
             width="920"
             quality={50}
-          />
+          /> */}
           <Typography className={classes.explain}>
             個人開発、チーム開発などで新しくプロダクトを作る際に、最も必要で難航するアイデア出し。
           </Typography>
@@ -61,24 +61,24 @@ const About = () => {
         </div>
         <div className={classes.section}>
           <Typography variant="h2">How to use?</Typography>
-          <Image
+          {/* <Image
             src="/aboutPage/step1.gif"
             alt="step1"
             height="600"
             width="1020"
             className={classes.img}
             quality={50}
-          />
+          /> */}
         </div>
         <div className={classes.section}>
-          <Image
+          {/* <Image
             src="/aboutPage/step2.gif"
             alt="step2"
             height="600"
             width="1020"
             className={classes.img}
             quality={50}
-          />
+          /> */}
           <div>
             <Button
               variant="contained"

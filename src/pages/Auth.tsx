@@ -46,13 +46,14 @@ const Auth = () => {
             Googleアカウントでログイン・登録する
           </Typography>
           <Button onClick={signinWithGoogle}>
-            <Image
+            {/* <Image
               src="/topPage/btn_google_signin_dark_normal_web@2x.png"
               alt="signInWithGoogle"
               width="320"
               height="80"
               quality={50}
-            />
+            /> */}
+            a
           </Button>
         </Grid>
         <Grid item xs={6}>
