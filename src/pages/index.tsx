@@ -3,8 +3,8 @@ import Layout from "../components/templates/Layout/Layout";
 import { makeStyles } from "@material-ui/core/styles";
 import { useRouter } from "next/router";
 import { Button, Grid, Typography } from "@material-ui/core";
-import Image from "next/image";
 import { AuthContext } from "../contexts/AuthContext";
+import { ReactComponent as Logo } from "../../public/topPage/topIllust.svg";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -74,14 +74,7 @@ const SignInPage: React.FC = () => {
           </div>
         </Grid>
         <Grid item xs={6}>
-          <Image
-            src="/topPage/topIllust.svg"
-            alt="topIllust"
-            // className={classes.img}
-            width={600}
-            height={400}
-            quality={50}
-          />
+          <Logo />
         </Grid>
       </Grid>
     </Layout>
