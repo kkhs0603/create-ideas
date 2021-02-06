@@ -21,6 +21,14 @@ type Template = {
   description: string;
 };
 
+const MaterialType = {
+  StickyNotes: "stickyNotes",
+  Lines: "lines",
+  Labels: "labels",
+} as const;
+
+type MaterialType = typeof MaterialType[keyof typeof MaterialType];
+
 //interface
 interface IContextProps {
   createCanvas: (canvasName: string, templateId: string) => void;
@@ -55,28 +63,32 @@ interface IContextProps {
 
   addMaterial: (
     id: string,
-    objName: Material,
+    objName: MaterialType,
     positionX: number,
     positionY: number,
     option: string
   ) => void;
-  deleteMaterial: (canvasId: string, objName: Material, objId: string) => void;
+  deleteMaterial: (
+    canvasId: string,
+    objName: MaterialType,
+    objId: string
+  ) => void;
   moveMaterial: (
     canvasId: string,
-    objName: Material,
+    objName: MaterialType,
     objId: string,
     x: number,
     y: number
   ) => void;
   editMaterialWord: (
     canvasId: string,
-    objName: Material,
+    objName: MaterialType,
     objId: string,
     word: string
   ) => void;
   resizeMaterial: (
     canvasId: string,
-    objName: Material,
+    objName: MaterialType,
     objId: string,
     positionX: number,
     positionY: number,
@@ -85,7 +97,7 @@ interface IContextProps {
   ) => void;
   lockMaterial: (
     canvasId: string,
-    objName: Material,
+    objName: MaterialType,
     objId: string,
     isLocked: boolean
   ) => void;
@@ -132,7 +144,7 @@ const CanvasProvider: React.FC = ({ children }) => {
       const stickyNotesRef = await db
         .collection("templates")
         .doc(templateId)
-        .collection(Material.StickyNotes)
+        .collection(MaterialType.StickyNotes)
         .get();
       const stickyNotes = stickyNotesRef.docs.map((stickyNote) =>
         stickyNote.data()
@@ -141,24 +153,24 @@ const CanvasProvider: React.FC = ({ children }) => {
       const linesRef = await db
         .collection("templates")
         .doc(templateId)
-        .collection(Material.Lines)
+        .collection(MaterialType.Lines)
         .get();
       const lines = linesRef.docs.map((line) => line.data());
 
       const labelsRef = await db
         .collection("templates")
         .doc(templateId)
-        .collection(Material.Labels)
+        .collection(MaterialType.Labels)
         .get();
       const labels = labelsRef.docs.map((label) => label.data());
 
       // console.log("stickyNotes writing");
       await stickyNotes.forEach(async (stickyNote) => {
         const stickyResult = await result
-          .collection(Material.StickyNotes)
+          .collection(MaterialType.StickyNotes)
           .add(stickyNote);
         result
-          .collection(Material.StickyNotes)
+          .collection(MaterialType.StickyNotes)
           .doc(stickyResult.id)
           .update({
             id: stickyResult.id,
@@ -171,9 +183,11 @@ const CanvasProvider: React.FC = ({ children }) => {
       });
       // console.log("labels writing");
       await labels.forEach(async (label) => {
-        const labelResult = await result.collection(Material.Labels).add(label);
+        const labelResult = await result
+          .collection(MaterialType.Labels)
+          .add(label);
         result
-          .collection(Material.Labels)
+          .collection(MaterialType.Labels)
           .doc(labelResult.id)
           .update({
             id: labelResult.id,
@@ -186,9 +200,11 @@ const CanvasProvider: React.FC = ({ children }) => {
       });
       // console.log("lines writing");
       await lines.forEach(async (line) => {
-        const lineResult = await result.collection(Material.Lines).add(line);
+        const lineResult = await result
+          .collection(MaterialType.Lines)
+          .add(line);
         result
-          .collection(Material.Lines)
+          .collection(MaterialType.Lines)
           .doc(lineResult.id)
           .update({
             id: lineResult.id,
@@ -203,7 +219,7 @@ const CanvasProvider: React.FC = ({ children }) => {
       // console.log("new canvas created!");
       router.push("/canvases/" + result.id);
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
 
@@ -240,13 +256,13 @@ const CanvasProvider: React.FC = ({ children }) => {
     const result = await ref.add({ name: "PDCA" });
 
     stickyNotes.map((stickyNote) =>
-      ref.doc(result.id).collection(Material.StickyNotes).add(stickyNote)
+      ref.doc(result.id).collection(MaterialType.StickyNotes).add(stickyNote)
     );
     labels.map((label) =>
-      ref.doc(result.id).collection(Material.Labels).add(label)
+      ref.doc(result.id).collection(MaterialType.Labels).add(label)
     );
     lines.map((line) =>
-      ref.doc(result.id).collection(Material.Lines).add(line)
+      ref.doc(result.id).collection(MaterialType.Lines).add(line)
     );
   };
 
