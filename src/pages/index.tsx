@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useRouter } from "next/router";
 import { Button, Grid, Typography } from "@material-ui/core";
 import { AuthContext } from "../contexts/AuthContext";
-import { ReactComponent as Logo } from "../../public/topPage/topIllust.svg";
+import Logo from "../../public/topPage/topIllust.svg";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -74,7 +74,7 @@ const SignInPage: React.FC = () => {
           </div>
         </Grid>
         <Grid item xs={6}>
-          <Logo />
+          <img className={classes.img} src={Logo} />
         </Grid>
       </Grid>
     </Layout>

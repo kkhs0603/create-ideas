@@ -125,16 +125,7 @@ const CreateCanvas = () => {
         />
       </div>
       <div className={classes.section}>
-        <div>
-          {user?.uid === process.env.TEST_USER_ID
-            ? "テストユーザーはCanvasを作成できません"
-            : ""}
-        </div>
-        <ColorButton
-          fullWidth
-          onClick={handleSubmit}
-          disabled={user?.uid === process.env.TEST_USER_ID}
-        >
+        <ColorButton fullWidth onClick={handleSubmit}>
           Canvas作成
         </ColorButton>
       </div>

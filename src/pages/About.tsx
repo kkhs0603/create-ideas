@@ -2,8 +2,9 @@ import React, { useState, useContext } from "react";
 import Layout from "../../src/components/templates/Layout/Layout";
 import { Button, Grid, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import Image from "next/image";
 import { useRouter } from "next/router";
+import whatIs from "../../public/aboutPage/whatis.svg";
+import step1 from "../../public/aboutPage/step1.gif";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
   section: {
     height: "91vh",
+    marginBottom: "10",
   },
 }));
 
@@ -42,13 +44,8 @@ const About = () => {
           <Typography variant="h2" className={classes.explain}>
             What is Create Ideas?
           </Typography>
-          {/* <Image
-            src="/aboutPage/whatis.svg"
-            alt="whatis"
-            height="300"
-            width="920"
-            quality={50}
-          /> */}
+          <img src={whatIs} alt="step1" className={classes.img} />
+
           <Typography className={classes.explain}>
             個人開発、チーム開発などで新しくプロダクトを作る際に、最も必要で難航するアイデア出し。
           </Typography>
@@ -61,14 +58,7 @@ const About = () => {
         </div>
         <div className={classes.section}>
           <Typography variant="h2">How to use?</Typography>
-          {/* <Image
-            src="/aboutPage/step1.gif"
-            alt="step1"
-            height="600"
-            width="1020"
-            className={classes.img}
-            quality={50}
-          /> */}
+          <img src="/aboutPage/step1.gif" alt="step1" className={classes.img} />
         </div>
         <div className={classes.section}>
           {/* <Image
