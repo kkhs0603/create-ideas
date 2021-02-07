@@ -24,7 +24,7 @@ export const useUserSetting = () => {
       await updateUser(user.uid, username, url);
       handleGoBack();
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
 
@@ -32,7 +32,10 @@ export const useUserSetting = () => {
   //画像をstorageにupload
   const uploadImage = (image) => {
     return new Promise((resolve, reject) => {
-      const uploadTask = firebase.storage.ref(`/images/${user.uid}`).put(image);
+      const storage = firebase.storage();
+      const uploadTask = storage
+        .ref(`/images/propfiles/${user.uid}`)
+        .put(image);
       uploadTask.on(
         "state_changed",
         // 進行中のsnapshotを得る
@@ -49,8 +52,8 @@ export const useUserSetting = () => {
         // 完了後の処理
         // 画像表示のため、アップロードした画像のURLを取得
         async () => {
-          const imageUrl = await firebase.storage
-            .ref("images")
+          const imageUrl = await storage
+            .ref("/images/propfiles")
             .child(user.uid)
             .getDownloadURL();
           await setImageUrl(imageUrl);
@@ -72,7 +75,7 @@ export const useUserSetting = () => {
       };
       // console.log("stored profile image");
     } catch (error) {
-      // console.log(error.message);
+      console.log(error.message);
     }
   };
 

@@ -66,7 +66,7 @@ const AuthProvider = ({ children }) => {
           updatedAt: new Date().toLocaleString("ja"),
         });
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
 
