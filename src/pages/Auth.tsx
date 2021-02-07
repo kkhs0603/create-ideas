@@ -40,7 +40,7 @@ const Auth = () => {
     : "サインインはこちら";
   return (
     <Layout>
-      <Grid container xs={12} className={classes.container}>
+      <Grid container className={classes.container}>
         <Grid item xs={6}>
           <Typography variant="h6" className={classes.explain}>
             Googleアカウントでログイン・登録する

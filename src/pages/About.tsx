@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     margin: 10,
   },
   img: {
-    width: "80%",
+    width: "70%",
     margin: "10px",
     height: "auto",
     color: "#fff",
@@ -26,11 +26,10 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
   explain: {
-    margin: 50,
+    margin: 40,
   },
   section: {
-    height: "91vh",
-    marginBottom: "10",
+    marginBottom: "50px",
   },
 }));
 
@@ -39,13 +38,12 @@ const About = () => {
   const router = useRouter();
   return (
     <Layout>
-      <Grid container xs={12} className={classes.container}>
+      <Grid container className={classes.container}>
         <div className={classes.section}>
           <Typography variant="h2" className={classes.explain}>
             What is Create Ideas?
           </Typography>
           <img src={whatIs} alt="step1" className={classes.img} />
-
           <Typography className={classes.explain}>
             個人開発、チーム開発などで新しくプロダクトを作る際に、最も必要で難航するアイデア出し。
           </Typography>
@@ -61,14 +59,7 @@ const About = () => {
           <img src="/aboutPage/step1.gif" alt="step1" className={classes.img} />
         </div>
         <div className={classes.section}>
-          {/* <Image
-            src="/aboutPage/step2.gif"
-            alt="step2"
-            height="600"
-            width="1020"
-            className={classes.img}
-            quality={50}
-          /> */}
+          <img src="/aboutPage/step2.gif" alt="step2" className={classes.img} />
           <div>
             <Button
               variant="contained"

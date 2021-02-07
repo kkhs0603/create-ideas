@@ -4,11 +4,11 @@ import { Lock, LockOpen } from "@material-ui/icons";
 
 import { MaterialsContext } from "../../contexts/MaterialsContext";
 
-const LockButton = (props) => {
+const LockButton = React.forwardRef((props, ref) => {
   const { lockMaterial } = useContext(MaterialsContext);
   //const [isLocked, setIsLocked] = useState<boolean>(props.isLocked);
   return (
-    <div style={{ paddingLeft: 15 }}>
+    <div style={{ paddingLeft: 15 }} ref={ref}>
       <FormControlLabel
         control={
           <Checkbox
@@ -32,6 +32,6 @@ const LockButton = (props) => {
       />
     </div>
   );
-};
+});
 
 export default LockButton;
