@@ -13,7 +13,6 @@ import {
 import { CanvasContext } from "../../contexts/CanvasContext";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import { orange } from "@material-ui/core/colors";
-import Image from "next/image";
 import { AuthContext } from "../../contexts/AuthContext";
 
 const ColorButton = withStyles((theme) => ({
@@ -58,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CreateCanvas = () => {
+const CreateCanvas = React.forwardRef((props, ref) => {
   const { createCanvas, templates } = useContext(CanvasContext);
   const { user } = useContext(AuthContext);
   const [canvasName, setCanvasName] = useState("");
@@ -78,29 +77,34 @@ const CreateCanvas = () => {
   };
 
   const templatesComponent = templates.map((template, index) => (
-    <Card
-      className={`${
-        index === selectedIndex ? classes.active : classes.inactive
-      }`}
-      key={index}
-      variant="outlined"
-    >
-      <CardActionArea onClick={() => setSelectedIndex(index)}>
-        <CardMedia className={classes.media} image={template.imageUrl} />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            {template.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {template.description}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+    <div key={index}>
+      <Card
+        className={`${
+          index === selectedIndex ? classes.active : classes.inactive
+        }`}
+        variant="outlined"
+      >
+        <CardActionArea onClick={() => setSelectedIndex(index)}>
+          {template.imageUrl ? (
+            <CardMedia className={classes.media} image={template.imageUrl} />
+          ) : (
+            <></>
+          )}
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h2">
+              {template.name}
+            </Typography>
+            <Typography variant="body2" color="textSecondary" component="p">
+              {template.description}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </div>
   ));
 
   return (
-    <div className={classes.container}>
+    <div className={classes.container} ref={ref}>
       <Backdrop className={classes.backdrop} open={isOpendBackdrop}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -131,6 +135,6 @@ const CreateCanvas = () => {
       </div>
     </div>
   );
-};
+});
 
 export default CreateCanvas;

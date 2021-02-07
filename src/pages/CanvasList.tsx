@@ -38,10 +38,10 @@ const CanvasListPage = () => {
           className={classes.modal}
           open={isOpenedModal}
           onClose={handleClose}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
         >
-          <CreateCanvas />
+          <div>
+            <CreateCanvas />
+          </div>
         </Modal>
         <Grid container direction="row" justify="flex-end" alignItems="center">
           <IconButton onClick={handleOpen}>
