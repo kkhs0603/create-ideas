@@ -18,6 +18,13 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
     outline: "none",
   },
+  howToImg: {
+    width: "100%",
+    margin: "10px",
+    height: "auto",
+    color: "#fff",
+    outline: "none",
+  },
   container: {
     display: "flex",
     flexDirection: "column",
@@ -56,10 +63,18 @@ const About = () => {
         </div>
         <div className={classes.section}>
           <Typography variant="h2">How to use?</Typography>
-          <img src="/aboutPage/step1.gif" alt="step1" className={classes.img} />
+          <img
+            src="/aboutPage/step1.gif"
+            alt="step1"
+            className={classes.howToImg}
+          />
         </div>
         <div className={classes.section}>
-          <img src="/aboutPage/step2.gif" alt="step2" className={classes.img} />
+          <img
+            src="/aboutPage/step2.gif"
+            alt="step2"
+            className={classes.howToImg}
+          />
           <div>
             <Button
               variant="contained"

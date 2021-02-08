@@ -35,7 +35,6 @@ const SignInPage: React.FC = () => {
       <Grid
         container
         alignItems="center"
-        direction="row"
         style={{
           height: "92vh",
           display: "flex",
@@ -43,7 +42,10 @@ const SignInPage: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <Grid item xs={6} className={classes.col}>
+        <Grid item md={6} sm={12} className={classes.col}>
+          <img className={classes.img} src={Logo} />
+        </Grid>
+        <Grid item md={6} sm={12} className={classes.col}>
           <Typography variant="h1">Create Ideas</Typography>
           <Typography variant="h5">アイデア出しをより手軽に</Typography>
           <Button
@@ -72,9 +74,6 @@ const SignInPage: React.FC = () => {
               テストユーザーでサインイン
             </Button>
           </div>
-        </Grid>
-        <Grid item xs={6}>
-          <img className={classes.img} src={Logo} />
         </Grid>
       </Grid>
     </Layout>

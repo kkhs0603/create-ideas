@@ -41,18 +41,7 @@ const Auth = () => {
   return (
     <Layout>
       <Grid container className={classes.container}>
-        <Grid item xs={6}>
-          <Typography variant="h6" className={classes.explain}>
-            Googleアカウントでログイン・登録する
-          </Typography>
-          <Button onClick={signinWithGoogle}>
-            <img
-              src="/topPage/btn_google_signin_dark_normal_web@2x.png"
-              alt="signInWithGoogle"
-            />
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
+        <Grid item md={6} sm={12}>
           <Typography variant="h6" className={classes.explain}>
             メールアドレスでログイン・登録する
           </Typography>
@@ -63,6 +52,18 @@ const Auth = () => {
             disableRipple
           >
             {caption}
+          </Button>
+        </Grid>
+        <Grid item md={6} sm={12}>
+          <Typography variant="h6" className={classes.explain}>
+            Googleアカウントでログイン・登録する
+          </Typography>
+          <Button onClick={signinWithGoogle}>
+            <img
+              src="/topPage/btn_google_signin_dark_normal_web@2x.png"
+              alt="signInWithGoogle"
+              className={classes.button}
+            />
           </Button>
         </Grid>
       </Grid>

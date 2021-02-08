@@ -226,18 +226,18 @@ const CanvasProvider: React.FC = ({ children }) => {
   const getCanvases = async () => {
     try {
       const collectionId =
-        auth.currentUser.uid === process.env.TEST_USER_ID
+        auth.currentUser?.uid === process.env.TEST_USER_ID
           ? "testCanvases"
           : "canvases";
-      const canvasesRef = await db.collection(collectionId);
+      const canvasesRef = await db
+        .collection(collectionId)
+        .orderBy("updatedAt", "desc");
       canvasesRef.onSnapshot((snapshot) => {
         setCanvases([]);
         setCanvases(snapshot.docs.map((canvas) => canvas.data()));
       });
-
-      // unsubscribe();
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
 
