@@ -32,28 +32,37 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     backgroundColor: "white",
-    padding: 100,
+    padding: 20,
+    margin: 40,
     borderRadius: 10,
+    minWidth: 100,
   },
   section: {
     margin: "50px 0",
   },
   templates: {
     display: "flex",
+    overflowX: "scroll",
+    maxWidth: 700,
+    minWidth: 100,
   },
   active: {
     maxWidth: 345,
     margin: 10,
     border: "3px solid black",
+    flex: "0 0 180px",
+    minWidth: 100,
   },
   inactive: {
     maxWidth: 345,
     margin: 10,
+    flex: "0 0 180px",
+    minWidth: 100,
   },
   media: {
     border: "1px solid #f1f1f1",
     height: 80,
-    width: "100%",
+    minWidth: 100,
   },
 }));
 
@@ -77,30 +86,29 @@ const CreateCanvas = React.forwardRef((props, ref) => {
   };
 
   const templatesComponent = templates.map((template, index) => (
-    <div key={index}>
-      <Card
-        className={`${
-          index === selectedIndex ? classes.active : classes.inactive
-        }`}
-        variant="outlined"
-      >
-        <CardActionArea onClick={() => setSelectedIndex(index)}>
-          {template.imageUrl ? (
-            <CardMedia className={classes.media} image={template.imageUrl} />
-          ) : (
-            <></>
-          )}
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {template.name}
-            </Typography>
-            <Typography variant="body2" color="textSecondary" component="p">
-              {template.description}
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </div>
+    <Card
+      key={index}
+      className={`${
+        index === selectedIndex ? classes.active : classes.inactive
+      }`}
+      variant="outlined"
+    >
+      <CardActionArea onClick={() => setSelectedIndex(index)}>
+        {template.imageUrl ? (
+          <CardMedia className={classes.media} image={template.imageUrl} />
+        ) : (
+          <></>
+        )}
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2">
+            {template.name}
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {template.description}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   ));
 
   return (
