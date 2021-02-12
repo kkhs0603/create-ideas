@@ -8,7 +8,9 @@ https://create-ideas-cea7b.web.app/
 
 ## 概要
 
-文字、線、付箋を自由に配置し、リアルタイムにアイデアを創造し共有することができるアプリです。
+文字、線、付箋を自由に配置し  
+リアルタイムにアイデアを創造し共有することができるアプリです。
+
 ![共有](https://user-images.githubusercontent.com/47450240/107727415-98897300-6d2e-11eb-9036-4003f361e607.gif)
 
 ## 用語
@@ -32,24 +34,24 @@ https://create-ideas-cea7b.web.app/
 
   - ToDo
   - PDCA
-  - SWOT
+  - SWOT  
     ![createCanvas](https://user-images.githubusercontent.com/47450240/107724362-0df14580-6d27-11eb-9097-46531995ec64.gif)
 
 - Canvas
 
-  - リアルタイムに共有
+  - リアルタイムに共有  
     ![共有](https://user-images.githubusercontent.com/47450240/107727415-98897300-6d2e-11eb-9036-4003f361e607.gif)
 
   - Material
 
-    - **Material 共通機能**：新規作成、削除、移動、前面背面へ移動、ロック機能
+    - **Material 共通機能**：新規作成、削除、移動、前面背面へ移動、ロック機能  
       ![material](https://user-images.githubusercontent.com/47450240/107724846-29108500-6d28-11eb-9ea0-c084231324f4.gif)
 
-    - 付箋：新規作成(色を選べる)、付箋のサイズの変更、付箋の色の変更、付箋の文字入力/変更
+    - 付箋：新規作成(色を選べる)、サイズの変更、色の変更、文字入力/変更
 
       <img width="188" alt="スクリーンショット 2021-02-12 11 54 09" src="https://user-images.githubusercontent.com/47450240/107725192-0b8feb00-6d29-11eb-9e02-5f1e449fe010.png">
 
-    - ラベル：ラベルのサイズ変更、ラベルの文字入力/変更  
+    - ラベル：サイズ変更、文字入力/変更  
       <img width="188" alt="スクリーンショット 2021-02-12 11 56 10" src="https://user-images.githubusercontent.com/47450240/107725361-6c1f2800-6d29-11eb-9ece-c2ded53944d8.png">
     - 線：新規作成(横/縦を選べる)  
       <img width="188" alt="スクリーンショット 2021-02-12 11 58 31" src="https://user-images.githubusercontent.com/47450240/107725450-ab4d7900-6d29-11eb-8066-39b547e3ee6d.png">
