@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
   container: {
     backgroundColor: "white",
     padding: 20,
-    margin: 40,
     borderRadius: 10,
     minWidth: 100,
   },
