@@ -37,6 +37,7 @@ const SelectCanvas = (props) => {
             <Typography gutterBottom variant="h5" component="h2">
               {canvas.name}
             </Typography>
+            <Typography gutterBottom>更新日時：{canvas.updatedAt}</Typography>
           </CardContent>
         </CardActionArea>
       </Card>
