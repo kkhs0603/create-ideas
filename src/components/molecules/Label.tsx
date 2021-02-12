@@ -65,7 +65,7 @@ const Label: React.FC<LabelProps> = (props) => {
   const [style, setStyle] = useState(classes.container);
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
   const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
-  const [fontSize, setFontSize] = useState<number>(0);
+  const [fontSize, setFontSize] = useState<number>(30);
   const [labelProps, setLabelProps] = useState<LabelProps>({
     positionX: props.positionX,
     positionY: props.positionY,
@@ -159,6 +159,7 @@ const Label: React.FC<LabelProps> = (props) => {
       <div id={props.id}>
         <Textfit
           className={style}
+          min={30}
           max={300}
           onReady={(e) => {
             setFontSize(e);
