@@ -123,10 +123,7 @@ const CanvasProvider: React.FC = ({ children }) => {
         .collection("templates")
         .doc(templateId)
         .get();
-      const collectionId =
-        auth.currentUser.uid === process.env.TEST_USER_ID
-          ? "testCanvases"
-          : "canvases";
+      const collectionId = "canvases";
       const result = await db.collection(collectionId).add({
         name: canvasName,
         ideas: [],
@@ -225,10 +222,7 @@ const CanvasProvider: React.FC = ({ children }) => {
 
   const getCanvases = async () => {
     try {
-      const collectionId =
-        auth.currentUser?.uid === process.env.TEST_USER_ID
-          ? "testCanvases"
-          : "canvases";
+      const collectionId = "canvases";
       const canvasesRef = await db
         .collection(collectionId)
         .orderBy("updatedAt", "desc");

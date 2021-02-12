@@ -193,13 +193,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
   const [labels, dispatchLabels] = useReducer(MaterialReducer, []);
   const auth = firebase.auth();
   const router = useRouter();
-  let collectionId = "canvases";
-  if (
-    auth.currentUser != null &&
-    auth.currentUser.uid === process.env.TEST_USER_ID
-  ) {
-    collectionId = "testCanvases";
-  }
+  const collectionId = "canvases";
 
   const enterCanvas = async (canvasId: string) => {
     try {
