@@ -2,18 +2,23 @@
 
 <img width="1434" alt="スクリーンショット 2021-02-12 10 28 03" src="https://user-images.githubusercontent.com/47450240/107727731-57de2980-6d2f-11eb-985a-cd11a4870c4c.png">
 
-## **APP URL**
+## **■APP URL**
 
 https://create-ideas-cea7b.web.app/
 
-## **概要**
+## **■ 概要**
 
 文字、線、付箋を自由に配置し  
 リアルタイムにアイデアを創造し共有することができるアプリです。
 
 ![共有](https://user-images.githubusercontent.com/47450240/107727415-98897300-6d2e-11eb-9036-4003f361e607.gif)
 
-## **用語**
+## **■ 背景**
+
+チーム開発などで何か新しいものを作り始める際に、  
+アイデアをリアルタイムで共有できるもの(ホワイトボードのようなもの)があればいいなと思って作成しました。
+
+## **■ 用語**
 
 - Canvas：アイデア出しをするための場所
 - Material：Canvas の中に配置するモノ
@@ -21,7 +26,7 @@ https://create-ideas-cea7b.web.app/
   - ラベル：背景色はないが、文字入力ができるモノ
   - 線：縦または横に線が引けるモノ
 
-## **機能**
+## **■ 機能**
 
 ### **ユーザー登録**
 
@@ -73,7 +78,7 @@ Google アカウントもしくはメールアドレスで登録可能
 右クリックメニューより png 出力ができます。  
  ![](https://user-images.githubusercontent.com/47450240/107719806-653de880-6d1c-11eb-87b5-63b2cae2c3f6.gif)
 
-## **技術**
+## **■ 技術**
 
 - Firebase
   - Authentication：アカウントの権限周り
