@@ -23,8 +23,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": "./",
-    "paths": {"react-textfit": ["/src/types/react-textfit/react-textfit.d.ts"]},
-    "typeRoots": ["/src/types","node_modules/@types"],
+    "paths": {"react-textfit": ["/src/@types/react-textfit/react-textfit.d.ts"]},
+    "typeRoots": ["/src/@types","node_modules/@types"],
   },
   "include": [
     "next-env.d.ts",

@@ -2,6 +2,7 @@
 import React, { useState, createContext, useEffect, useReducer } from "react";
 import firebase, { storage } from "../firebase/firebase";
 import { useRouter } from "next/router";
+import { MaterialType } from "../MaterialTypeEnum";
 
 type Canvas = {
   //TODO:型直す
@@ -20,14 +21,6 @@ type Template = {
   imageUrl: string;
   description: string;
 };
-
-const MaterialType = {
-  StickyNotes: "stickyNotes",
-  Lines: "lines",
-  Labels: "labels",
-} as const;
-
-type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 //interface
 interface IContextProps {

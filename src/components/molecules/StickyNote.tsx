@@ -10,6 +10,7 @@ import { Rnd } from "react-rnd";
 import LockButton from "../atoms/LockButton";
 import { atom } from "recoil";
 import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
+import { MaterialType } from "../../MaterialTypeEnum";
 
 export const stickyNoteState = atom({
   key: "stickyNoteState",
@@ -56,14 +57,6 @@ type StickyNoteProps = {
   positionX: number;
   positionY: number;
 };
-
-const MaterialType = {
-  StickyNotes: "stickyNotes",
-  Lines: "lines",
-  Labels: "labels",
-} as const;
-
-type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 const initiaMouselState = {
   mouseX: null,

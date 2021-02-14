@@ -7,6 +7,7 @@ import { Menu, MenuItem } from "@material-ui/core";
 import { Rnd } from "react-rnd";
 import LockButton from "../atoms/LockButton";
 import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
+import { MaterialType } from "../../MaterialTypeEnum";
 
 type LineProps = {
   canvasId: string;
@@ -20,14 +21,6 @@ type LineProps = {
   isLocked: boolean;
   areaSize: { height: number; width: number };
 };
-
-const MaterialType = {
-  StickyNotes: "stickyNotes",
-  Lines: "lines",
-  Labels: "labels",
-} as const;
-
-type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 const initiaMouselState = {
   mouseX: null,
