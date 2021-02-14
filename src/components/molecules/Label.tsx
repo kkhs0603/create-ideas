@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useContext, useEffect } from "react";
 import { MaterialsContext } from "../../contexts/MaterialsContext";
 import { TextField, Menu, MenuItem } from "@material-ui/core";
@@ -7,15 +6,7 @@ import { Rnd } from "react-rnd";
 import { Textfit } from "react-textfit";
 import LockButton from "../atoms/LockButton";
 import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
-
-const MaterialType = {
-  StickyNotes: "stickyNotes",
-  Lines: "lines",
-  Labels: "labels",
-} as const;
-
-type MaterialType = typeof MaterialType[keyof typeof MaterialType];
-
+import { MaterialType } from "../../MaterialTypeEnum";
 interface mouseState {
   mouseX: null | number;
   mouseY: null | number;
@@ -39,6 +30,7 @@ type LabelProps = {
   isLocked: boolean;
   canvasId: string;
   isAreaClicked: boolean;
+  color: string;
   setIsAreaClicked: (boolean) => void;
 };
 
@@ -71,7 +63,6 @@ const Label: React.FC<LabelProps> = (props) => {
     positionY: props.positionY,
     width: props.width,
     height: props.height,
-    selectedColor: props.color,
     word: props.word,
     isLocked: props.isLocked,
   });

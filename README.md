@@ -78,7 +78,7 @@ Google アカウントもしくはメールアドレスで登録可能
 右クリックメニューより png 出力ができます。  
  ![](https://user-images.githubusercontent.com/47450240/107719806-653de880-6d1c-11eb-87b5-63b2cae2c3f6.gif)
 
-## **■ 技術**
+## **■ ぉ技術**
 
 - Firebase
   - Authentication：アカウントの権限周り

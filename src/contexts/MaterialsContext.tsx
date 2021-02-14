@@ -4,6 +4,7 @@ import firebase from "../firebase/firebase";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import loadImage from "blueimp-load-image";
+import { MaterialType } from "../MaterialTypeEnum";
 
 interface Material {
   id: string;
@@ -30,14 +31,6 @@ interface Label extends Material {
   height: number;
   createdBy: string;
 }
-
-const MaterialType = {
-  StickyNotes: "stickyNotes",
-  Lines: "lines",
-  Labels: "labels",
-} as const;
-
-type MaterialType = typeof MaterialType[keyof typeof MaterialType];
 
 type Template = {
   name: string;
