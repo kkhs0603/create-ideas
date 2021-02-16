@@ -8,7 +8,7 @@ const AuthContext = React.createContext({} as any);
 
 const AuthProvider = ({ children }) => {
   const router = useRouter();
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [user, setUser] = useState<User | null>();
   const [isLoading, setIsLoading] = useState<Boolean>(false);
   const auth = firebase.auth();
   const db = firebase.firestore();
