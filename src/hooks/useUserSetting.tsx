@@ -33,9 +33,7 @@ export const useUserSetting = () => {
   const uploadImage = (image) => {
     return new Promise((resolve, reject) => {
       const storage = firebase.storage();
-      const uploadTask = storage
-        .ref(`/images/propfiles/${user.uid}`)
-        .put(image);
+      const uploadTask = storage.ref(`/images/profiles/${user.uid}`).put(image);
       uploadTask.on(
         "state_changed",
         // 進行中のsnapshotを得る
@@ -53,7 +51,7 @@ export const useUserSetting = () => {
         // 画像表示のため、アップロードした画像のURLを取得
         async () => {
           const imageUrl = await storage
-            .ref("/images/propfiles")
+            .ref("/images/profiles")
             .child(user.uid)
             .getDownloadURL();
           await setImageUrl(imageUrl);
