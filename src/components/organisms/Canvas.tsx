@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useRef, useEffect, useMemo, useState, useContext } from "react";
+import React, { useEffect, useMemo, useState, useContext } from "react";
 import StickyNote from "../molecules/StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
 import { MaterialsContext } from "../../contexts/MaterialsContext";
@@ -53,26 +53,25 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     labels,
     // uploadTemplate,
   } = useContext(MaterialsContext);
-  const ref = useRef();
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
     mouseY: number;
   }>(initialMouseState);
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
-
   const classes = useStyles(areaSize);
   useEffect(() => {
     enterCanvas(props.id);
+    const canvasElement = document.getElementById("canvas");
     setAreaSize({
-      width: ref.current.scrollWidth,
-      height: ref.current.scrollHeight,
+      width: canvasElement.scrollWidth + canvasElement.offsetWidth,
+      height: canvasElement.scrollHeight + canvasElement.offsetHeight,
     });
   }, []);
 
   const handleClick = (e) => {
     e.preventDefault();
-    if (e.target.id !== "area") return;
+    if (e.target.id !== "canvas") return;
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -99,7 +98,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
   };
 
   const onClickExport = () => {
-    const target = document.getElementById("area");
+    const target = document.getElementById("canvas");
     html2canvas(target).then((canvas) => {
       const targetImgUri = canvas.toDataURL("img/png");
       saveAsImage(targetImgUri);
@@ -113,7 +112,6 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     return (
       <StickyNote
         key={stickyNote.id}
-        parent={ref.current?.getBoundingClientRect()}
         canvasId={props.id}
         isAreaClicked={isAreaClicked}
         setIsAreaClicked={setIsAreaClicked}
@@ -151,16 +149,14 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     />
   ));
 
-  //TODO:退出した時、初期化
   return (
     <div
-      id="area"
+      id="canvas"
       className={classes.container}
-      ref={ref}
       onContextMenu={handleClick}
       onClick={(e) => {
         e.preventDefault();
-        if (e.target.id !== "area") return;
+        if (e.target.id !== "canvas") return;
         setIsAreaClicked(true);
       }}
     >

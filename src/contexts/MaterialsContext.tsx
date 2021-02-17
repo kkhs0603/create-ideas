@@ -677,7 +677,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
 
   const updateThumbnail = async (canvasId: string) => {
     try {
-      const target = document.getElementById("area");
+      const target = document.getElementById("canvas");
       const canvas = await html2canvas(target);
       const dataUrl = canvas.toDataURL("image/png");
       const result = await loadImage(dataUrl, {
