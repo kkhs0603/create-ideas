@@ -2,6 +2,13 @@
   // // font-family: "LogoType";
   // width: 100%;
   margin: 0 auto;
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
   .main {
     // width: 100%;
     margin: 0 auto;

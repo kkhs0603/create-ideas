@@ -1,101 +1,174 @@
-import React, { useState, useContext, useEffect } from "react";
+// @ts-nocheck
+import React, { useState, useContext, useRef, useEffect, useMemo } from "react";
+import { withStyles } from "@material-ui/core/styles";
+import { yellow, green, red, blue } from "@material-ui/core/colors";
 import { MaterialsContext } from "../../contexts/MaterialsContext";
-import { TextField, Menu, MenuItem } from "@material-ui/core";
+import { TextField, Menu, MenuItem, Radio, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import classNames from "classnames";
 import { Rnd } from "react-rnd";
-import { Textfit } from "react-textfit";
 import LockButton from "../atoms/LockButton";
+import { atom } from "recoil";
 import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
 import { MaterialType } from "../../MaterialTypeEnum";
-interface mouseState {
-  mouseX: null | number;
-  mouseY: null | number;
-}
 
-const initiaMouselState: mouseState = {
+export const stickyNoteState = atom({
+  key: "stickyNoteState",
+  default: {
+    color: "",
+    createdBy: "",
+    height: 0,
+    width: 0,
+    id: "",
+    isEdit: false,
+    word: "",
+    zIndex: 0,
+    positionX: 0,
+    positionY: 0,
+  },
+});
+type Props = {
+  canvasId: string;
+  setIsAreaClicked: (isAreaClicked: boolean) => void;
+  isAreaClicked: boolean;
+  data: {
+    color: string;
+    createdBy: string;
+    height: number;
+    width: number;
+    id: string;
+    isEdit: boolean;
+    word: string;
+    zIndex: number;
+    positionX: number;
+    positionY: number;
+  };
+};
+
+type StickyNoteProps = {
+  color: string;
+  createdBy: string;
+  height: number;
+  width: number;
+  id: string;
+  isEdit: boolean;
+  word: string;
+  zIndex: number;
+  positionX: number;
+  positionY: number;
+};
+
+const initiaMouselState = {
   mouseX: null,
   mouseY: null,
 };
 
-type LabelProps = {
-  id: string;
-  vh: string;
-  positionX: number;
-  positionY: number;
-  zIndex: number;
-  isEdit: boolean;
-  word: string;
-  width: number;
-  height: number;
-  isLocked: boolean;
-  canvasId: string;
-  isAreaClicked: boolean;
-  color: string;
-  setIsAreaClicked: (boolean) => void;
-};
-
-type DraggableData = {
-  node: HTMLElement;
-  x: number;
-  y: number;
-  deltaX: number;
-  deltaY: number;
-  lastX: number;
-  lastY: number;
-};
-
-type DraggableEventHandler = (e: any, data: DraggableData) => void | false;
-
-const Label: React.FC<LabelProps> = (props) => {
+const ImageBox: React.FC<any> = (props) => {
   const classes = useStyles(props);
   const {
     moveMaterial,
-    resizeMaterial,
-    editMaterialWord,
     deleteMaterial,
+    editMaterialWord,
+    resizeMaterial,
   } = useContext(MaterialsContext);
-  const [style, setStyle] = useState(classes.container);
-  const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
-  const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
-  const [fontSize, setFontSize] = useState<number>(30);
-  const [labelProps, setLabelProps] = useState<LabelProps>({
+  const [mouseState, setMouseState] = useState<{
+    mouseX: number;
+    mouseY: number;
+  }>(initiaMouselState);
+  const [cursor, setCursor] = useState<string>("grab");
+  const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+
+  const [stickyNoteProps, setStickyNoteProps] = useState<StickyNoteProps>({
     positionX: props.positionX,
     positionY: props.positionY,
     width: props.width,
     height: props.height,
+    selectedColor: props.color,
     word: props.word,
     isLocked: props.isLocked,
   });
 
-  const handleStop: DraggableEventHandler = (e, d) => {
+  const handleClick = (e) => {
+    setIsOpendMenu(true);
+    setMouseState({
+      mouseX: e.clientX - 2,
+      mouseY: e.clientY - 4,
+    });
+  };
+
+  const handleClose = () => {
+    setIsOpendMenu(false);
+    setMouseState(initiaMouselState);
+  };
+
+  const handleStart = () => {
+    props.setIsAreaClicked(false);
+    if (isOpendMenu) return false;
+    setCursor("grabbing");
+  };
+
+  const handleDrag = () => {
+    if (cursor !== "grabbing") {
+      setCursor("grabbing");
+    }
+  };
+
+  const handleStop = (e, d) => {
     const positionX = d.x;
     const positionY = d.y;
+    if (isNaN(positionX) || isNaN(positionY)) return;
     if (
-      labelProps.positionX !== positionX ||
-      labelProps.positionY !== positionY
+      stickyNoteProps.positionX !== positionX ||
+      stickyNoteProps.positionY !== positionY
     ) {
-      setLabelProps({ ...labelProps, positionX, positionY });
+      setStickyNoteProps({
+        ...stickyNoteProps,
+        positionX: positionX,
+        positionY: positionY,
+      });
       moveMaterial(
         props.canvasId,
-        MaterialType.Labels,
+        MaterialType.ImageBox,
         props.id,
         positionX,
         positionY
       );
     }
+    setCursor("grab");
   };
 
+  let color = classNames(classes.yellow, classes.container);
+  switch (props.color) {
+    case "yellow":
+      color = classNames(classes.yellow, classes.container);
+      break;
+    case "green":
+      color = classNames(classes.green, classes.container);
+      break;
+    case "red":
+      color = classNames(classes.red, classes.container);
+      break;
+    case "blue":
+      color = classNames(classes.blue, classes.container);
+      break;
+    default:
+      color = classNames(classes.yellow, classes.container);
+      break;
+  }
+
   const handleResizeStop = (e, direction, ref, delta, position) => {
-    const changedWidth = labelProps.width + delta.width;
-    const changedHeight = labelProps.height + delta.height;
+    const changedWidth = stickyNoteProps.width + delta.width;
+    const changedHeight = stickyNoteProps.height + delta.height;
     const positionX = position.x;
     const positionY = position.y;
+    if (isNaN(positionX) || isNaN(positionY)) return;
     if (
-      labelProps.width !== changedWidth ||
-      labelProps.height !== changedHeight
+      stickyNoteProps.width !== changedWidth ||
+      stickyNoteProps.height !== changedHeight
     ) {
-      setLabelProps({
-        ...labelProps,
+      setStickyNoteProps({
+        ...stickyNoteProps,
         width: changedWidth,
         height: changedHeight,
         positionX,
@@ -103,7 +176,7 @@ const Label: React.FC<LabelProps> = (props) => {
       });
       resizeMaterial(
         props.canvasId,
-        MaterialType.Labels,
+        MaterialType.ImageBox,
         props.id,
         positionX,
         positionY,
@@ -113,108 +186,64 @@ const Label: React.FC<LabelProps> = (props) => {
     }
   };
 
-  const handleClick = (e) => {
-    setMouseState({
-      mouseX: e.clientX - 2,
-      mouseY: e.clientY - 4,
-    });
-  };
+  useEffect(() => {
+    // console.log(props);
+    setStickyNoteProps(props);
+  }, [props]);
 
-  const handleClose = () => {
-    setMouseState(initiaMouselState);
-  };
-
-  const word =
-    !labelProps.isLocked && isEdit ? (
-      <textarea
-        style={{
-          fontSize: fontSize,
-          width: labelProps.width,
-          height: labelProps.height,
-          resize: "none",
-        }}
-        value={labelProps.word}
-        onChange={(e) => {
-          // console.log(e.target.value);
-          setLabelProps({ ...labelProps, word: e.target.value });
-        }}
-        autoFocus
-        onFocus={(e) =>
-          e.currentTarget.setSelectionRange(
-            e.currentTarget.value.length,
-            e.currentTarget.value.length
-          )
-        }
-      />
-    ) : (
-      <div id={props.id}>
-        <Textfit
-          className={style}
-          min={30}
-          max={300}
-          onReady={(e) => {
-            setFontSize(e);
-          }}
-        >
-          {labelProps.word}
-        </Textfit>
-      </div>
-    );
   useEffect(() => {
     //編集状態を解除する
     if (props.isAreaClicked) {
       setIsEdit(false);
-      if (props.word !== labelProps.word) {
-        setLabelProps({ ...labelProps, word: labelProps.word });
+      if (props.word !== stickyNoteProps.word) {
+        setStickyNoteProps({ ...stickyNoteProps, word: stickyNoteProps.word });
         editMaterialWord(
           props.canvasId,
-          MaterialType.Labels,
+          MaterialType.ImageBox,
           props.id,
-          labelProps.word
+          stickyNoteProps.word
         );
       }
     }
   }, [props.isAreaClicked]);
-
-  useEffect(() => {
-    // console.log(props);
-    setLabelProps(props);
-  }, [props]);
-
   return (
     <Rnd
-      style={{ zIndex: props.zIndex }}
-      size={{
-        width: labelProps.width,
-        height: labelProps.height,
+      style={{
+        zIndex: 1,
       }}
-      position={{ x: labelProps.positionX, y: labelProps.positionY }}
+      size={{
+        width: 100,
+        height: 100,
+      }}
+      position={{ x: stickyNoteProps.positionX, y: stickyNoteProps.positionY }}
+      onDragStart={handleStart}
+      onDrag={handleDrag}
       onDragStop={handleStop}
       onResizeStop={handleResizeStop}
       minHeight="50"
       minWidth="50"
-      onMouseOver={() => {
-        if (!labelProps.isLocked && style !== classes.onHoverContainer) {
-          setStyle(classes.onHoverContainer);
-        }
-      }}
-      onMouseLeave={() => {
-        if (!labelProps.isLocked && style !== classes.container) {
-          setStyle(classes.container);
-        }
-      }}
-      id={props.id}
-      disableDragging={labelProps.isLocked}
-      enableResizing={!labelProps.isLocked}
+      disableDragging={stickyNoteProps.isLocked}
+      enableResizing={!stickyNoteProps.isLocked}
+      bounds="parent"
     >
       <div
-        onDoubleClick={(e) => {
-          setIsEdit(true);
+        id={props.id}
+        className={color}
+        style={{ cursor: cursor }}
+        onContextMenu={handleClick}
+        onClick={() => {
           props.setIsAreaClicked(false);
         }}
-        onContextMenu={handleClick}
+        onDoubleClick={(e) => {
+          setIsEdit(e.target.id === props.id);
+          props.setIsAreaClicked(false);
+        }}
       >
-        {word}
+        <img
+          style={{ width: "100%", height: "100%" }}
+          src={props.resource}
+          alt={props.id}
+        />
         <Menu
           open={mouseState.mouseY !== null}
           onClose={handleClose}
@@ -226,30 +255,21 @@ const Label: React.FC<LabelProps> = (props) => {
           }
         >
           <LockButton
-            isLocked={props.isLocked}
+            isLocked={stickyNoteProps.isLocked}
             canvasId={props.canvasId}
-            objName={MaterialType.Labels}
+            objName={MaterialType.ImageBox}
             id={props.id}
-            setProps={setLabelProps}
           />
-          <MenuItem
-            disabled={labelProps.isLocked}
-            onClick={(e) => {
-              setIsEdit(true);
-              handleClose();
-            }}
-          >
-            編集
-          </MenuItem>
+          <Divider />
           <FrontBackContextMenuItems
-            materialType={MaterialType.Labels}
+            materialType={MaterialType.ImageBox}
             canvasId={props.canvasId}
-            {...labelProps}
+            {...stickyNoteProps}
           />
           <MenuItem
-            disabled={labelProps.isLocked}
+            disabled={stickyNoteProps.isLocked}
             onClick={() => {
-              deleteMaterial(props.canvasId, MaterialType.Labels, props.id);
+              deleteMaterial(props.canvasId, MaterialType.ImageBox, props.id);
               handleClose();
             }}
           >
@@ -260,31 +280,19 @@ const Label: React.FC<LabelProps> = (props) => {
     </Rnd>
   );
 };
-
 ///////
 //Style
 ///////
 const useStyles = makeStyles({
   container: {
+    whiteSpace: "pre-wrap",
     position: "absolute",
     boxSizing: "border-box",
-    border: "1px solid transparent",
+    border: "1px solid black",
     height: "100%",
     width: "100%",
-    padding: 0,
-    zIndex: (props: LabelProps) => props.zIndex,
-    whiteSpace: "pre-wrap",
-  },
-  onHoverContainer: {
-    position: "absolute",
-    boxSizing: "border-box",
-    border: "1px solid gray",
-    height: "100%",
-    width: "100%",
-    padding: 0,
-    zIndex: (props: LabelProps) => props.zIndex,
-    whiteSpace: "pre-wrap",
+    zIndex: (props: Props) => props.zIndex,
   },
 });
 
-export default Label;
+export default ImageBox;

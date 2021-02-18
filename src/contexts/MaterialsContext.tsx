@@ -179,11 +179,15 @@ const MaterialsProvider: React.FC = ({ children }) => {
       case MaterialType.Labels:
         dispatchLabels({ type: type, material: material });
         break;
+      case MaterialType.ImageBox:
+        dispatchImageBoxes({ type: type, material: material });
+        break;
     }
   };
   const [stickyNotes, dispatchStickyNotes] = useReducer(MaterialReducer, []);
   const [lines, dispatchLines] = useReducer(MaterialReducer, []);
   const [labels, dispatchLabels] = useReducer(MaterialReducer, []);
+  const [imageBoxes, dispatchImageBoxes] = useReducer(MaterialReducer, []);
   const auth = firebase.auth();
   const router = useRouter();
   const collectionId = "canvases";
@@ -193,6 +197,8 @@ const MaterialsProvider: React.FC = ({ children }) => {
       dispatchMaterial(MaterialType.StickyNotes, "initialize", []);
       dispatchMaterial(MaterialType.Lines, "initialize", []);
       dispatchMaterial(MaterialType.Labels, "initialize", []);
+      dispatchMaterial(MaterialType.ImageBox, "initialize", []);
+
       await db.collection(collectionId).doc(canvasId);
       await getAllMaterials(canvasId);
     } catch (error) {}
@@ -203,6 +209,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       await getMaterial(canvasId, MaterialType.StickyNotes);
       await getMaterial(canvasId, MaterialType.Lines);
       await getMaterial(canvasId, MaterialType.Labels);
+      await getMaterial(canvasId, MaterialType.ImageBox);
     } catch (error) {
       // console.log(error.message);
     }
@@ -484,6 +491,66 @@ const MaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
+  const addImageBox = async (
+    canvasId: string,
+    x: number,
+    y: number,
+    file: File
+  ) => {
+    try {
+      const chars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const idLength = 20;
+      let id = Array.from(Array(idLength))
+        .map(() => chars[Math.floor(Math.random() * chars.length)])
+        .join("");
+      const uploadTask = firebase
+        .storage()
+        .ref(`/images/imageBox/${id}`)
+        .put(file);
+      uploadTask.on(
+        "state_changed",
+        // 進行中のsnapshotを得る
+        // アップロードの進行度を表示
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          // console.log("Upload is " + progress + "% done");
+        },
+        (error) => {
+          reject(error);
+          alert(error);
+        },
+        // 完了後の処理
+        // 画像表示のため、アップロードした画像のURLを取得
+        async () => {
+          const imageUrl = await firebase
+            .storage()
+            .ref("/images/imageBox")
+            .child(id)
+            .getDownloadURL();
+          await db
+            .collection("canvases")
+            .doc(canvasId)
+            .collection("imageBox")
+            .doc(id)
+            .set({
+              positionX: x,
+              positionY: y,
+              updatedBy: auth.currentUser.uid,
+              updatedAt:
+                new Date().toLocaleString("ja") +
+                ":" +
+                new Date().getMilliseconds(),
+              resource: imageUrl,
+            });
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   /* --------------------------
   stickyNote
   -------------------------- */
@@ -711,6 +778,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
         editMaterialWord,
         resizeMaterial,
         lockMaterial,
+        addImageBox,
 
         changeStickyNoteColor,
         bringForward,
@@ -724,6 +792,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
         lines,
         stickyNotes,
         labels,
+        imageBoxes,
       }}
     >
       {children}
