@@ -10,11 +10,14 @@ import {
   MenuItem,
   Radio,
   Divider,
+  withWidth,
 } from "@material-ui/core";
 import Line from "../molecules/Line";
 import Label from "../molecules/Label";
+import ImageBox from "../molecules/ImageBox";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import html2canvas from "html2canvas";
+import { useDropzone } from "react-dropzone";
 
 type StickyNoteAreaProps = {
   id: string;
@@ -51,6 +54,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     lines,
     isEdit,
     labels,
+    addImageBox,
+    imageBoxes,
     // uploadTemplate,
   } = useContext(MaterialsContext);
   const [mouseState, setMouseState] = useState<{
@@ -60,12 +65,18 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
   const [isAreaClicked, setIsAreaClicked] = useState<boolean>(false);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
   const classes = useStyles(areaSize);
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    noClick: true,
+    accept: "image/jpeg, image/png",
+  });
+  const [droppedPosition, setDroppedPosition] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     enterCanvas(props.id);
     const canvasElement = document.getElementById("canvas");
     setAreaSize({
-      width: canvasElement.scrollWidth + canvasElement.offsetWidth,
-      height: canvasElement.scrollHeight + canvasElement.offsetHeight,
+      width: canvasElement.clientWidth,
+      height: canvasElement.scrollHeight,
     });
   }, []);
 
@@ -149,6 +160,22 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     />
   ));
 
+  const imageBoxesComponent = imageBoxes?.map((imageBox) => (
+    <ImageBox
+      key={imageBox.id}
+      canvasId={props.id}
+      isAreaClicked={isAreaClicked}
+      setIsAreaClicked={setIsAreaClicked}
+      {...imageBox}
+    />
+  ));
+  useEffect(() => {
+    acceptedFiles.map((file) => {
+      addImageBox(props.id, droppedPosition.x, droppedPosition.y, file);
+      //storageにアップロード
+    });
+  }, [acceptedFiles]);
+
   return (
     <div
       id="canvas"
@@ -160,9 +187,38 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
         setIsAreaClicked(true);
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          outline: "none",
+        }}
+        {...getRootProps({
+          className: "dropzone",
+          onDrop: (event) => {
+            const canvasElement = document.getElementById("canvas");
+            const dropPositionY = event.clientY - canvasElement.offsetTop;
+            const dropPositionX = event.clientX;
+            setDroppedPosition({ x: dropPositionX, y: dropPositionY });
+          },
+        })}
+      >
+        <input
+          {...getInputProps()}
+          style={{
+            position: "absolute",
+            visibility: "hidden",
+            outline: "none",
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      </div>
       {stickyNotesComponent}
       {linesComponent}
       {labelsComponent}
+      {imageBoxesComponent}
       <Menu
         keepMounted
         open={mouseState.mouseY !== null}

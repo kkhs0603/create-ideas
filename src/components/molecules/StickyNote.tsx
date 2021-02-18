@@ -311,6 +311,7 @@ const StickyNote: React.FC<any> = (props) => {
       minWidth="50"
       disableDragging={stickyNoteProps.isLocked}
       enableResizing={!stickyNoteProps.isLocked}
+      bounds="parent"
     >
       <div
         id={props.id}

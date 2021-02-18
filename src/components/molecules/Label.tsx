@@ -206,6 +206,7 @@ const Label: React.FC<LabelProps> = (props) => {
       id={props.id}
       disableDragging={labelProps.isLocked}
       enableResizing={!labelProps.isLocked}
+      bounds="parent"
     >
       <div
         onDoubleClick={(e) => {
