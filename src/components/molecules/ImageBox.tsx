@@ -8,25 +8,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import LockButton from "../atoms/LockButton";
-import { atom } from "recoil";
 import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
 import { MaterialType } from "../../MaterialTypeEnum";
 
-export const stickyNoteState = atom({
-  key: "stickyNoteState",
-  default: {
-    color: "",
-    createdBy: "",
-    height: 0,
-    width: 0,
-    id: "",
-    isEdit: false,
-    word: "",
-    zIndex: 0,
-    positionX: 0,
-    positionY: 0,
-  },
-});
 type Props = {
   canvasId: string;
   setIsAreaClicked: (isAreaClicked: boolean) => void;
@@ -45,14 +29,12 @@ type Props = {
   };
 };
 
-type StickyNoteProps = {
-  color: string;
+type ImageBoxProps = {
   createdBy: string;
   height: number;
   width: number;
   id: string;
   isEdit: boolean;
-  word: string;
   zIndex: number;
   positionX: number;
   positionY: number;
@@ -65,12 +47,9 @@ const initiaMouselState = {
 
 const ImageBox: React.FC<any> = (props) => {
   const classes = useStyles(props);
-  const {
-    moveMaterial,
-    deleteMaterial,
-    editMaterialWord,
-    resizeMaterial,
-  } = useContext(MaterialsContext);
+  const { moveMaterial, deleteMaterial, resizeMaterial } = useContext(
+    MaterialsContext
+  );
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
     mouseY: number;
@@ -79,17 +58,16 @@ const ImageBox: React.FC<any> = (props) => {
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
-  const [stickyNoteProps, setStickyNoteProps] = useState<StickyNoteProps>({
+  const [imageBoxProps, setImageBoxProps] = useState<ImageBoxProps>({
     positionX: props.positionX,
     positionY: props.positionY,
     width: props.width,
     height: props.height,
-    selectedColor: props.color,
-    word: props.word,
     isLocked: props.isLocked,
   });
 
   const handleClick = (e) => {
+    e.preventDefault();
     setIsOpendMenu(true);
     setMouseState({
       mouseX: e.clientX - 2,
@@ -103,7 +81,6 @@ const ImageBox: React.FC<any> = (props) => {
   };
 
   const handleStart = () => {
-    props.setIsAreaClicked(false);
     if (isOpendMenu) return false;
     setCursor("grabbing");
   };
@@ -119,11 +96,11 @@ const ImageBox: React.FC<any> = (props) => {
     const positionY = d.y;
     if (isNaN(positionX) || isNaN(positionY)) return;
     if (
-      stickyNoteProps.positionX !== positionX ||
-      stickyNoteProps.positionY !== positionY
+      imageBoxProps.positionX !== positionX ||
+      imageBoxProps.positionY !== positionY
     ) {
-      setStickyNoteProps({
-        ...stickyNoteProps,
+      setImageBoxProps({
+        ...imageBoxProps,
         positionX: positionX,
         positionY: positionY,
       });
@@ -138,37 +115,18 @@ const ImageBox: React.FC<any> = (props) => {
     setCursor("grab");
   };
 
-  let color = classNames(classes.yellow, classes.container);
-  switch (props.color) {
-    case "yellow":
-      color = classNames(classes.yellow, classes.container);
-      break;
-    case "green":
-      color = classNames(classes.green, classes.container);
-      break;
-    case "red":
-      color = classNames(classes.red, classes.container);
-      break;
-    case "blue":
-      color = classNames(classes.blue, classes.container);
-      break;
-    default:
-      color = classNames(classes.yellow, classes.container);
-      break;
-  }
-
   const handleResizeStop = (e, direction, ref, delta, position) => {
-    const changedWidth = stickyNoteProps.width + delta.width;
-    const changedHeight = stickyNoteProps.height + delta.height;
+    const changedWidth = imageBoxProps.width + delta.width;
+    const changedHeight = imageBoxProps.height + delta.height;
     const positionX = position.x;
     const positionY = position.y;
     if (isNaN(positionX) || isNaN(positionY)) return;
     if (
-      stickyNoteProps.width !== changedWidth ||
-      stickyNoteProps.height !== changedHeight
+      imageBoxProps.width !== changedWidth ||
+      imageBoxProps.height !== changedHeight
     ) {
-      setStickyNoteProps({
-        ...stickyNoteProps,
+      setImageBoxProps({
+        ...imageBoxProps,
         width: changedWidth,
         height: changedHeight,
         positionX,
@@ -188,56 +146,34 @@ const ImageBox: React.FC<any> = (props) => {
 
   useEffect(() => {
     // console.log(props);
-    setStickyNoteProps(props);
+    setImageBoxProps(props);
   }, [props]);
 
-  useEffect(() => {
-    //編集状態を解除する
-    if (props.isAreaClicked) {
-      setIsEdit(false);
-      if (props.word !== stickyNoteProps.word) {
-        setStickyNoteProps({ ...stickyNoteProps, word: stickyNoteProps.word });
-        editMaterialWord(
-          props.canvasId,
-          MaterialType.ImageBox,
-          props.id,
-          stickyNoteProps.word
-        );
-      }
-    }
-  }, [props.isAreaClicked]);
   return (
     <Rnd
       style={{
-        zIndex: 1,
+        zIndex: props.zIndex,
       }}
       size={{
-        width: 100,
-        height: 100,
+        width: imageBoxProps.width,
+        height: imageBoxProps.height,
       }}
-      position={{ x: stickyNoteProps.positionX, y: stickyNoteProps.positionY }}
+      position={{ x: imageBoxProps.positionX, y: imageBoxProps.positionY }}
       onDragStart={handleStart}
       onDrag={handleDrag}
       onDragStop={handleStop}
       onResizeStop={handleResizeStop}
       minHeight="50"
       minWidth="50"
-      disableDragging={stickyNoteProps.isLocked}
-      enableResizing={!stickyNoteProps.isLocked}
+      disableDragging={imageBoxProps.isLocked}
+      enableResizing={!imageBoxProps.isLocked}
       bounds="parent"
     >
       <div
         id={props.id}
-        className={color}
+        className={classes.container}
         style={{ cursor: cursor }}
         onContextMenu={handleClick}
-        onClick={() => {
-          props.setIsAreaClicked(false);
-        }}
-        onDoubleClick={(e) => {
-          setIsEdit(e.target.id === props.id);
-          props.setIsAreaClicked(false);
-        }}
       >
         <img
           style={{ width: "100%", height: "100%" }}
@@ -255,7 +191,7 @@ const ImageBox: React.FC<any> = (props) => {
           }
         >
           <LockButton
-            isLocked={stickyNoteProps.isLocked}
+            isLocked={imageBoxProps.isLocked}
             canvasId={props.canvasId}
             objName={MaterialType.ImageBox}
             id={props.id}
@@ -264,10 +200,10 @@ const ImageBox: React.FC<any> = (props) => {
           <FrontBackContextMenuItems
             materialType={MaterialType.ImageBox}
             canvasId={props.canvasId}
-            {...stickyNoteProps}
+            {...imageBoxProps}
           />
           <MenuItem
-            disabled={stickyNoteProps.isLocked}
+            disabled={imageBoxProps.isLocked}
             onClick={() => {
               deleteMaterial(props.canvasId, MaterialType.ImageBox, props.id);
               handleClose();
@@ -288,7 +224,6 @@ const useStyles = makeStyles({
     whiteSpace: "pre-wrap",
     position: "absolute",
     boxSizing: "border-box",
-    border: "1px solid black",
     height: "100%",
     width: "100%",
     zIndex: (props: Props) => props.zIndex,

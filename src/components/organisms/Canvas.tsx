@@ -82,7 +82,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
 
   const handleClick = (e) => {
     e.preventDefault();
-    if (e.target.id !== "canvas") return;
+    if (e.target.id !== "imageDropzone") return;
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
@@ -161,13 +161,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
   ));
 
   const imageBoxesComponent = imageBoxes?.map((imageBox) => (
-    <ImageBox
-      key={imageBox.id}
-      canvasId={props.id}
-      isAreaClicked={isAreaClicked}
-      setIsAreaClicked={setIsAreaClicked}
-      {...imageBox}
-    />
+    <ImageBox key={imageBox.id} canvasId={props.id} {...imageBox} />
   ));
   useEffect(() => {
     acceptedFiles.map((file) => {
@@ -177,22 +171,15 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
   }, [acceptedFiles]);
 
   return (
-    <div
-      id="canvas"
-      className={classes.container}
-      onContextMenu={handleClick}
-      onClick={(e) => {
-        e.preventDefault();
-        if (e.target.id !== "canvas") return;
-        setIsAreaClicked(true);
-      }}
-    >
+    <div id="canvas" className={classes.container}>
       <div
+        id="imageDropzone"
         style={{
           position: "absolute",
           width: "100%",
           height: "100%",
           outline: "none",
+          zIndex: -1,
         }}
         {...getRootProps({
           className: "dropzone",
@@ -203,6 +190,12 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
             setDroppedPosition({ x: dropPositionX, y: dropPositionY });
           },
         })}
+        onContextMenu={handleClick}
+        onClick={(e) => {
+          e.preventDefault();
+          if (e.target.id !== "imageDropzone") return;
+          setIsAreaClicked(true);
+        }}
       >
         <input
           {...getInputProps()}
