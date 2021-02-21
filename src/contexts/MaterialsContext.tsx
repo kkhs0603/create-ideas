@@ -491,6 +491,25 @@ const MaterialsProvider: React.FC = ({ children }) => {
     }
   };
 
+  //画像サイズ(width,height)取得
+  const getImageSize = async (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const size = {
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        };
+        URL.revokeObjectURL(img.src);
+        resolve(size);
+      };
+      img.onerror = (error) => {
+        reject(error);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const addImageBox = async (
     canvasId: string,
     x: number,
@@ -508,6 +527,10 @@ const MaterialsProvider: React.FC = ({ children }) => {
         .storage()
         .ref(`/images/imageBox/${id}`)
         .put(file);
+      const { width, height } = await getImageSize(file);
+      const imageWidth = 200 * (width / (width + height));
+      const imageHeight = 200 * (height / (width + height));
+
       uploadTask.on(
         "state_changed",
         // 進行中のsnapshotを得る
@@ -529,20 +552,29 @@ const MaterialsProvider: React.FC = ({ children }) => {
             .ref("/images/imageBox")
             .child(id)
             .getDownloadURL();
+
+          const zIndeices = await getAllZindices(canvasId);
+          const maxZindex =
+            zIndeices.length !== 0 ? Math.max.apply(null, zIndeices) : 0;
           await db
             .collection("canvases")
             .doc(canvasId)
             .collection("imageBox")
             .doc(id)
             .set({
+              id: id,
+              width: imageWidth,
+              height: imageHeight,
               positionX: x,
               positionY: y,
+              zIndex: maxZindex + 1,
               updatedBy: auth.currentUser.uid,
               updatedAt:
                 new Date().toLocaleString("ja") +
                 ":" +
                 new Date().getMilliseconds(),
               resource: imageUrl,
+              isLocked: false,
             });
         }
       );
@@ -742,11 +774,14 @@ const MaterialsProvider: React.FC = ({ children }) => {
     return result;
   };
 
+  //サムネイルをアップロード
   const updateThumbnail = async (canvasId: string) => {
     try {
       const target = document.getElementById("canvas");
-      const canvas = await html2canvas(target);
-      const dataUrl = canvas.toDataURL("image/png");
+      const canvas = await html2canvas(target, {
+        useCORS: true,
+      });
+      const dataUrl = await canvas.toDataURL("image/png");
       const result = await loadImage(dataUrl, {
         maxWidth: 300,
         canvas: true,
@@ -763,7 +798,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
         canvasRef.update({ thumbnailUrl: url });
       });
     } catch (error) {
-      // console.log(error.message);
+      console.log(error.message);
     }
   };
 

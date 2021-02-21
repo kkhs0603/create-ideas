@@ -114,6 +114,7 @@ const Label: React.FC<LabelProps> = (props) => {
   };
 
   const handleClick = (e) => {
+    e.preventDefault();
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,

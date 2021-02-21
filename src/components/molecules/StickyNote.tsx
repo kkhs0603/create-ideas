@@ -8,25 +8,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Rnd } from "react-rnd";
 import LockButton from "../atoms/LockButton";
-import { atom } from "recoil";
 import FrontBackContextMenuItems from "../atoms/FrontBackContextMenuItems";
 import { MaterialType } from "../../MaterialTypeEnum";
 
-export const stickyNoteState = atom({
-  key: "stickyNoteState",
-  default: {
-    color: "",
-    createdBy: "",
-    height: 0,
-    width: 0,
-    id: "",
-    isEdit: false,
-    word: "",
-    zIndex: 0,
-    positionX: 0,
-    positionY: 0,
-  },
-});
 type Props = {
   canvasId: string;
   setIsAreaClicked: (isAreaClicked: boolean) => void;
@@ -108,10 +92,6 @@ const StickyNote: React.FC<any> = (props) => {
     editMaterialWord,
     resizeMaterial,
     changeStickyNoteColor,
-    bringForward,
-    sendBackward,
-    bringToFront,
-    sendToBack,
   } = useContext(MaterialsContext);
   const [mouseState, setMouseState] = useState<{
     mouseX: number;
@@ -132,6 +112,7 @@ const StickyNote: React.FC<any> = (props) => {
   });
 
   const handleClick = (e) => {
+    e.preventDefault();
     setIsOpendMenu(true);
     setMouseState({
       mouseX: e.clientX - 2,

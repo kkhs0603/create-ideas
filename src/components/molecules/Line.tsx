@@ -101,6 +101,7 @@ const Line: React.FC<LineProps> = (props) => {
   };
 
   const handleClick = (e) => {
+    e.preventDefault();
     setMouseState({
       mouseX: e.clientX - 2,
       mouseY: e.clientY - 4,
