@@ -578,6 +578,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
             });
         }
       );
+      await updateCanvas(canvasId);
     } catch (error) {
       console.log(error);
     }
