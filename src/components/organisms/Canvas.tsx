@@ -110,7 +110,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
 
   const onClickExport = () => {
     const target = document.getElementById("canvas");
-    html2canvas(target).then((canvas) => {
+    html2canvas(target, {
+      useCORS: true,
+    }).then((canvas) => {
       const targetImgUri = canvas.toDataURL("img/png");
       saveAsImage(targetImgUri);
     });
