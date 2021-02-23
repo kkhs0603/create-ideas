@@ -4,13 +4,11 @@ import StickyNote from "../molecules/StickyNote";
 import { makeStyles } from "@material-ui/core/styles";
 import { MaterialsContext } from "../../contexts/MaterialsContext";
 import {
-  Button,
-  TextField,
   Menu,
   MenuItem,
-  Radio,
   Divider,
-  withWidth,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core";
 import Line from "../molecules/Line";
 import Label from "../molecules/Label";
@@ -70,6 +68,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     accept: "image/jpeg, image/png",
   });
   const [droppedPosition, setDroppedPosition] = useState({ x: 0, y: 0 });
+  const [isOpendBackdrop, setIsOpendBackdrop] = useState<boolean>(false);
 
   useEffect(() => {
     enterCanvas(props.id);
@@ -84,8 +83,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
     e.preventDefault();
     if (e.target.id !== "imageDropzone") return;
     setMouseState({
-      mouseX: e.clientX - 2,
-      mouseY: e.clientY - 4,
+      mouseX: e.clientX,
+      mouseY: e.clientY,
     });
     setIsAreaClicked(true);
   };
@@ -95,6 +94,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
       setMouseState(initialMouseState);
     }
   };
+  //画像出力
   const saveAsImage = (uri) => {
     const downloadLink = document.createElement("a");
     if (typeof downloadLink.download === "string") {
@@ -116,6 +116,21 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
       const targetImgUri = canvas.toDataURL("img/png");
       saveAsImage(targetImgUri);
     });
+  };
+
+  //画像入力/ImageBox
+  const inputRef = React.useRef();
+  const AddImageBoxWithRightClick = (e) => {
+    inputRef.current.click();
+  };
+
+  const OnChangedImage = async (e) => {
+    const image = e.target.files[0];
+    if (image !== undefined) {
+      // setIsOpendBackdrop(true);
+      await addImageBox(props.id, droppedPosition.x, droppedPosition.y, image);
+      // setIsOpendBackdrop(false);
+    }
   };
 
   // useEffect(() => {
@@ -174,6 +189,9 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
 
   return (
     <div id="canvas" className={classes.container}>
+      {/* <Backdrop className={classes.backdrop} open={isOpendBackdrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop> */}
       <div
         id="imageDropzone"
         style={{
@@ -196,6 +214,10 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
         onClick={(e) => {
           e.preventDefault();
           if (e.target.id !== "imageDropzone") return;
+          setMouseState({
+            mouseX: e.clientX,
+            mouseY: e.clientY,
+          });
           setIsAreaClicked(true);
         }}
       >
@@ -210,13 +232,29 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
           }}
         />
       </div>
+      <input
+        type="file"
+        ref={inputRef}
+        onChange={(e) => {
+          OnChangedImage(e);
+        }}
+        style={{ display: "none" }}
+        accept="image/png, image/jpeg, image/gif"
+      />
       {stickyNotesComponent}
       {linesComponent}
       {labelsComponent}
       {imageBoxesComponent}
       <Menu
         keepMounted
-        open={mouseState.mouseY !== null}
+        open={mouseState.mouseY !== null && mouseState.mouseY != null}
+        onEntering={(e) => {
+          setDroppedPosition({
+            //ヘッダーの高さ分微調整
+            x: e.offsetLeft,
+            y: e.offsetTop - 85,
+          });
+        }}
         onClose={handleClose}
         anchorReference="anchorPosition"
         anchorPosition={
@@ -232,8 +270,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
                 addMaterial(
                   props.id,
                   Material.StickyNotes,
-                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  mouseState.mouseX,
+                  mouseState.mouseY,
                   "yellow"
                 );
                 handleClose();
@@ -247,8 +285,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
                 addMaterial(
                   props.id,
                   Material.StickyNotes,
-                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  mouseState.mouseX,
+                  mouseState.mouseY,
                   "red"
                 );
                 handleClose();
@@ -262,8 +300,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
                 addMaterial(
                   props.id,
                   Material.StickyNotes,
-                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  mouseState.mouseX,
+                  mouseState.mouseY,
                   "blue"
                 );
                 handleClose();
@@ -277,8 +315,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
                 addMaterial(
                   props.id,
                   Material.StickyNotes,
-                  mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                  mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                  mouseState.mouseX,
+                  mouseState.mouseY,
                   "green"
                 );
                 handleClose();
@@ -312,7 +350,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
                 props.id,
                 Material.Lines,
                 0,
-                mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                mouseState.mouseY,
                 "horizontal"
               );
               handleClose();
@@ -328,8 +366,8 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
               addMaterial(
                 props.id,
                 Material.Labels,
-                mouseState.mouseX - ref.current.getBoundingClientRect().x,
-                mouseState.mouseY - ref.current.getBoundingClientRect().y,
+                mouseState.mouseX,
+                mouseState.mouseY,
                 ""
               );
               handleClose();
@@ -344,7 +382,15 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
           {/* <MenuItem onClick={zoomOut}>縮小</MenuItem>
             <MenuItem onClick={zoomIn}>拡大</MenuItem> */}
           <MenuItem
-            onClick={() => {
+            onClick={(e) => {
+              handleClose();
+              AddImageBoxWithRightClick(e);
+            }}
+          >
+            画像を貼る
+          </MenuItem>
+          <MenuItem
+            onClick={(e) => {
               handleClose();
               onClickExport();
             }}
@@ -367,7 +413,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
 ///////
 //Style
 ///////
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   container: {
     height: "90vh",
     position: "relative",
@@ -417,6 +463,10 @@ const useStyles = makeStyles({
     height: 15,
     width: 15,
   },
-});
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
+}));
 
 export default Canvas;
