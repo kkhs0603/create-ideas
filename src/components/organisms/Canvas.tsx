@@ -81,6 +81,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
 
   const handleClick = (e) => {
     e.preventDefault();
+
     if (e.target.id !== "imageDropzone") return;
     setMouseState({
       mouseX: e.clientX,
@@ -214,10 +215,6 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
         onClick={(e) => {
           e.preventDefault();
           if (e.target.id !== "imageDropzone") return;
-          setMouseState({
-            mouseX: e.clientX,
-            mouseY: e.clientY,
-          });
           setIsAreaClicked(true);
         }}
       >
