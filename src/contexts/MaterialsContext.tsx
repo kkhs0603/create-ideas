@@ -531,7 +531,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       const imageWidth = 200 * (width / (width + height));
       const imageHeight = 200 * (height / (width + height));
 
-      uploadTask.on(
+      return uploadTask.on(
         "state_changed",
         // 進行中のsnapshotを得る
         // アップロードの進行度を表示

@@ -56,7 +56,6 @@ const ImageBox: React.FC<any> = (props) => {
   }>(initiaMouselState);
   const [cursor, setCursor] = useState<string>("grab");
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
-  const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const [imageBoxProps, setImageBoxProps] = useState<ImageBoxProps>({
     positionX: props.positionX,
