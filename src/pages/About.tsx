@@ -81,7 +81,7 @@ const About = () => {
               color="primary"
               className={classes.button}
               size="large"
-              onClick={() => router.push("/auth")}
+              onClick={() => router.push("/Auth")}
             >
               Create Ideasを使ってみる
             </Button>
