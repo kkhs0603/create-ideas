@@ -369,6 +369,15 @@ const MaterialsProvider: React.FC = ({ children }) => {
         .doc(materialId)
         .delete();
       await updateCanvas(canvasId);
+
+      //storageから削除
+      if (materialName === MaterialType.ImageBox) {
+        await firebase
+          .storage()
+          .ref("/images/imageBox")
+          .child(materialId)
+          .delete();
+      }
     } catch (error) {
       // console.log(error.message);
     }
@@ -531,7 +540,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       const imageWidth = 200 * (width / (width + height));
       const imageHeight = 200 * (height / (width + height));
 
-      return uploadTask.on(
+      uploadTask.on(
         "state_changed",
         // 進行中のsnapshotを得る
         // アップロードの進行度を表示
