@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
   col: {
     textAlign: "center",
+    marginTop: "100px",
   },
 }));
 
@@ -75,7 +76,7 @@ const SignInPage: React.FC = () => {
             </Button>
           </div>
         </Grid>
-        <Grid item md={6} sm={12} style={{ marginTop: 200 }}>
+        <Grid item md={8} sm={12} style={{ marginTop: 200 }}>
           <Typography variant="h3">Release Notes</Typography>
           <div style={{ marginTop: 50 }}>
             <Typography variant="h5">2021-02-23</Typography>
@@ -86,21 +87,20 @@ const SignInPage: React.FC = () => {
               右クリックメニューより追加またはドラッグ＆ドロップで画像を貼り付ける事ができます。
             </Typography>
             <img
-              src="/topPage/2021-2-23.gif"
-              alt="2021-2-23"
+              src="/topPage/2021-02-23.gif"
+              alt="2021-02-23"
               style={{
                 width: "100%",
                 height: "auto",
               }}
             />
           </div>
-
-          <div style={{ margin: 50 }}>
+          <div style={{ marginTop: 50 }}>
             <Typography variant="h5">2021-02-12 </Typography>
-            <Typography variant="h4">■Version1.0 公開</Typography>
+            <Typography variant="h5">■Version1.0 公開</Typography>
             <img
-              src="/topPage/2021-2-12.png"
-              alt="2021-2-12"
+              src="/topPage/2021-02-12.png"
+              alt="2021-02-12"
               style={{
                 width: "100%",
                 height: "auto",

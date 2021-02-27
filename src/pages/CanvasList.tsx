@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useContext, useState, useEffect } from "react";
 import { CanvasContext } from "../contexts/CanvasContext";
+import { AuthContext } from "../contexts/AuthContext";
 import Layout from "../components/templates/Layout/Layout";
 import CreateCanvas from "../components/organisms/CreateCanvas";
 import SelectCanvas from "../components/organisms/SelectCanvas";
@@ -21,6 +22,7 @@ const CanvasListPage = () => {
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
   const { canvases, getCanvases, getTemplates } = useContext(CanvasContext);
+  const { user } = useContext(AuthContext);
   const handleOpen = () => {
     setIsOpenedModal(true);
   };
@@ -50,7 +52,7 @@ const CanvasListPage = () => {
         </Grid>
         <div style={{ height: "70vh" }}>
           <div>Canvas一覧</div>
-          <SelectCanvas canvases={canvases} />
+          <SelectCanvas canvases={canvases} user={user} />
         </div>
       </Container>
     </Layout>
