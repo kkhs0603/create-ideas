@@ -95,7 +95,6 @@ const SignInPage: React.FC = () => {
               }}
             />
           </div>
-
           <div style={{ marginTop: 50 }}>
             <Typography variant="h5">2021-02-12 </Typography>
             <Typography variant="h5">■Version1.0 公開</Typography>
