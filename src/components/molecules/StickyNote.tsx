@@ -100,6 +100,7 @@ const StickyNote: React.FC<any> = (props) => {
   const [cursor, setCursor] = useState<string>("grab");
   const [isOpendMenu, setIsOpendMenu] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [tempWord, setTempWord] = useState<string>(props.word);
 
   const [stickyNoteProps, setStickyNoteProps] = useState<StickyNoteProps>({
     positionX: props.positionX,
@@ -112,7 +113,6 @@ const StickyNote: React.FC<any> = (props) => {
   });
 
   const handleClick = (e) => {
-    e.preventDefault();
     setIsOpendMenu(true);
     setMouseState({
       mouseX: e.clientX - 2,
@@ -238,9 +238,9 @@ const StickyNote: React.FC<any> = (props) => {
         backgroundColor: "transparent",
         resize: "none",
       }}
-      value={stickyNoteProps.word}
+      value={tempWord}
       onChange={(e) => {
-        setStickyNoteProps({ ...stickyNoteProps, word: e.target.value });
+        setTempWord(e.target.value);
       }}
       onKeyDown={(e) => finishWordEdit(e)}
       autoFocus
@@ -252,26 +252,30 @@ const StickyNote: React.FC<any> = (props) => {
       }
     />
   ) : (
-    <div id={props.id}>{stickyNoteProps.word}</div>
+    <div id={props.id}>{tempWord}</div>
   );
+
   useEffect(() => {
-    // console.log(props);
+    setTempWord(props.word);
+  }, [props.word]);
+
+  useEffect(() => {
     setStickyNoteProps(props);
   }, [props]);
 
   useEffect(() => {
     //編集状態を解除する
     if (props.isAreaClicked) {
-      setIsEdit(false);
-      if (props.word !== stickyNoteProps.word) {
-        setStickyNoteProps({ ...stickyNoteProps, word: stickyNoteProps.word });
+      if (props.word !== tempWord) {
         editMaterialWord(
           props.canvasId,
           MaterialType.StickyNotes,
           props.id,
-          stickyNoteProps.word
+          tempWord
         );
+        setStickyNoteProps({ ...stickyNoteProps, word: tempWord });
       }
+      setIsEdit(false);
     }
   }, [props.isAreaClicked]);
   return (

@@ -58,6 +58,7 @@ const Label: React.FC<LabelProps> = (props) => {
   const [isEdit, setIsEdit] = useState<boolean>(props.isEdit);
   const [mouseState, setMouseState] = useState<mouseState>(initiaMouselState);
   const [fontSize, setFontSize] = useState<number>(30);
+  const [tempWord, setTempWord] = useState<string>(props.word);
   const [labelProps, setLabelProps] = useState<LabelProps>({
     positionX: props.positionX,
     positionY: props.positionY,
@@ -134,10 +135,10 @@ const Label: React.FC<LabelProps> = (props) => {
           height: labelProps.height,
           resize: "none",
         }}
-        value={labelProps.word}
+        value={tempWord}
         onChange={(e) => {
           // console.log(e.target.value);
-          setLabelProps({ ...labelProps, word: e.target.value });
+          setTempWord(e.target.value);
         }}
         autoFocus
         onFocus={(e) =>
@@ -157,7 +158,7 @@ const Label: React.FC<LabelProps> = (props) => {
             setFontSize(e);
           }}
         >
-          {labelProps.word}
+          {tempWord}
         </Textfit>
       </div>
     );
@@ -165,17 +166,21 @@ const Label: React.FC<LabelProps> = (props) => {
     //編集状態を解除する
     if (props.isAreaClicked) {
       setIsEdit(false);
-      if (props.word !== labelProps.word) {
+      if (props.word !== tempWord) {
         setLabelProps({ ...labelProps, word: labelProps.word });
         editMaterialWord(
           props.canvasId,
           MaterialType.Labels,
           props.id,
-          labelProps.word
+          tempWord
         );
       }
     }
   }, [props.isAreaClicked]);
+
+  useEffect(() => {
+    setTempWord(props.word);
+  }, [props.word]);
 
   useEffect(() => {
     // console.log(props);
