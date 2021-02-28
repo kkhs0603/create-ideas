@@ -20,14 +20,28 @@ const useStyles = makeStyles((theme) => ({
 const CanvasListPage = () => {
   const classes = useStyles();
   const [isOpenedModal, setIsOpenedModal] = useState(false);
+  const [isOpenedDeleteCanvasModal, setIsOpenedDeleteCanvasModal] = useState(
+    false
+  );
 
-  const { canvases, getCanvases, getTemplates } = useContext(CanvasContext);
+  const { canvases, getCanvases, getTemplates, deleteCanvas } = useContext(
+    CanvasContext
+  );
   const { user } = useContext(AuthContext);
   const handleOpen = () => {
     setIsOpenedModal(true);
   };
   const handleClose = () => {
     setIsOpenedModal(false);
+    setIsOpenedDeleteCanvasModal(false);
+  };
+
+  const [selectedCanvasName, setSelectedCanvasName] = useState("");
+  const [selectedCanvasId, setSelectedCanvasId] = useState("");
+  const openDeleteModal = (canvasName, canvasId) => {
+    setSelectedCanvasName(canvasName);
+    setSelectedCanvasId(canvasId);
+    setIsOpenedDeleteCanvasModal(true);
   };
   useEffect(() => {
     getCanvases();
@@ -45,6 +59,33 @@ const CanvasListPage = () => {
             <CreateCanvas />
           </div>
         </Modal>
+        <Modal
+          className={classes.modal}
+          open={isOpenedDeleteCanvasModal}
+          onClose={handleClose}
+        >
+          <div
+            style={{ backgroundColor: "white", width: "30%", height: "40%" }}
+          >
+            Canvas名：{selectedCanvasName}
+            <div>こちらのCanvasを削除しますか？</div>
+            <div>
+              <Button variant="contained" onClick={handleClose}>
+                キャンセル
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  deleteCanvas(selectedCanvasId);
+                  handleClose();
+                }}
+              >
+                削除
+              </Button>
+            </div>
+          </div>
+        </Modal>
         <Grid container direction="row" justify="flex-end" alignItems="center">
           <IconButton onClick={handleOpen}>
             <AddCircleOutlineIcon fontSize="large" />
@@ -52,7 +93,11 @@ const CanvasListPage = () => {
         </Grid>
         <div style={{ height: "70vh" }}>
           <div>Canvas一覧</div>
-          <SelectCanvas canvases={canvases} user={user} />
+          <SelectCanvas
+            canvases={canvases}
+            user={user}
+            openDeleteModal={openDeleteModal}
+          />
         </div>
       </Container>
     </Layout>
