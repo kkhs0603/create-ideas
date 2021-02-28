@@ -48,7 +48,7 @@ const SelectCanvas = (props) => {
           <div
             style={{
               visibility:
-                props.user.uid === canvas.createdBy ? "visible" : "hidden",
+                props.user?.uid === canvas.createdBy ? "visible" : "hidden",
               textAlign: "right",
             }}
           >
@@ -87,7 +87,7 @@ const SelectCanvas = (props) => {
                 >
                   {canvas.name}
                 </h2>
-                {props.user.uid === canvas.createdBy ? (
+                {props.user?.uid === canvas.createdBy ? (
                   <div
                     style={{ width: "20%", alignItems: "flex-end", flex: "1" }}
                   >
