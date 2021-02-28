@@ -113,6 +113,7 @@ const StickyNote: React.FC<any> = (props) => {
   });
 
   const handleClick = (e) => {
+    e.preventDefault();
     setIsOpendMenu(true);
     setMouseState({
       mouseX: e.clientX - 2,
