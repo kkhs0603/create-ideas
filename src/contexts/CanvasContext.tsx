@@ -228,6 +228,14 @@ const CanvasProvider: React.FC = ({ children }) => {
     }
   };
 
+  const deleteCanvas = async (canvasId) => {
+    try {
+      await db.collection("canvases").doc(canvasId).delete();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   /* --------------------------
   Template
   -------------------------- */
@@ -253,8 +261,6 @@ const CanvasProvider: React.FC = ({ children }) => {
     );
   };
 
-  useEffect(() => {}, []);
-
   return (
     <CanvasContext.Provider
       value={{
@@ -267,6 +273,7 @@ const CanvasProvider: React.FC = ({ children }) => {
 
         getCanvases,
         getTemplates,
+        deleteCanvas,
       }}
     >
       {children}

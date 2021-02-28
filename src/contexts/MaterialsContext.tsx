@@ -406,6 +406,9 @@ const MaterialsProvider: React.FC = ({ children }) => {
             new Date().toLocaleString("ja") +
             ":" +
             new Date().getMilliseconds(),
+        })
+        .catch((error) => {
+          router.push("/CanvasList");
         });
       await updateCanvas(canvasId);
     } catch (error) {
@@ -636,6 +639,15 @@ const MaterialsProvider: React.FC = ({ children }) => {
             new Date().toLocaleString("ja") +
             ":" +
             new Date().getMilliseconds(),
+        })
+        .catch((error) => {
+          if (
+            !alert(
+              "こちらのCanvasが削除された可能性があります。Canvas一覧へ戻ります。"
+            )
+          ) {
+            router.push("/CanvasList");
+          }
         });
     } catch (error) {
       // console.log(error.message);
@@ -793,7 +805,7 @@ const MaterialsProvider: React.FC = ({ children }) => {
       });
       const dataUrl = await canvas.toDataURL("image/png");
       const result = await loadImage(dataUrl, {
-        maxWidth: 300,
+        maxWidth: 500,
         canvas: true,
       });
       result.image.toBlob(async (blob: Blob) => {
@@ -804,8 +816,14 @@ const MaterialsProvider: React.FC = ({ children }) => {
         //Canvasにサムネイル画像のURLがなければ入れる
         const url = await storageResult.ref.getDownloadURL();
         const canvasRef = await db.collection(collectionId).doc(canvasId);
-        await canvasRef.get();
-        canvasRef.update({ thumbnailUrl: url });
+
+        await canvasRef.get().catch((error) => {
+          console.log(error.message);
+          router.push("/CanvasList");
+        });
+        canvasRef.update({ thumbnailUrl: url }).catch((error) => {
+          router.push("/CanvasList");
+        });
       });
     } catch (error) {
       console.log(error.message);

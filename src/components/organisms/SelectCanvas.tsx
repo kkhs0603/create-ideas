@@ -52,34 +52,57 @@ const SelectCanvas = (props) => {
               textAlign: "right",
             }}
           >
-            {editCanvasId === canvas.id ? (
-              <IconButton
-                onClick={() => {
-                  handleEdit("");
-                }}
-              >
-                <CheckIcon fontSize="small" />
-              </IconButton>
-            ) : (
-              <IconButton
-                onClick={() => {
-                  handleEdit(canvas.id);
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-            <IconButton onClick={() => {}}>
+            <IconButton
+              onClick={() => {
+                props.openDeleteModal(canvas.name, canvas.id);
+              }}
+            >
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>
           <div>
             {editCanvasId === canvas.id ? (
-              <TextField value={canvas.name}></TextField>
+              <div style={{ display: "flex" }}>
+                <div
+                  style={{ width: "70%", alignItems: "flex-start", flex: "6" }}
+                >
+                  <TextField value={canvas.name} size="medium"></TextField>
+                </div>
+                <div
+                  style={{ width: "20%", alignItems: "flex-end", flex: "1" }}
+                >
+                  <IconButton
+                    onClick={() => {
+                      handleEdit("");
+                    }}
+                  >
+                    <CheckIcon fontSize="small" />
+                  </IconButton>
+                </div>
+              </div>
             ) : (
-              <Typography gutterBottom variant="h5" component="h2">
-                {canvas.name}
-              </Typography>
+              <div style={{ display: "flex" }}>
+                <h2
+                  style={{ width: "70%", alignItems: "flex-start", flex: "6" }}
+                >
+                  {canvas.name}
+                </h2>
+                {props.user.uid === canvas.createdBy ? (
+                  <div
+                    style={{ width: "20%", alignItems: "flex-end", flex: "1" }}
+                  >
+                    <IconButton
+                      onClick={() => {
+                        handleEdit(canvas.id);
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
             )}
           </div>
 
@@ -103,9 +126,11 @@ const useStyles = makeStyles({
   },
   card: {
     margin: 20,
+    width: "320px",
+    backgroundColor: "#f8f8f8",
   },
   media: {
-    height: 140,
-    width: 240,
+    width: "420px",
+    height: "190px",
   },
 });
