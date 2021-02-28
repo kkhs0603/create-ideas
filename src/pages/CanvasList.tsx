@@ -65,15 +65,28 @@ const CanvasListPage = () => {
           onClose={handleClose}
         >
           <div
-            style={{ backgroundColor: "white", width: "30%", height: "40%" }}
+            style={{
+              backgroundColor: "white",
+              width: "30%",
+              height: "20%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+              textAlign: "center",
+            }}
           >
             Canvas名：{selectedCanvasName}
             <div>こちらのCanvasを削除しますか？</div>
             <div>
-              <Button variant="contained" onClick={handleClose}>
+              <Button
+                variant="contained"
+                onClick={handleClose}
+                style={{ width: "40%" }}
+              >
                 キャンセル
               </Button>
               <Button
+                style={{ width: "40%" }}
                 variant="contained"
                 color="secondary"
                 onClick={() => {
