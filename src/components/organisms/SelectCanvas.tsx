@@ -92,6 +92,7 @@ const SelectCanvas = (props) => {
                     style={{ width: "20%", alignItems: "flex-end", flex: "1" }}
                   >
                     <IconButton
+                      disabled={true}
                       onClick={() => {
                         handleEdit(canvas.id);
                       }}
