@@ -329,7 +329,7 @@ const Canvas: React.FC<StickyNoteAreaProps> = (props: StickyNoteAreaProps) => {
               addMaterial(
                 props.id,
                 Material.Lines,
-                mouseState.mouseX - ref.current.getBoundingClientRect().x,
+                mouseState.mouseX,
                 0,
                 "vertical"
               );
